@@ -1,0 +1,1 @@
+/usr/bin/c++ -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/telemetry_vulkan.dir/src/main.cpp.o -o telemetry_vulkan  -Wl,-rpath,/usr/local/lib /usr/local/lib/libvulkan.dylib external/glfw/src/libglfw3.a -framework Cocoa -framework IOKit -framework CoreFoundation -framework QuartzCore

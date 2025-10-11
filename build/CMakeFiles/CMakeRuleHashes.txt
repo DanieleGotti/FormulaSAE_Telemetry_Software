@@ -1,0 +1,2 @@
+# Hashes of file build rules.
+542c48048df8f1f7a4aee3a1c1a013f3 external/glfw/docs/html/index.html
