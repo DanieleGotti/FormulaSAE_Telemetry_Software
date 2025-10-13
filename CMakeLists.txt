@@ -60,5 +60,8 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     # Vulkan::Vulkan
     glfw
     imgui
-    "-framework OpenGL"
 )
+
+if(APPLE)
+    target_link_libraries(${PROJECT_NAME} PRIVATE "-framework OpenGL")
+endif()

@@ -16,7 +16,12 @@
     #include <regex>
 #endif
 
-SerialDataSource::SerialDataSource() : fd(-1)
+SerialDataSource::SerialDataSource()
+#if defined (_WIN32) || defined( _WIN64) 
+    : handle(nullptr)
+#else
+    : fd(-1)
+#endif
 {
 }
 
@@ -35,7 +40,7 @@ std::vector<std::string> SerialDataSource::getAvailableResources()
 	for (uint32_t k = 0; k < MAX_PORTS; k++)
 	{
 		std::string port_name = COM_STR + std::to_string(k);
-		DWORD test = QueryDosDevice(port_name.c_str(), path, CHAR_NUM);
+		DWORD test = QueryDosDeviceA(port_name.c_str(), path, CHAR_NUM);
 		if (test == 0) continue;
 		m_availablePorts.push_back(port_name);
 	}

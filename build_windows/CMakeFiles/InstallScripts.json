@@ -1,0 +1,10 @@
+{
+	"InstallScripts" : 
+	[
+		"C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/build_windows/cmake_install.cmake",
+		"C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/build_windows/external/glfw/cmake_install.cmake",
+		"C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/build_windows/external/glfw/src/cmake_install.cmake",
+		"C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/build_windows/external/glfw/docs/cmake_install.cmake"
+	],
+	"Parallel" : false
+}
