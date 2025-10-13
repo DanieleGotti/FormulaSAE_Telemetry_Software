@@ -4,8 +4,8 @@ project(telemetry_vulkan LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Trova Vulkan (dall'SDK installato sul sistema)
-find_package(Vulkan REQUIRED)
+# # Trova Vulkan (dall'SDK installato sul sistema)
+# find_package(Vulkan REQUIRED)
 
 # Aggiungi GLFW come subdir (verrà compilato insieme al progetto)
 add_subdirectory(external/glfw)
@@ -50,13 +50,14 @@ file(GLOB SRC_FILES
     src/UI/*.cpp
     src/Telemetry/*.cpp
     src/Telemetry/data_acquisition/*.cpp
+    src/Telemetry/Services/*.cpp
 )
 
 add_executable(${PROJECT_NAME} ${SRC_FILES})
 
 # Link
 target_link_libraries(${PROJECT_NAME} PRIVATE
-    Vulkan::Vulkan
+    # Vulkan::Vulkan
     glfw
     imgui
     "-framework OpenGL"

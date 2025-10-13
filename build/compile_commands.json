@@ -55,6 +55,12 @@
 },
 {
   "directory": "/Users/xtc/dev/telemetry-manager/build",
+  "command": "/usr/bin/c++ -I/Users/xtc/dev/telemetry-manager/external/glm -I/Users/xtc/dev/telemetry-manager/external/glfw/include -I/Users/xtc/dev/telemetry-manager/include -I/Users/xtc/dev/telemetry-manager/external/imgui -I/Users/xtc/dev/telemetry-manager/external/imgui/backends -I/Users/xtc/dev/telemetry-manager/external/implot -g -std=gnu++20 -o CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/ServiceManager.cpp.o -c /Users/xtc/dev/telemetry-manager/src/Telemetry/Services/ServiceManager.cpp",
+  "file": "/Users/xtc/dev/telemetry-manager/src/Telemetry/Services/ServiceManager.cpp",
+  "output": "CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/ServiceManager.cpp.o"
+},
+{
+  "directory": "/Users/xtc/dev/telemetry-manager/build",
   "command": "/usr/bin/c++ -I/Users/xtc/dev/telemetry-manager/external/glm -I/Users/xtc/dev/telemetry-manager/external/glfw/include -I/Users/xtc/dev/telemetry-manager/include -I/Users/xtc/dev/telemetry-manager/external/imgui -I/Users/xtc/dev/telemetry-manager/external/imgui/backends -I/Users/xtc/dev/telemetry-manager/external/implot -g -std=gnu++20 -o CMakeFiles/telemetry_vulkan.dir/src/Telemetry/data_acquisition/SerialDataSource.cpp.o -c /Users/xtc/dev/telemetry-manager/src/Telemetry/data_acquisition/SerialDataSource.cpp",
   "file": "/Users/xtc/dev/telemetry-manager/src/Telemetry/data_acquisition/SerialDataSource.cpp",
   "output": "CMakeFiles/telemetry_vulkan.dir/src/Telemetry/data_acquisition/SerialDataSource.cpp.o"
