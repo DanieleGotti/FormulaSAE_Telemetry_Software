@@ -3,6 +3,9 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <memory>
+#include "SerialService.hpp"
+#include "NetworkService.hpp"
 
 typedef enum {
     ACQUISITION_METHOD_SERIAL = 0,
@@ -11,19 +14,19 @@ typedef enum {
 
 class ServiceManager {
 public:
-    // Istanzia tutti i servizi necessari senza startare i thread
     static void initialize();
-    // Restituisce tutti i dispositivi di connessione disponibili (es. porte seriali, dispositivi di rete, ecc.)
     static std::vector<std::string> getAllConnectionOptions();
-    // Imposta il path del database (da chiamare prima di startare i servizi)
     static void setDBPath(const std::string& path);
-    // Imposta il metodo di acquisizione (da chiamare prima di startare i servizi)
-    static void setAcquisitionMethod(int method);
-    // Avvia i thread dei servizi
+    static void setAcquisitionMethod(AcquisitionMethod method);
+    static bool configureSerial(const std::string& port, int baudrate);
+    static bool configureNetwork(const std::string& ip, int port);
     static void startServices();
-    // Ferma i thread dei servizi
     static void stopTasks();
+    static void cleanup();
 
 private:
     static std::string dbPath;
+    static AcquisitionMethod m_method;
+    static std::unique_ptr<SerialService> m_serialService;
+    static std::unique_ptr<NetworkService> m_networkService;
 };
