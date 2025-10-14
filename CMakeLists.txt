@@ -51,6 +51,7 @@ file(GLOB SRC_FILES
     src/Telemetry/*.cpp
     src/Telemetry/data_acquisition/*.cpp
     src/Telemetry/Services/*.cpp
+    src/Telemetry/data_writing/*.cpp
 )
 
 add_executable(${PROJECT_NAME} ${SRC_FILES})

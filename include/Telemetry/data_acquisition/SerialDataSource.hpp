@@ -2,7 +2,6 @@
 #include "IDataSource.hpp"
 #include <string>
 #include <vector>
-
 #include "BaudRateQueryable.hpp"
 
 class SerialDataSource: public IDataSource, public BaudRateQueryable {
