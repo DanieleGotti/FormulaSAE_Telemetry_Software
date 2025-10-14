@@ -1,16 +1,29 @@
 #pragma once
 #include <string>
-#include <vector>
-#include <cstdint>
+#include <variant>
 #include <chrono>
+
+using PacketData = std::variant<int, double, std::string>;
+
+// Ordino i tipi di pacchetto in categorie
+enum class PacketType {
+    SENSOR_DATA,
+    STATUS_LED,
+    INVERTER,
+    UNKNOWN
+};
 
 class PacketParser {
 public:
-    PacketParser() = default;
-    // Timestamp assegnato al momento di validazione
+    // Converte riga dato grezza in oggetto PacketParser
+    static PacketParser parse(const std::string& line);
+
     std::chrono::system_clock::time_point timestamp;
-    // Tipo di messaggio (es. "ACC1", "BRK1", ecc.)
-    std::string type;  
-    // Dato nel pacchetto
-    std::vector<uint8_t> data;
+    PacketType packetType = PacketType::UNKNOWN;
+    std::string label;
+    PacketData data;
+
+private:
+    PacketParser() = default;
 };
+
