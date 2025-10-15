@@ -7,7 +7,6 @@
 #include <algorithm>
 
 UiManager::UiManager() {
-        // Init GLFW
     if (!glfwInit())
         return;
 
@@ -48,49 +47,34 @@ UiManager::UiManager() {
     glfwWindowHint(GLFW_REFRESH_RATE, 60);
 }
 
-void UiManager::startMainLoop() {
-    // Main loop
-    while (!glfwWindowShouldClose((GLFWwindow*)m_window)) {
-        glfwPollEvents();
-
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
-        ImGuiViewport* viewport = ImGui::GetMainViewport();
-        ImGui::SetNextWindowPos(viewport->WorkPos);
-        ImGui::SetNextWindowSize(viewport->WorkSize);
-        ImGui::SetNextWindowViewport(viewport->ID);
-
-        window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse |
-                        ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
-        window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
-
-        showDockingSpace();
-        draw();
-
-        // draw default ImGui demo window (for reference)
-        ImGui::ShowDemoWindow(); // Show demo window! :)
-
-        // === RENDER ===
-        ImGui::Render();
-        int display_w, display_h;
-        glfwGetFramebufferSize((GLFWwindow*)m_window, &display_w, &display_h);
-        // glViewport(0, 0, display_w, display_h);
-        // glClear(GL_COLOR_BUFFER_BIT);
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-        // === FIX per Viewports ===
-        ImGuiIO& io = ImGui::GetIO();
-        if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
-            GLFWwindow* backup_current_context = glfwGetCurrentContext();
-            ImGui::UpdatePlatformWindows();
-            ImGui::RenderPlatformWindowsDefault();
-            glfwMakeContextCurrent(backup_current_context);
-        }
-
-
-        glfwSwapBuffers((GLFWwindow*)m_window);
-    }
+void* UiManager::getWindowHandle() {
+    return m_window;
 }
+
+void UiManager::beginFrame() {
+    glfwPollEvents();
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
+    showDockingSpace(); // Prepara il docking space per le finestre
+}
+
+void UiManager::endFrame() {
+    // === RENDER ===
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    
+    ImGuiIO& io = ImGui::GetIO();
+    if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+        GLFWwindow* backup_current_context = glfwGetCurrentContext();
+        ImGui::UpdatePlatformWindows();
+        ImGui::RenderPlatformWindowsDefault();
+        glfwMakeContextCurrent(backup_current_context);
+    }
+
+    glfwSwapBuffers((GLFWwindow*)m_window);
+}
+
 
 void UiManager::draw() {
     for (auto& element : m_uiElements) {

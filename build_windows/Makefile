@@ -441,6 +441,78 @@ external/implot/implot_items.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\imgui.dir\build.make CMakeFiles/imgui.dir/external/implot/implot_items.cpp.s
 .PHONY : external/implot/implot_items.cpp.s
 
+src/Telemetry/Services/NetworkService.obj: src/Telemetry/Services/NetworkService.cpp.obj
+.PHONY : src/Telemetry/Services/NetworkService.obj
+
+# target to build an object file
+src/Telemetry/Services/NetworkService.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\telemetry_vulkan.dir\build.make CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/NetworkService.cpp.obj
+.PHONY : src/Telemetry/Services/NetworkService.cpp.obj
+
+src/Telemetry/Services/NetworkService.i: src/Telemetry/Services/NetworkService.cpp.i
+.PHONY : src/Telemetry/Services/NetworkService.i
+
+# target to preprocess a source file
+src/Telemetry/Services/NetworkService.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\telemetry_vulkan.dir\build.make CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/NetworkService.cpp.i
+.PHONY : src/Telemetry/Services/NetworkService.cpp.i
+
+src/Telemetry/Services/NetworkService.s: src/Telemetry/Services/NetworkService.cpp.s
+.PHONY : src/Telemetry/Services/NetworkService.s
+
+# target to generate assembly for a file
+src/Telemetry/Services/NetworkService.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\telemetry_vulkan.dir\build.make CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/NetworkService.cpp.s
+.PHONY : src/Telemetry/Services/NetworkService.cpp.s
+
+src/Telemetry/Services/PacketParser.obj: src/Telemetry/Services/PacketParser.cpp.obj
+.PHONY : src/Telemetry/Services/PacketParser.obj
+
+# target to build an object file
+src/Telemetry/Services/PacketParser.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\telemetry_vulkan.dir\build.make CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/PacketParser.cpp.obj
+.PHONY : src/Telemetry/Services/PacketParser.cpp.obj
+
+src/Telemetry/Services/PacketParser.i: src/Telemetry/Services/PacketParser.cpp.i
+.PHONY : src/Telemetry/Services/PacketParser.i
+
+# target to preprocess a source file
+src/Telemetry/Services/PacketParser.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\telemetry_vulkan.dir\build.make CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/PacketParser.cpp.i
+.PHONY : src/Telemetry/Services/PacketParser.cpp.i
+
+src/Telemetry/Services/PacketParser.s: src/Telemetry/Services/PacketParser.cpp.s
+.PHONY : src/Telemetry/Services/PacketParser.s
+
+# target to generate assembly for a file
+src/Telemetry/Services/PacketParser.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\telemetry_vulkan.dir\build.make CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/PacketParser.cpp.s
+.PHONY : src/Telemetry/Services/PacketParser.cpp.s
+
+src/Telemetry/Services/SerialService.obj: src/Telemetry/Services/SerialService.cpp.obj
+.PHONY : src/Telemetry/Services/SerialService.obj
+
+# target to build an object file
+src/Telemetry/Services/SerialService.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\telemetry_vulkan.dir\build.make CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/SerialService.cpp.obj
+.PHONY : src/Telemetry/Services/SerialService.cpp.obj
+
+src/Telemetry/Services/SerialService.i: src/Telemetry/Services/SerialService.cpp.i
+.PHONY : src/Telemetry/Services/SerialService.i
+
+# target to preprocess a source file
+src/Telemetry/Services/SerialService.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\telemetry_vulkan.dir\build.make CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/SerialService.cpp.i
+.PHONY : src/Telemetry/Services/SerialService.cpp.i
+
+src/Telemetry/Services/SerialService.s: src/Telemetry/Services/SerialService.cpp.s
+.PHONY : src/Telemetry/Services/SerialService.s
+
+# target to generate assembly for a file
+src/Telemetry/Services/SerialService.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\telemetry_vulkan.dir\build.make CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/SerialService.cpp.s
+.PHONY : src/Telemetry/Services/SerialService.cpp.s
+
 src/Telemetry/Services/ServiceManager.obj: src/Telemetry/Services/ServiceManager.cpp.obj
 .PHONY : src/Telemetry/Services/ServiceManager.obj
 
@@ -488,6 +560,78 @@ src/Telemetry/data_acquisition/SerialDataSource.s: src/Telemetry/data_acquisitio
 src/Telemetry/data_acquisition/SerialDataSource.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\telemetry_vulkan.dir\build.make CMakeFiles/telemetry_vulkan.dir/src/Telemetry/data_acquisition/SerialDataSource.cpp.s
 .PHONY : src/Telemetry/data_acquisition/SerialDataSource.cpp.s
+
+src/Telemetry/data_writing/DataManager.obj: src/Telemetry/data_writing/DataManager.cpp.obj
+.PHONY : src/Telemetry/data_writing/DataManager.obj
+
+# target to build an object file
+src/Telemetry/data_writing/DataManager.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\telemetry_vulkan.dir\build.make CMakeFiles/telemetry_vulkan.dir/src/Telemetry/data_writing/DataManager.cpp.obj
+.PHONY : src/Telemetry/data_writing/DataManager.cpp.obj
+
+src/Telemetry/data_writing/DataManager.i: src/Telemetry/data_writing/DataManager.cpp.i
+.PHONY : src/Telemetry/data_writing/DataManager.i
+
+# target to preprocess a source file
+src/Telemetry/data_writing/DataManager.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\telemetry_vulkan.dir\build.make CMakeFiles/telemetry_vulkan.dir/src/Telemetry/data_writing/DataManager.cpp.i
+.PHONY : src/Telemetry/data_writing/DataManager.cpp.i
+
+src/Telemetry/data_writing/DataManager.s: src/Telemetry/data_writing/DataManager.cpp.s
+.PHONY : src/Telemetry/data_writing/DataManager.s
+
+# target to generate assembly for a file
+src/Telemetry/data_writing/DataManager.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\telemetry_vulkan.dir\build.make CMakeFiles/telemetry_vulkan.dir/src/Telemetry/data_writing/DataManager.cpp.s
+.PHONY : src/Telemetry/data_writing/DataManager.cpp.s
+
+src/Telemetry/data_writing/TxtWriter.obj: src/Telemetry/data_writing/TxtWriter.cpp.obj
+.PHONY : src/Telemetry/data_writing/TxtWriter.obj
+
+# target to build an object file
+src/Telemetry/data_writing/TxtWriter.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\telemetry_vulkan.dir\build.make CMakeFiles/telemetry_vulkan.dir/src/Telemetry/data_writing/TxtWriter.cpp.obj
+.PHONY : src/Telemetry/data_writing/TxtWriter.cpp.obj
+
+src/Telemetry/data_writing/TxtWriter.i: src/Telemetry/data_writing/TxtWriter.cpp.i
+.PHONY : src/Telemetry/data_writing/TxtWriter.i
+
+# target to preprocess a source file
+src/Telemetry/data_writing/TxtWriter.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\telemetry_vulkan.dir\build.make CMakeFiles/telemetry_vulkan.dir/src/Telemetry/data_writing/TxtWriter.cpp.i
+.PHONY : src/Telemetry/data_writing/TxtWriter.cpp.i
+
+src/Telemetry/data_writing/TxtWriter.s: src/Telemetry/data_writing/TxtWriter.cpp.s
+.PHONY : src/Telemetry/data_writing/TxtWriter.s
+
+# target to generate assembly for a file
+src/Telemetry/data_writing/TxtWriter.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\telemetry_vulkan.dir\build.make CMakeFiles/telemetry_vulkan.dir/src/Telemetry/data_writing/TxtWriter.cpp.s
+.PHONY : src/Telemetry/data_writing/TxtWriter.cpp.s
+
+src/UI/Dashboard.obj: src/UI/Dashboard.cpp.obj
+.PHONY : src/UI/Dashboard.obj
+
+# target to build an object file
+src/UI/Dashboard.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\telemetry_vulkan.dir\build.make CMakeFiles/telemetry_vulkan.dir/src/UI/Dashboard.cpp.obj
+.PHONY : src/UI/Dashboard.cpp.obj
+
+src/UI/Dashboard.i: src/UI/Dashboard.cpp.i
+.PHONY : src/UI/Dashboard.i
+
+# target to preprocess a source file
+src/UI/Dashboard.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\telemetry_vulkan.dir\build.make CMakeFiles/telemetry_vulkan.dir/src/UI/Dashboard.cpp.i
+.PHONY : src/UI/Dashboard.cpp.i
+
+src/UI/Dashboard.s: src/UI/Dashboard.cpp.s
+.PHONY : src/UI/Dashboard.s
+
+# target to generate assembly for a file
+src/UI/Dashboard.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\telemetry_vulkan.dir\build.make CMakeFiles/telemetry_vulkan.dir/src/UI/Dashboard.cpp.s
+.PHONY : src/UI/Dashboard.cpp.s
 
 src/UI/SerialDeviceSelection.obj: src/UI/SerialDeviceSelection.cpp.obj
 .PHONY : src/UI/SerialDeviceSelection.obj
@@ -605,12 +749,30 @@ help:
 	@echo ... external/implot/implot_items.obj
 	@echo ... external/implot/implot_items.i
 	@echo ... external/implot/implot_items.s
+	@echo ... src/Telemetry/Services/NetworkService.obj
+	@echo ... src/Telemetry/Services/NetworkService.i
+	@echo ... src/Telemetry/Services/NetworkService.s
+	@echo ... src/Telemetry/Services/PacketParser.obj
+	@echo ... src/Telemetry/Services/PacketParser.i
+	@echo ... src/Telemetry/Services/PacketParser.s
+	@echo ... src/Telemetry/Services/SerialService.obj
+	@echo ... src/Telemetry/Services/SerialService.i
+	@echo ... src/Telemetry/Services/SerialService.s
 	@echo ... src/Telemetry/Services/ServiceManager.obj
 	@echo ... src/Telemetry/Services/ServiceManager.i
 	@echo ... src/Telemetry/Services/ServiceManager.s
 	@echo ... src/Telemetry/data_acquisition/SerialDataSource.obj
 	@echo ... src/Telemetry/data_acquisition/SerialDataSource.i
 	@echo ... src/Telemetry/data_acquisition/SerialDataSource.s
+	@echo ... src/Telemetry/data_writing/DataManager.obj
+	@echo ... src/Telemetry/data_writing/DataManager.i
+	@echo ... src/Telemetry/data_writing/DataManager.s
+	@echo ... src/Telemetry/data_writing/TxtWriter.obj
+	@echo ... src/Telemetry/data_writing/TxtWriter.i
+	@echo ... src/Telemetry/data_writing/TxtWriter.s
+	@echo ... src/UI/Dashboard.obj
+	@echo ... src/UI/Dashboard.i
+	@echo ... src/UI/Dashboard.s
 	@echo ... src/UI/SerialDeviceSelection.obj
 	@echo ... src/UI/SerialDeviceSelection.i
 	@echo ... src/UI/SerialDeviceSelection.s

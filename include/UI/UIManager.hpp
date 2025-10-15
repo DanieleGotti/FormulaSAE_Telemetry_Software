@@ -1,17 +1,20 @@
 #pragma once
 #include <memory>
 #include <vector>
-
 #include "UIElement.hpp"
 
 class UiManager {
 public:
     UiManager();
     ~UiManager();
-    void startMainLoop();
+
+    void* getWindowHandle();
+    void beginFrame();
+    void endFrame();
     void draw();
     void addElement(std::unique_ptr<UIElement> uiElement);
     void removeElement(UIElement* uiElement);
+
 private:
     void showDockingSpace();
     void* m_window;

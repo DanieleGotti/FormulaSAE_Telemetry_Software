@@ -16,7 +16,7 @@ enum class PacketType {
 class PacketParser {
 public:
     // Converte riga dato grezza in oggetto PacketParser
-    static PacketParser parse(const std::string& line);
+    static PacketParser parse(const std::string& line, const std::chrono::system_clock::time_point& reception_time);
 
     std::chrono::system_clock::time_point timestamp;
     PacketType packetType = PacketType::UNKNOWN;

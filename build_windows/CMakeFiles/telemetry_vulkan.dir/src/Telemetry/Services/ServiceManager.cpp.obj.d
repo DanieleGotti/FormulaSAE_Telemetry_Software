@@ -178,4 +178,34 @@ CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/ServiceManager.cpp.obj: \
  C:/msys64/mingw64/include/c++/11.2.0/bits/stl_uninitialized.h \
  C:/msys64/mingw64/include/c++/11.2.0/bits/stl_vector.h \
  C:/msys64/mingw64/include/c++/11.2.0/bits/stl_bvector.h \
- C:/msys64/mingw64/include/c++/11.2.0/bits/vector.tcc
+ C:/msys64/mingw64/include/c++/11.2.0/bits/vector.tcc \
+ C:/msys64/mingw64/include/c++/11.2.0/memory \
+ C:/msys64/mingw64/include/c++/11.2.0/bits/stl_raw_storage_iter.h \
+ C:/msys64/mingw64/include/c++/11.2.0/bits/align.h \
+ C:/msys64/mingw64/include/c++/11.2.0/bit \
+ C:/msys64/mingw64/include/c++/11.2.0/bits/shared_ptr.h \
+ C:/msys64/mingw64/include/c++/11.2.0/bits/shared_ptr_base.h \
+ C:/msys64/mingw64/include/c++/11.2.0/bits/allocated_ptr.h \
+ C:/msys64/mingw64/include/c++/11.2.0/ext/aligned_buffer.h \
+ C:/msys64/mingw64/include/c++/11.2.0/ext/concurrence.h \
+ C:/msys64/mingw64/include/c++/11.2.0/bits/shared_ptr_atomic.h \
+ C:/msys64/mingw64/include/c++/11.2.0/backward/auto_ptr.h \
+ C:/msys64/mingw64/include/c++/11.2.0/bits/ranges_uninitialized.h \
+ C:/msys64/mingw64/include/c++/11.2.0/bits/ranges_algobase.h \
+ C:/msys64/mingw64/include/c++/11.2.0/iterator \
+ C:/msys64/mingw64/include/c++/11.2.0/bits/stream_iterator.h \
+ C:/msys64/mingw64/include/c++/11.2.0/bits/uses_allocator_args.h \
+ C:/msys64/mingw64/include/c++/11.2.0/pstl/glue_memory_defs.h \
+ C:/msys64/mingw64/include/c++/11.2.0/pstl/execution_defs.h \
+ C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/Telemetry/Services/SerialService.hpp \
+ C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/Telemetry/data_acquisition/IDataSource.hpp \
+ C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/Telemetry/data_writing/DataManager.hpp \
+ C:/msys64/mingw64/include/c++/11.2.0/mutex \
+ C:/msys64/mingw64/include/c++/11.2.0/bits/unique_lock.h \
+ C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/Telemetry/data_writing/IWritingSubscriber.hpp \
+ C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/Telemetry/data_acquisition/PacketParser.hpp \
+ C:/msys64/mingw64/include/c++/11.2.0/variant \
+ C:/msys64/mingw64/include/c++/11.2.0/bits/enable_special_members.h \
+ C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/Telemetry/Services/NetworkService.hpp \
+ C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/Telemetry/data_acquisition/SerialDataSource.hpp \
+ C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/Telemetry/data_acquisition/BaudRateQueryable.hpp

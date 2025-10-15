@@ -13,7 +13,6 @@ public:
     bool open(const std::string &resource, int baudRate) override;
     std::vector<uint8_t> readPacket() override;
     void close() override;
-
     std::vector<int> supportedBaudRates() const override;
 
 private:

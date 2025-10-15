@@ -9,6 +9,7 @@ struct NetworkConfig{
 class NetworkService {
 public:
     NetworkService() = default;
+    
     bool configure(const NetworkConfig& config);
     bool start();
     void stop();

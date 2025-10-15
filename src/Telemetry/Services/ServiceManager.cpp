@@ -1,14 +1,16 @@
 #include "Telemetry/Services/ServiceManager.hpp"
 #include "Telemetry/data_acquisition/SerialDataSource.hpp" 
+#include "Telemetry/data_writing/DataManager.hpp"
 
 std::string ServiceManager::dbPath;
 AcquisitionMethod ServiceManager::m_method;
 std::unique_ptr<SerialService> ServiceManager::m_serialService;
 std::unique_ptr<NetworkService> ServiceManager::m_networkService;
-
+std::unique_ptr<DataManager> ServiceManager::m_dataManager;
 
 void ServiceManager::initialize() {
-    m_serialService = std::make_unique<SerialService>();
+    m_dataManager = std::make_unique<DataManager>();
+    m_serialService = std::make_unique<SerialService>(m_dataManager.get());
     m_networkService = std::make_unique<NetworkService>();
     std::cout << "ServiceManager initialized." << std::endl;
 }
@@ -17,6 +19,10 @@ std::vector<std::string> ServiceManager::getAllConnectionOptions() {
     // Per ora restituisce solo le opzioni seriali
     SerialDataSource sds;
     return sds.getAvailableResources();
+}
+
+DataManager* ServiceManager::getDataManager() {
+    return m_dataManager.get();
 }
 
 void ServiceManager::setDBPath(const std::string& path) {

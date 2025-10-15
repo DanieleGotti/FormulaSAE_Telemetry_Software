@@ -27,6 +27,7 @@ events:
     names:
       - "mingw32-make.exe"
     candidate_directories:
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/"
       - "C:/VulkanSDK/1.4.328.1/Bin/"
       - "C:/Program Files/Python312/Scripts/"
       - "C:/Program Files/Python312/"
@@ -70,11 +71,14 @@ events:
       - "C:/Users/Asus/AppData/Local/Coursier/data/bin/"
       - "C:/Program Files/JetBrains/IntelliJ IDEA 2024.3.2.2/bin/"
       - "C:/Program Files/JetBrains/CLion 2024.3.2/bin/"
+      - "C:/Users/Asus/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/"
       - "/REGISTRY-NOTFOUND/bin/"
       - "c:/MinGW/bin/"
       - "/MinGW/bin/"
       - "/REGISTRY-NOTFOUND/MinGW/bin/"
     searched_directories:
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/mingw32-make.exe.com"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/mingw32-make.exe"
       - "C:/VulkanSDK/1.4.328.1/Bin/mingw32-make.exe.com"
       - "C:/VulkanSDK/1.4.328.1/Bin/mingw32-make.exe"
       - "C:/Program Files/Python312/Scripts/mingw32-make.exe.com"
@@ -101,6 +105,7 @@ events:
     found: "C:/msys64/mingw64/bin/mingw32-make.exe"
     search_context:
       ENV{PATH}:
+        - "C:\\Flutter\\flutter\\bin\\cache\\dart-sdk\\bin\\"
         - "C:\\VulkanSDK\\1.4.328.1\\Bin"
         - "C:\\Program Files\\Python312\\Scripts\\"
         - "C:\\Program Files\\Python312\\"
@@ -146,6 +151,7 @@ events:
         - "C:\\Users\\Asus\\AppData\\Local\\Microsoft\\WindowsApps"
         - "C:\\Program Files\\JetBrains\\IntelliJ IDEA 2024.3.2.2\\bin"
         - "C:\\Program Files\\JetBrains\\CLion 2024.3.2\\bin"
+        - "c:\\Users\\Asus\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
   -
     kind: "find-v1"
     backtrace:
@@ -171,6 +177,7 @@ events:
       - "icx"
       - "clang++"
     candidate_directories:
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/"
       - "C:/VulkanSDK/1.4.328.1/Bin/"
       - "C:/Program Files/Python312/Scripts/"
       - "C:/Program Files/Python312/"
@@ -214,7 +221,26 @@ events:
       - "C:/Users/Asus/AppData/Local/Coursier/data/bin/"
       - "C:/Program Files/JetBrains/IntelliJ IDEA 2024.3.2.2/bin/"
       - "C:/Program Files/JetBrains/CLion 2024.3.2/bin/"
+      - "C:/Users/Asus/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/"
     searched_directories:
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/c++.com"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/c++.exe"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/c++"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/g++.com"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/g++.exe"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/g++"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/cl.com"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/cl.exe"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/cl"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/bcc.com"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/bcc.exe"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/bcc"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/icx.com"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/icx.exe"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/icx"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/clang++.com"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/clang++.exe"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/clang++"
       - "C:/VulkanSDK/1.4.328.1/Bin/c++.com"
       - "C:/VulkanSDK/1.4.328.1/Bin/c++.exe"
       - "C:/VulkanSDK/1.4.328.1/Bin/c++"
@@ -417,6 +443,7 @@ events:
     found: "C:/msys64/mingw64/bin/c++.exe"
     search_context:
       ENV{PATH}:
+        - "C:\\Flutter\\flutter\\bin\\cache\\dart-sdk\\bin\\"
         - "C:\\VulkanSDK\\1.4.328.1\\Bin"
         - "C:\\Program Files\\Python312\\Scripts\\"
         - "C:\\Program Files\\Python312\\"
@@ -462,6 +489,7 @@ events:
         - "C:\\Users\\Asus\\AppData\\Local\\Microsoft\\WindowsApps"
         - "C:\\Program Files\\JetBrains\\IntelliJ IDEA 2024.3.2.2\\bin"
         - "C:\\Program Files\\JetBrains\\CLion 2024.3.2\\bin"
+        - "c:\\Users\\Asus\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
   -
     kind: "find-v1"
     backtrace:
@@ -489,6 +517,7 @@ events:
     found: "C:/Program Files/CMake/share/cmake-4.1/Modules/CMakeCXXCompilerId.cpp.in"
     search_context:
       ENV{PATH}:
+        - "C:\\Flutter\\flutter\\bin\\cache\\dart-sdk\\bin\\"
         - "C:\\VulkanSDK\\1.4.328.1\\Bin"
         - "C:\\Program Files\\Python312\\Scripts\\"
         - "C:\\Program Files\\Python312\\"
@@ -534,6 +563,7 @@ events:
         - "C:\\Users\\Asus\\AppData\\Local\\Microsoft\\WindowsApps"
         - "C:\\Program Files\\JetBrains\\IntelliJ IDEA 2024.3.2.2\\bin"
         - "C:\\Program Files\\JetBrains\\CLion 2024.3.2\\bin"
+        - "c:\\Users\\Asus\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
   -
     kind: "message-v1"
     backtrace:
@@ -577,6 +607,7 @@ events:
       - "ar"
     candidate_directories:
       - "C:/msys64/mingw64/bin/"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/"
       - "C:/VulkanSDK/1.4.328.1/Bin/"
       - "C:/Program Files/Python312/Scripts/"
       - "C:/Program Files/Python312/"
@@ -619,11 +650,13 @@ events:
       - "C:/Users/Asus/AppData/Local/Coursier/data/bin/"
       - "C:/Program Files/JetBrains/IntelliJ IDEA 2024.3.2.2/bin/"
       - "C:/Program Files/JetBrains/CLion 2024.3.2/bin/"
+      - "C:/Users/Asus/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/"
     searched_directories:
       - "C:/msys64/mingw64/bin/ar.com"
     found: "C:/msys64/mingw64/bin/ar.exe"
     search_context:
       ENV{PATH}:
+        - "C:\\Flutter\\flutter\\bin\\cache\\dart-sdk\\bin\\"
         - "C:\\VulkanSDK\\1.4.328.1\\Bin"
         - "C:\\Program Files\\Python312\\Scripts\\"
         - "C:\\Program Files\\Python312\\"
@@ -669,6 +702,7 @@ events:
         - "C:\\Users\\Asus\\AppData\\Local\\Microsoft\\WindowsApps"
         - "C:\\Program Files\\JetBrains\\IntelliJ IDEA 2024.3.2.2\\bin"
         - "C:\\Program Files\\JetBrains\\CLion 2024.3.2\\bin"
+        - "c:\\Users\\Asus\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
   -
     kind: "find-v1"
     backtrace:
@@ -690,6 +724,7 @@ events:
       - "ranlib"
     candidate_directories:
       - "C:/msys64/mingw64/bin/"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/"
       - "C:/VulkanSDK/1.4.328.1/Bin/"
       - "C:/Program Files/Python312/Scripts/"
       - "C:/Program Files/Python312/"
@@ -732,11 +767,13 @@ events:
       - "C:/Users/Asus/AppData/Local/Coursier/data/bin/"
       - "C:/Program Files/JetBrains/IntelliJ IDEA 2024.3.2.2/bin/"
       - "C:/Program Files/JetBrains/CLion 2024.3.2/bin/"
+      - "C:/Users/Asus/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/"
     searched_directories:
       - "C:/msys64/mingw64/bin/ranlib.com"
     found: "C:/msys64/mingw64/bin/ranlib.exe"
     search_context:
       ENV{PATH}:
+        - "C:\\Flutter\\flutter\\bin\\cache\\dart-sdk\\bin\\"
         - "C:\\VulkanSDK\\1.4.328.1\\Bin"
         - "C:\\Program Files\\Python312\\Scripts\\"
         - "C:\\Program Files\\Python312\\"
@@ -782,6 +819,7 @@ events:
         - "C:\\Users\\Asus\\AppData\\Local\\Microsoft\\WindowsApps"
         - "C:\\Program Files\\JetBrains\\IntelliJ IDEA 2024.3.2.2\\bin"
         - "C:\\Program Files\\JetBrains\\CLion 2024.3.2\\bin"
+        - "c:\\Users\\Asus\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
   -
     kind: "find-v1"
     backtrace:
@@ -803,6 +841,7 @@ events:
       - "strip"
     candidate_directories:
       - "C:/msys64/mingw64/bin/"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/"
       - "C:/VulkanSDK/1.4.328.1/Bin/"
       - "C:/Program Files/Python312/Scripts/"
       - "C:/Program Files/Python312/"
@@ -845,11 +884,13 @@ events:
       - "C:/Users/Asus/AppData/Local/Coursier/data/bin/"
       - "C:/Program Files/JetBrains/IntelliJ IDEA 2024.3.2.2/bin/"
       - "C:/Program Files/JetBrains/CLion 2024.3.2/bin/"
+      - "C:/Users/Asus/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/"
     searched_directories:
       - "C:/msys64/mingw64/bin/strip.com"
     found: "C:/msys64/mingw64/bin/strip.exe"
     search_context:
       ENV{PATH}:
+        - "C:\\Flutter\\flutter\\bin\\cache\\dart-sdk\\bin\\"
         - "C:\\VulkanSDK\\1.4.328.1\\Bin"
         - "C:\\Program Files\\Python312\\Scripts\\"
         - "C:\\Program Files\\Python312\\"
@@ -895,6 +936,7 @@ events:
         - "C:\\Users\\Asus\\AppData\\Local\\Microsoft\\WindowsApps"
         - "C:\\Program Files\\JetBrains\\IntelliJ IDEA 2024.3.2.2\\bin"
         - "C:\\Program Files\\JetBrains\\CLion 2024.3.2\\bin"
+        - "c:\\Users\\Asus\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
   -
     kind: "find-v1"
     backtrace:
@@ -916,6 +958,7 @@ events:
       - "ld"
     candidate_directories:
       - "C:/msys64/mingw64/bin/"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/"
       - "C:/VulkanSDK/1.4.328.1/Bin/"
       - "C:/Program Files/Python312/Scripts/"
       - "C:/Program Files/Python312/"
@@ -958,11 +1001,13 @@ events:
       - "C:/Users/Asus/AppData/Local/Coursier/data/bin/"
       - "C:/Program Files/JetBrains/IntelliJ IDEA 2024.3.2.2/bin/"
       - "C:/Program Files/JetBrains/CLion 2024.3.2/bin/"
+      - "C:/Users/Asus/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/"
     searched_directories:
       - "C:/msys64/mingw64/bin/ld.com"
     found: "C:/msys64/mingw64/bin/ld.exe"
     search_context:
       ENV{PATH}:
+        - "C:\\Flutter\\flutter\\bin\\cache\\dart-sdk\\bin\\"
         - "C:\\VulkanSDK\\1.4.328.1\\Bin"
         - "C:\\Program Files\\Python312\\Scripts\\"
         - "C:\\Program Files\\Python312\\"
@@ -1008,6 +1053,7 @@ events:
         - "C:\\Users\\Asus\\AppData\\Local\\Microsoft\\WindowsApps"
         - "C:\\Program Files\\JetBrains\\IntelliJ IDEA 2024.3.2.2\\bin"
         - "C:\\Program Files\\JetBrains\\CLion 2024.3.2\\bin"
+        - "c:\\Users\\Asus\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
   -
     kind: "find-v1"
     backtrace:
@@ -1029,6 +1075,7 @@ events:
       - "nm"
     candidate_directories:
       - "C:/msys64/mingw64/bin/"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/"
       - "C:/VulkanSDK/1.4.328.1/Bin/"
       - "C:/Program Files/Python312/Scripts/"
       - "C:/Program Files/Python312/"
@@ -1071,11 +1118,13 @@ events:
       - "C:/Users/Asus/AppData/Local/Coursier/data/bin/"
       - "C:/Program Files/JetBrains/IntelliJ IDEA 2024.3.2.2/bin/"
       - "C:/Program Files/JetBrains/CLion 2024.3.2/bin/"
+      - "C:/Users/Asus/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/"
     searched_directories:
       - "C:/msys64/mingw64/bin/nm.com"
     found: "C:/msys64/mingw64/bin/nm.exe"
     search_context:
       ENV{PATH}:
+        - "C:\\Flutter\\flutter\\bin\\cache\\dart-sdk\\bin\\"
         - "C:\\VulkanSDK\\1.4.328.1\\Bin"
         - "C:\\Program Files\\Python312\\Scripts\\"
         - "C:\\Program Files\\Python312\\"
@@ -1121,6 +1170,7 @@ events:
         - "C:\\Users\\Asus\\AppData\\Local\\Microsoft\\WindowsApps"
         - "C:\\Program Files\\JetBrains\\IntelliJ IDEA 2024.3.2.2\\bin"
         - "C:\\Program Files\\JetBrains\\CLion 2024.3.2\\bin"
+        - "c:\\Users\\Asus\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
   -
     kind: "find-v1"
     backtrace:
@@ -1142,6 +1192,7 @@ events:
       - "objdump"
     candidate_directories:
       - "C:/msys64/mingw64/bin/"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/"
       - "C:/VulkanSDK/1.4.328.1/Bin/"
       - "C:/Program Files/Python312/Scripts/"
       - "C:/Program Files/Python312/"
@@ -1184,11 +1235,13 @@ events:
       - "C:/Users/Asus/AppData/Local/Coursier/data/bin/"
       - "C:/Program Files/JetBrains/IntelliJ IDEA 2024.3.2.2/bin/"
       - "C:/Program Files/JetBrains/CLion 2024.3.2/bin/"
+      - "C:/Users/Asus/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/"
     searched_directories:
       - "C:/msys64/mingw64/bin/objdump.com"
     found: "C:/msys64/mingw64/bin/objdump.exe"
     search_context:
       ENV{PATH}:
+        - "C:\\Flutter\\flutter\\bin\\cache\\dart-sdk\\bin\\"
         - "C:\\VulkanSDK\\1.4.328.1\\Bin"
         - "C:\\Program Files\\Python312\\Scripts\\"
         - "C:\\Program Files\\Python312\\"
@@ -1234,6 +1287,7 @@ events:
         - "C:\\Users\\Asus\\AppData\\Local\\Microsoft\\WindowsApps"
         - "C:\\Program Files\\JetBrains\\IntelliJ IDEA 2024.3.2.2\\bin"
         - "C:\\Program Files\\JetBrains\\CLion 2024.3.2\\bin"
+        - "c:\\Users\\Asus\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
   -
     kind: "find-v1"
     backtrace:
@@ -1255,6 +1309,7 @@ events:
       - "objcopy"
     candidate_directories:
       - "C:/msys64/mingw64/bin/"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/"
       - "C:/VulkanSDK/1.4.328.1/Bin/"
       - "C:/Program Files/Python312/Scripts/"
       - "C:/Program Files/Python312/"
@@ -1297,11 +1352,13 @@ events:
       - "C:/Users/Asus/AppData/Local/Coursier/data/bin/"
       - "C:/Program Files/JetBrains/IntelliJ IDEA 2024.3.2.2/bin/"
       - "C:/Program Files/JetBrains/CLion 2024.3.2/bin/"
+      - "C:/Users/Asus/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/"
     searched_directories:
       - "C:/msys64/mingw64/bin/objcopy.com"
     found: "C:/msys64/mingw64/bin/objcopy.exe"
     search_context:
       ENV{PATH}:
+        - "C:\\Flutter\\flutter\\bin\\cache\\dart-sdk\\bin\\"
         - "C:\\VulkanSDK\\1.4.328.1\\Bin"
         - "C:\\Program Files\\Python312\\Scripts\\"
         - "C:\\Program Files\\Python312\\"
@@ -1347,6 +1404,7 @@ events:
         - "C:\\Users\\Asus\\AppData\\Local\\Microsoft\\WindowsApps"
         - "C:\\Program Files\\JetBrains\\IntelliJ IDEA 2024.3.2.2\\bin"
         - "C:\\Program Files\\JetBrains\\CLion 2024.3.2\\bin"
+        - "c:\\Users\\Asus\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
   -
     kind: "find-v1"
     backtrace:
@@ -1368,6 +1426,7 @@ events:
       - "readelf"
     candidate_directories:
       - "C:/msys64/mingw64/bin/"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/"
       - "C:/VulkanSDK/1.4.328.1/Bin/"
       - "C:/Program Files/Python312/Scripts/"
       - "C:/Program Files/Python312/"
@@ -1410,11 +1469,13 @@ events:
       - "C:/Users/Asus/AppData/Local/Coursier/data/bin/"
       - "C:/Program Files/JetBrains/IntelliJ IDEA 2024.3.2.2/bin/"
       - "C:/Program Files/JetBrains/CLion 2024.3.2/bin/"
+      - "C:/Users/Asus/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/"
     searched_directories:
       - "C:/msys64/mingw64/bin/readelf.com"
     found: "C:/msys64/mingw64/bin/readelf.exe"
     search_context:
       ENV{PATH}:
+        - "C:\\Flutter\\flutter\\bin\\cache\\dart-sdk\\bin\\"
         - "C:\\VulkanSDK\\1.4.328.1\\Bin"
         - "C:\\Program Files\\Python312\\Scripts\\"
         - "C:\\Program Files\\Python312\\"
@@ -1460,6 +1521,7 @@ events:
         - "C:\\Users\\Asus\\AppData\\Local\\Microsoft\\WindowsApps"
         - "C:\\Program Files\\JetBrains\\IntelliJ IDEA 2024.3.2.2\\bin"
         - "C:\\Program Files\\JetBrains\\CLion 2024.3.2\\bin"
+        - "c:\\Users\\Asus\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
   -
     kind: "find-v1"
     backtrace:
@@ -1481,6 +1543,7 @@ events:
       - "dlltool"
     candidate_directories:
       - "C:/msys64/mingw64/bin/"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/"
       - "C:/VulkanSDK/1.4.328.1/Bin/"
       - "C:/Program Files/Python312/Scripts/"
       - "C:/Program Files/Python312/"
@@ -1523,11 +1586,13 @@ events:
       - "C:/Users/Asus/AppData/Local/Coursier/data/bin/"
       - "C:/Program Files/JetBrains/IntelliJ IDEA 2024.3.2.2/bin/"
       - "C:/Program Files/JetBrains/CLion 2024.3.2/bin/"
+      - "C:/Users/Asus/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/"
     searched_directories:
       - "C:/msys64/mingw64/bin/dlltool.com"
     found: "C:/msys64/mingw64/bin/dlltool.exe"
     search_context:
       ENV{PATH}:
+        - "C:\\Flutter\\flutter\\bin\\cache\\dart-sdk\\bin\\"
         - "C:\\VulkanSDK\\1.4.328.1\\Bin"
         - "C:\\Program Files\\Python312\\Scripts\\"
         - "C:\\Program Files\\Python312\\"
@@ -1573,6 +1638,7 @@ events:
         - "C:\\Users\\Asus\\AppData\\Local\\Microsoft\\WindowsApps"
         - "C:\\Program Files\\JetBrains\\IntelliJ IDEA 2024.3.2.2\\bin"
         - "C:\\Program Files\\JetBrains\\CLion 2024.3.2\\bin"
+        - "c:\\Users\\Asus\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
   -
     kind: "find-v1"
     backtrace:
@@ -1594,6 +1660,7 @@ events:
       - "addr2line"
     candidate_directories:
       - "C:/msys64/mingw64/bin/"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/"
       - "C:/VulkanSDK/1.4.328.1/Bin/"
       - "C:/Program Files/Python312/Scripts/"
       - "C:/Program Files/Python312/"
@@ -1636,11 +1703,13 @@ events:
       - "C:/Users/Asus/AppData/Local/Coursier/data/bin/"
       - "C:/Program Files/JetBrains/IntelliJ IDEA 2024.3.2.2/bin/"
       - "C:/Program Files/JetBrains/CLion 2024.3.2/bin/"
+      - "C:/Users/Asus/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/"
     searched_directories:
       - "C:/msys64/mingw64/bin/addr2line.com"
     found: "C:/msys64/mingw64/bin/addr2line.exe"
     search_context:
       ENV{PATH}:
+        - "C:\\Flutter\\flutter\\bin\\cache\\dart-sdk\\bin\\"
         - "C:\\VulkanSDK\\1.4.328.1\\Bin"
         - "C:\\Program Files\\Python312\\Scripts\\"
         - "C:\\Program Files\\Python312\\"
@@ -1686,6 +1755,7 @@ events:
         - "C:\\Users\\Asus\\AppData\\Local\\Microsoft\\WindowsApps"
         - "C:\\Program Files\\JetBrains\\IntelliJ IDEA 2024.3.2.2\\bin"
         - "C:\\Program Files\\JetBrains\\CLion 2024.3.2\\bin"
+        - "c:\\Users\\Asus\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
   -
     kind: "find-v1"
     backtrace:
@@ -1707,6 +1777,7 @@ events:
       - "tapi"
     candidate_directories:
       - "C:/msys64/mingw64/bin/"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/"
       - "C:/VulkanSDK/1.4.328.1/Bin/"
       - "C:/Program Files/Python312/Scripts/"
       - "C:/Program Files/Python312/"
@@ -1749,10 +1820,14 @@ events:
       - "C:/Users/Asus/AppData/Local/Coursier/data/bin/"
       - "C:/Program Files/JetBrains/IntelliJ IDEA 2024.3.2.2/bin/"
       - "C:/Program Files/JetBrains/CLion 2024.3.2/bin/"
+      - "C:/Users/Asus/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/"
     searched_directories:
       - "C:/msys64/mingw64/bin/tapi.com"
       - "C:/msys64/mingw64/bin/tapi.exe"
       - "C:/msys64/mingw64/bin/tapi"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/tapi.com"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/tapi.exe"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/tapi"
       - "C:/VulkanSDK/1.4.328.1/Bin/tapi.com"
       - "C:/VulkanSDK/1.4.328.1/Bin/tapi.exe"
       - "C:/VulkanSDK/1.4.328.1/Bin/tapi"
@@ -1879,9 +1954,13 @@ events:
       - "C:/Program Files/JetBrains/CLion 2024.3.2/bin/tapi.com"
       - "C:/Program Files/JetBrains/CLion 2024.3.2/bin/tapi.exe"
       - "C:/Program Files/JetBrains/CLion 2024.3.2/bin/tapi"
+      - "C:/Users/Asus/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/tapi.com"
+      - "C:/Users/Asus/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/tapi.exe"
+      - "C:/Users/Asus/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/tapi"
     found: false
     search_context:
       ENV{PATH}:
+        - "C:\\Flutter\\flutter\\bin\\cache\\dart-sdk\\bin\\"
         - "C:\\VulkanSDK\\1.4.328.1\\Bin"
         - "C:\\Program Files\\Python312\\Scripts\\"
         - "C:\\Program Files\\Python312\\"
@@ -1927,6 +2006,7 @@ events:
         - "C:\\Users\\Asus\\AppData\\Local\\Microsoft\\WindowsApps"
         - "C:\\Program Files\\JetBrains\\IntelliJ IDEA 2024.3.2.2\\bin"
         - "C:\\Program Files\\JetBrains\\CLion 2024.3.2\\bin"
+        - "c:\\Users\\Asus\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
   -
     kind: "find-v1"
     backtrace:
@@ -1951,6 +2031,7 @@ events:
       - "gcc-ar"
     candidate_directories:
       - "C:/msys64/mingw64/bin/"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/"
       - "C:/VulkanSDK/1.4.328.1/Bin/"
       - "C:/Program Files/Python312/Scripts/"
       - "C:/Program Files/Python312/"
@@ -1993,10 +2074,14 @@ events:
       - "C:/Users/Asus/AppData/Local/Coursier/data/bin/"
       - "C:/Program Files/JetBrains/IntelliJ IDEA 2024.3.2.2/bin/"
       - "C:/Program Files/JetBrains/CLion 2024.3.2/bin/"
+      - "C:/Users/Asus/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/"
     searched_directories:
       - "C:/msys64/mingw64/bin/gcc-ar-11.2.com"
       - "C:/msys64/mingw64/bin/gcc-ar-11.2.exe"
       - "C:/msys64/mingw64/bin/gcc-ar-11.2"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/gcc-ar-11.2.com"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/gcc-ar-11.2.exe"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/gcc-ar-11.2"
       - "C:/VulkanSDK/1.4.328.1/Bin/gcc-ar-11.2.com"
       - "C:/VulkanSDK/1.4.328.1/Bin/gcc-ar-11.2.exe"
       - "C:/VulkanSDK/1.4.328.1/Bin/gcc-ar-11.2"
@@ -2123,9 +2208,15 @@ events:
       - "C:/Program Files/JetBrains/CLion 2024.3.2/bin/gcc-ar-11.2.com"
       - "C:/Program Files/JetBrains/CLion 2024.3.2/bin/gcc-ar-11.2.exe"
       - "C:/Program Files/JetBrains/CLion 2024.3.2/bin/gcc-ar-11.2"
+      - "C:/Users/Asus/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/gcc-ar-11.2.com"
+      - "C:/Users/Asus/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/gcc-ar-11.2.exe"
+      - "C:/Users/Asus/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/gcc-ar-11.2"
       - "C:/msys64/mingw64/bin/gcc-ar-11.com"
       - "C:/msys64/mingw64/bin/gcc-ar-11.exe"
       - "C:/msys64/mingw64/bin/gcc-ar-11"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/gcc-ar-11.com"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/gcc-ar-11.exe"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/gcc-ar-11"
       - "C:/VulkanSDK/1.4.328.1/Bin/gcc-ar-11.com"
       - "C:/VulkanSDK/1.4.328.1/Bin/gcc-ar-11.exe"
       - "C:/VulkanSDK/1.4.328.1/Bin/gcc-ar-11"
@@ -2252,9 +2343,15 @@ events:
       - "C:/Program Files/JetBrains/CLion 2024.3.2/bin/gcc-ar-11.com"
       - "C:/Program Files/JetBrains/CLion 2024.3.2/bin/gcc-ar-11.exe"
       - "C:/Program Files/JetBrains/CLion 2024.3.2/bin/gcc-ar-11"
+      - "C:/Users/Asus/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/gcc-ar-11.com"
+      - "C:/Users/Asus/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/gcc-ar-11.exe"
+      - "C:/Users/Asus/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/gcc-ar-11"
       - "C:/msys64/mingw64/bin/gcc-ar11.com"
       - "C:/msys64/mingw64/bin/gcc-ar11.exe"
       - "C:/msys64/mingw64/bin/gcc-ar11"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/gcc-ar11.com"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/gcc-ar11.exe"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/gcc-ar11"
       - "C:/VulkanSDK/1.4.328.1/Bin/gcc-ar11.com"
       - "C:/VulkanSDK/1.4.328.1/Bin/gcc-ar11.exe"
       - "C:/VulkanSDK/1.4.328.1/Bin/gcc-ar11"
@@ -2381,10 +2478,14 @@ events:
       - "C:/Program Files/JetBrains/CLion 2024.3.2/bin/gcc-ar11.com"
       - "C:/Program Files/JetBrains/CLion 2024.3.2/bin/gcc-ar11.exe"
       - "C:/Program Files/JetBrains/CLion 2024.3.2/bin/gcc-ar11"
+      - "C:/Users/Asus/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/gcc-ar11.com"
+      - "C:/Users/Asus/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/gcc-ar11.exe"
+      - "C:/Users/Asus/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/gcc-ar11"
       - "C:/msys64/mingw64/bin/gcc-ar.com"
     found: "C:/msys64/mingw64/bin/gcc-ar.exe"
     search_context:
       ENV{PATH}:
+        - "C:\\Flutter\\flutter\\bin\\cache\\dart-sdk\\bin\\"
         - "C:\\VulkanSDK\\1.4.328.1\\Bin"
         - "C:\\Program Files\\Python312\\Scripts\\"
         - "C:\\Program Files\\Python312\\"
@@ -2430,6 +2531,7 @@ events:
         - "C:\\Users\\Asus\\AppData\\Local\\Microsoft\\WindowsApps"
         - "C:\\Program Files\\JetBrains\\IntelliJ IDEA 2024.3.2.2\\bin"
         - "C:\\Program Files\\JetBrains\\CLion 2024.3.2\\bin"
+        - "c:\\Users\\Asus\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
   -
     kind: "find-v1"
     backtrace:
@@ -2454,6 +2556,7 @@ events:
       - "gcc-ranlib"
     candidate_directories:
       - "C:/msys64/mingw64/bin/"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/"
       - "C:/VulkanSDK/1.4.328.1/Bin/"
       - "C:/Program Files/Python312/Scripts/"
       - "C:/Program Files/Python312/"
@@ -2496,10 +2599,14 @@ events:
       - "C:/Users/Asus/AppData/Local/Coursier/data/bin/"
       - "C:/Program Files/JetBrains/IntelliJ IDEA 2024.3.2.2/bin/"
       - "C:/Program Files/JetBrains/CLion 2024.3.2/bin/"
+      - "C:/Users/Asus/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/"
     searched_directories:
       - "C:/msys64/mingw64/bin/gcc-ranlib-11.2.com"
       - "C:/msys64/mingw64/bin/gcc-ranlib-11.2.exe"
       - "C:/msys64/mingw64/bin/gcc-ranlib-11.2"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/gcc-ranlib-11.2.com"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/gcc-ranlib-11.2.exe"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/gcc-ranlib-11.2"
       - "C:/VulkanSDK/1.4.328.1/Bin/gcc-ranlib-11.2.com"
       - "C:/VulkanSDK/1.4.328.1/Bin/gcc-ranlib-11.2.exe"
       - "C:/VulkanSDK/1.4.328.1/Bin/gcc-ranlib-11.2"
@@ -2626,9 +2733,15 @@ events:
       - "C:/Program Files/JetBrains/CLion 2024.3.2/bin/gcc-ranlib-11.2.com"
       - "C:/Program Files/JetBrains/CLion 2024.3.2/bin/gcc-ranlib-11.2.exe"
       - "C:/Program Files/JetBrains/CLion 2024.3.2/bin/gcc-ranlib-11.2"
+      - "C:/Users/Asus/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/gcc-ranlib-11.2.com"
+      - "C:/Users/Asus/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/gcc-ranlib-11.2.exe"
+      - "C:/Users/Asus/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/gcc-ranlib-11.2"
       - "C:/msys64/mingw64/bin/gcc-ranlib-11.com"
       - "C:/msys64/mingw64/bin/gcc-ranlib-11.exe"
       - "C:/msys64/mingw64/bin/gcc-ranlib-11"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/gcc-ranlib-11.com"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/gcc-ranlib-11.exe"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/gcc-ranlib-11"
       - "C:/VulkanSDK/1.4.328.1/Bin/gcc-ranlib-11.com"
       - "C:/VulkanSDK/1.4.328.1/Bin/gcc-ranlib-11.exe"
       - "C:/VulkanSDK/1.4.328.1/Bin/gcc-ranlib-11"
@@ -2755,9 +2868,15 @@ events:
       - "C:/Program Files/JetBrains/CLion 2024.3.2/bin/gcc-ranlib-11.com"
       - "C:/Program Files/JetBrains/CLion 2024.3.2/bin/gcc-ranlib-11.exe"
       - "C:/Program Files/JetBrains/CLion 2024.3.2/bin/gcc-ranlib-11"
+      - "C:/Users/Asus/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/gcc-ranlib-11.com"
+      - "C:/Users/Asus/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/gcc-ranlib-11.exe"
+      - "C:/Users/Asus/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/gcc-ranlib-11"
       - "C:/msys64/mingw64/bin/gcc-ranlib11.com"
       - "C:/msys64/mingw64/bin/gcc-ranlib11.exe"
       - "C:/msys64/mingw64/bin/gcc-ranlib11"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/gcc-ranlib11.com"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/gcc-ranlib11.exe"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/gcc-ranlib11"
       - "C:/VulkanSDK/1.4.328.1/Bin/gcc-ranlib11.com"
       - "C:/VulkanSDK/1.4.328.1/Bin/gcc-ranlib11.exe"
       - "C:/VulkanSDK/1.4.328.1/Bin/gcc-ranlib11"
@@ -2884,10 +3003,14 @@ events:
       - "C:/Program Files/JetBrains/CLion 2024.3.2/bin/gcc-ranlib11.com"
       - "C:/Program Files/JetBrains/CLion 2024.3.2/bin/gcc-ranlib11.exe"
       - "C:/Program Files/JetBrains/CLion 2024.3.2/bin/gcc-ranlib11"
+      - "C:/Users/Asus/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/gcc-ranlib11.com"
+      - "C:/Users/Asus/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/gcc-ranlib11.exe"
+      - "C:/Users/Asus/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/gcc-ranlib11"
       - "C:/msys64/mingw64/bin/gcc-ranlib.com"
     found: "C:/msys64/mingw64/bin/gcc-ranlib.exe"
     search_context:
       ENV{PATH}:
+        - "C:\\Flutter\\flutter\\bin\\cache\\dart-sdk\\bin\\"
         - "C:\\VulkanSDK\\1.4.328.1\\Bin"
         - "C:\\Program Files\\Python312\\Scripts\\"
         - "C:\\Program Files\\Python312\\"
@@ -2933,6 +3056,7 @@ events:
         - "C:\\Users\\Asus\\AppData\\Local\\Microsoft\\WindowsApps"
         - "C:\\Program Files\\JetBrains\\IntelliJ IDEA 2024.3.2.2\\bin"
         - "C:\\Program Files\\JetBrains\\CLion 2024.3.2\\bin"
+        - "c:\\Users\\Asus\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
   -
     kind: "find-v1"
     backtrace:
@@ -2956,6 +3080,7 @@ events:
       - "windres"
       - "windres"
     candidate_directories:
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/"
       - "C:/VulkanSDK/1.4.328.1/Bin/"
       - "C:/Program Files/Python312/Scripts/"
       - "C:/Program Files/Python312/"
@@ -2999,6 +3124,7 @@ events:
       - "C:/Users/Asus/AppData/Local/Coursier/data/bin/"
       - "C:/Program Files/JetBrains/IntelliJ IDEA 2024.3.2.2/bin/"
       - "C:/Program Files/JetBrains/CLion 2024.3.2/bin/"
+      - "C:/Users/Asus/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/"
       - "C:/Program Files/bin/"
       - "C:/Program Files/sbin/"
       - "C:/Program Files/"
@@ -3012,6 +3138,9 @@ events:
       - "C:/Program Files (x86)/telemetry_vulkan/sbin/"
       - "C:/Program Files (x86)/telemetry_vulkan/"
     searched_directories:
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/windres.com"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/windres.exe"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/windres"
       - "C:/VulkanSDK/1.4.328.1/Bin/windres.com"
       - "C:/VulkanSDK/1.4.328.1/Bin/windres.exe"
       - "C:/VulkanSDK/1.4.328.1/Bin/windres"
@@ -3049,6 +3178,7 @@ events:
     found: "C:/msys64/mingw64/bin/windres.exe"
     search_context:
       ENV{PATH}:
+        - "C:\\Flutter\\flutter\\bin\\cache\\dart-sdk\\bin\\"
         - "C:\\VulkanSDK\\1.4.328.1\\Bin"
         - "C:\\Program Files\\Python312\\Scripts\\"
         - "C:\\Program Files\\Python312\\"
@@ -3094,6 +3224,7 @@ events:
         - "C:\\Users\\Asus\\AppData\\Local\\Microsoft\\WindowsApps"
         - "C:\\Program Files\\JetBrains\\IntelliJ IDEA 2024.3.2.2\\bin"
         - "C:\\Program Files\\JetBrains\\CLion 2024.3.2\\bin"
+        - "c:\\Users\\Asus\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
       CMAKE_INSTALL_PREFIX: "C:/Program Files (x86)/telemetry_vulkan"
       CMAKE_SYSTEM_PREFIX_PATH:
         - "C:/Program Files"
@@ -3109,8 +3240,8 @@ events:
     checks:
       - "Detecting CXX compiler ABI info"
     directories:
-      source: "C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/build_windows/CMakeFiles/CMakeScratch/TryCompile-e0demk"
-      binary: "C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/build_windows/CMakeFiles/CMakeScratch/TryCompile-e0demk"
+      source: "C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/build_windows/CMakeFiles/CMakeScratch/TryCompile-7acpms"
+      binary: "C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/build_windows/CMakeFiles/CMakeScratch/TryCompile-7acpms"
     cmakeVariables:
       CMAKE_CXX_FLAGS: ""
       CMAKE_CXX_FLAGS_DEBUG: "-g"
@@ -3120,13 +3251,13 @@ events:
       variable: "CMAKE_CXX_ABI_COMPILED"
       cached: true
       stdout: |
-        Change Dir: 'C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/build_windows/CMakeFiles/CMakeScratch/TryCompile-e0demk'
+        Change Dir: 'C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/build_windows/CMakeFiles/CMakeScratch/TryCompile-7acpms'
         
-        Run Build Command(s): "C:/Program Files/CMake/bin/cmake.exe" -E env VERBOSE=1 C:/msys64/mingw64/bin/mingw32-make.exe -f Makefile cmTC_57ac3/fast
-        C:/msys64/mingw64/bin/mingw32-make.exe  -f CMakeFiles\\cmTC_57ac3.dir\\build.make CMakeFiles/cmTC_57ac3.dir/build
-        mingw32-make[1]: Entering directory 'C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/build_windows/CMakeFiles/CMakeScratch/TryCompile-e0demk'
-        Building CXX object CMakeFiles/cmTC_57ac3.dir/CMakeCXXCompilerABI.cpp.obj
-        C:\\msys64\\mingw64\\bin\\c++.exe   -v -o CMakeFiles\\cmTC_57ac3.dir\\CMakeCXXCompilerABI.cpp.obj -c "C:\\Program Files\\CMake\\share\\cmake-4.1\\Modules\\CMakeCXXCompilerABI.cpp"
+        Run Build Command(s): "C:/Program Files/CMake/bin/cmake.exe" -E env VERBOSE=1 C:/msys64/mingw64/bin/mingw32-make.exe -f Makefile cmTC_7e703/fast
+        C:/msys64/mingw64/bin/mingw32-make.exe  -f CMakeFiles\\cmTC_7e703.dir\\build.make CMakeFiles/cmTC_7e703.dir/build
+        mingw32-make[1]: Entering directory 'C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/build_windows/CMakeFiles/CMakeScratch/TryCompile-7acpms'
+        Building CXX object CMakeFiles/cmTC_7e703.dir/CMakeCXXCompilerABI.cpp.obj
+        C:\\msys64\\mingw64\\bin\\c++.exe   -v -o CMakeFiles\\cmTC_7e703.dir\\CMakeCXXCompilerABI.cpp.obj -c "C:\\Program Files\\CMake\\share\\cmake-4.1\\Modules\\CMakeCXXCompilerABI.cpp"
         Using built-in specs.
         COLLECT_GCC=C:\\msys64\\mingw64\\bin\\c++.exe
         Target: x86_64-w64-mingw32
@@ -3134,8 +3265,8 @@ events:
         Thread model: posix
         Supported LTO compression algorithms: zlib zstd
         gcc version 11.2.0 (Rev1, Built by MSYS2 project) 
-        COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles\\cmTC_57ac3.dir\\CMakeCXXCompilerABI.cpp.obj' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles\\cmTC_57ac3.dir\\'
-         C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/cc1plus.exe -quiet -v -iprefix C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/ -D_REENTRANT C:\\Program Files\\CMake\\share\\cmake-4.1\\Modules\\CMakeCXXCompilerABI.cpp -quiet -dumpdir CMakeFiles\\cmTC_57ac3.dir\\ -dumpbase CMakeCXXCompilerABI.cpp.cpp -dumpbase-ext .cpp -mtune=generic -march=x86-64 -version -o C:\\Users\\Asus\\AppData\\Local\\Temp\\ccyy4jFG.s
+        COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles\\cmTC_7e703.dir\\CMakeCXXCompilerABI.cpp.obj' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles\\cmTC_7e703.dir\\'
+         C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/cc1plus.exe -quiet -v -iprefix C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/ -D_REENTRANT C:\\Program Files\\CMake\\share\\cmake-4.1\\Modules\\CMakeCXXCompilerABI.cpp -quiet -dumpdir CMakeFiles\\cmTC_7e703.dir\\ -dumpbase CMakeCXXCompilerABI.cpp.cpp -dumpbase-ext .cpp -mtune=generic -march=x86-64 -version -o C:\\Users\\Asus\\AppData\\Local\\Temp\\cceWDkwE.s
         GNU C++17 (Rev1, Built by MSYS2 project) version 11.2.0 (x86_64-w64-mingw32)
         	compiled by GNU C version 11.2.0, GMP version 6.2.1, MPFR version 4.1.0-p13, MPC version 1.2.1, isl version isl-0.24-GMP
         
@@ -3164,14 +3295,14 @@ events:
         
         GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
         Compiler executable checksum: cb8d24b0bda2fdc2f4bb48fa7a04a068
-        COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles\\cmTC_57ac3.dir\\CMakeCXXCompilerABI.cpp.obj' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles\\cmTC_57ac3.dir\\'
-         C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/bin/as.exe -v -o CMakeFiles\\cmTC_57ac3.dir\\CMakeCXXCompilerABI.cpp.obj C:\\Users\\Asus\\AppData\\Local\\Temp\\ccyy4jFG.s
+        COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles\\cmTC_7e703.dir\\CMakeCXXCompilerABI.cpp.obj' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles\\cmTC_7e703.dir\\'
+         C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/bin/as.exe -v -o CMakeFiles\\cmTC_7e703.dir\\CMakeCXXCompilerABI.cpp.obj C:\\Users\\Asus\\AppData\\Local\\Temp\\cceWDkwE.s
         GNU assembler version 2.37 (x86_64-w64-mingw32) using BFD version (GNU Binutils) 2.37
         COMPILER_PATH=C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/;C:/msys64/mingw64/bin/../lib/gcc/;C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/bin/
         LIBRARY_PATH=C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/;C:/msys64/mingw64/bin/../lib/gcc/;C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/;C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../lib/;C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/;C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../
-        COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles\\cmTC_57ac3.dir\\CMakeCXXCompilerABI.cpp.obj' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles\\cmTC_57ac3.dir\\CMakeCXXCompilerABI.cpp.'
-        Linking CXX executable cmTC_57ac3.exe
-        "C:\\Program Files\\CMake\\bin\\cmake.exe" -E cmake_link_script CMakeFiles\\cmTC_57ac3.dir\\link.txt --verbose=1
+        COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles\\cmTC_7e703.dir\\CMakeCXXCompilerABI.cpp.obj' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles\\cmTC_7e703.dir\\CMakeCXXCompilerABI.cpp.'
+        Linking CXX executable cmTC_7e703.exe
+        "C:\\Program Files\\CMake\\bin\\cmake.exe" -E cmake_link_script CMakeFiles\\cmTC_7e703.dir\\link.txt --verbose=1
         Using built-in specs.
         COLLECT_GCC=C:\\msys64\\mingw64\\bin\\c++.exe
         COLLECT_LTO_WRAPPER=C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/lto-wrapper.exe
@@ -3182,16 +3313,16 @@ events:
         gcc version 11.2.0 (Rev1, Built by MSYS2 project) 
         COMPILER_PATH=C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/;C:/msys64/mingw64/bin/../lib/gcc/;C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/bin/
         LIBRARY_PATH=C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/;C:/msys64/mingw64/bin/../lib/gcc/;C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/;C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../lib/;C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/;C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../
-        COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_57ac3.exe' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'cmTC_57ac3.'
-         C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/collect2.exe -plugin C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/liblto_plugin.dll -plugin-opt=C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/lto-wrapper.exe -plugin-opt=-fresolution=C:\\Users\\Asus\\AppData\\Local\\Temp\\ccUjxy6j.res -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmoldname -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lpthread -plugin-opt=-pass-through=-ladvapi32 -plugin-opt=-pass-through=-lshell32 -plugin-opt=-pass-through=-luser32 -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmoldname -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 -m i386pep -Bdynamic -o cmTC_57ac3.exe C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/crt2.o C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/crtbegin.o -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0 -LC:/msys64/mingw64/bin/../lib/gcc -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../lib -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../.. -v --whole-archive CMakeFiles\\cmTC_57ac3.dir/objects.a --no-whole-archive --out-implib libcmTC_57ac3.dll.a --major-image-version 0 --minor-image-version 0 -lstdc++ -lmingw32 -lgcc_s -lgcc -lmoldname -lmingwex -lmsvcrt -lkernel32 -lpthread -ladvapi32 -lshell32 -luser32 -lkernel32 -lmingw32 -lgcc_s -lgcc -lmoldname -lmingwex -lmsvcrt -lkernel32 C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/default-manifest.o C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/crtend.o
+        COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_7e703.exe' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'cmTC_7e703.'
+         C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/collect2.exe -plugin C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/liblto_plugin.dll -plugin-opt=C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/lto-wrapper.exe -plugin-opt=-fresolution=C:\\Users\\Asus\\AppData\\Local\\Temp\\ccq4qNof.res -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmoldname -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lpthread -plugin-opt=-pass-through=-ladvapi32 -plugin-opt=-pass-through=-lshell32 -plugin-opt=-pass-through=-luser32 -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmoldname -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 -m i386pep -Bdynamic -o cmTC_7e703.exe C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/crt2.o C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/crtbegin.o -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0 -LC:/msys64/mingw64/bin/../lib/gcc -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../lib -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../.. -v --whole-archive CMakeFiles\\cmTC_7e703.dir/objects.a --no-whole-archive --out-implib libcmTC_7e703.dll.a --major-image-version 0 --minor-image-version 0 -lstdc++ -lmingw32 -lgcc_s -lgcc -lmoldname -lmingwex -lmsvcrt -lkernel32 -lpthread -ladvapi32 -lshell32 -luser32 -lkernel32 -lmingw32 -lgcc_s -lgcc -lmoldname -lmingwex -lmsvcrt -lkernel32 C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/default-manifest.o C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/crtend.o
         collect2 version 11.2.0
-        C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe -plugin C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/liblto_plugin.dll -plugin-opt=C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/lto-wrapper.exe -plugin-opt=-fresolution=C:\\Users\\Asus\\AppData\\Local\\Temp\\ccUjxy6j.res -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmoldname -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lpthread -plugin-opt=-pass-through=-ladvapi32 -plugin-opt=-pass-through=-lshell32 -plugin-opt=-pass-through=-luser32 -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmoldname -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 -m i386pep -Bdynamic -o cmTC_57ac3.exe C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/crt2.o C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/crtbegin.o -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0 -LC:/msys64/mingw64/bin/../lib/gcc -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../lib -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../.. -v --whole-archive CMakeFiles\\cmTC_57ac3.dir/objects.a --no-whole-archive --out-implib libcmTC_57ac3.dll.a --major-image-version 0 --minor-image-version 0 -lstdc++ -lmingw32 -lgcc_s -lgcc -lmoldname -lmingwex -lmsvcrt -lkernel32 -lpthread -ladvapi32 -lshell32 -luser32 -lkernel32 -lmingw32 -lgcc_s -lgcc -lmoldname -lmingwex -lmsvcrt -lkernel32 C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/default-manifest.o C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/crtend.o
+        C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe -plugin C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/liblto_plugin.dll -plugin-opt=C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/lto-wrapper.exe -plugin-opt=-fresolution=C:\\Users\\Asus\\AppData\\Local\\Temp\\ccq4qNof.res -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmoldname -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lpthread -plugin-opt=-pass-through=-ladvapi32 -plugin-opt=-pass-through=-lshell32 -plugin-opt=-pass-through=-luser32 -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmoldname -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 -m i386pep -Bdynamic -o cmTC_7e703.exe C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/crt2.o C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/crtbegin.o -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0 -LC:/msys64/mingw64/bin/../lib/gcc -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../lib -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../.. -v --whole-archive CMakeFiles\\cmTC_7e703.dir/objects.a --no-whole-archive --out-implib libcmTC_7e703.dll.a --major-image-version 0 --minor-image-version 0 -lstdc++ -lmingw32 -lgcc_s -lgcc -lmoldname -lmingwex -lmsvcrt -lkernel32 -lpthread -ladvapi32 -lshell32 -luser32 -lkernel32 -lmingw32 -lgcc_s -lgcc -lmoldname -lmingwex -lmsvcrt -lkernel32 C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/default-manifest.o C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/crtend.o
         GNU ld (GNU Binutils) 2.37
-        COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_57ac3.exe' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'cmTC_57ac3.'
-        "C:\\Program Files\\CMake\\bin\\cmake.exe" -E rm -f CMakeFiles\\cmTC_57ac3.dir/objects.a
-        C:\\msys64\\mingw64\\bin\\ar.exe qc CMakeFiles\\cmTC_57ac3.dir/objects.a @CMakeFiles\\cmTC_57ac3.dir\\objects1.rsp
-        C:\\msys64\\mingw64\\bin\\c++.exe  -v -Wl,-v -Wl,--whole-archive CMakeFiles\\cmTC_57ac3.dir/objects.a -Wl,--no-whole-archive -o cmTC_57ac3.exe -Wl,--out-implib,libcmTC_57ac3.dll.a -Wl,--major-image-version,0,--minor-image-version,0
-        mingw32-make[1]: Leaving directory 'C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/build_windows/CMakeFiles/CMakeScratch/TryCompile-e0demk'
+        COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_7e703.exe' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'cmTC_7e703.'
+        "C:\\Program Files\\CMake\\bin\\cmake.exe" -E rm -f CMakeFiles\\cmTC_7e703.dir/objects.a
+        C:\\msys64\\mingw64\\bin\\ar.exe qc CMakeFiles\\cmTC_7e703.dir/objects.a @CMakeFiles\\cmTC_7e703.dir\\objects1.rsp
+        C:\\msys64\\mingw64\\bin\\c++.exe  -v -Wl,-v -Wl,--whole-archive CMakeFiles\\cmTC_7e703.dir/objects.a -Wl,--no-whole-archive -o cmTC_7e703.exe -Wl,--out-implib,libcmTC_7e703.dll.a -Wl,--major-image-version,0,--minor-image-version,0
+        mingw32-make[1]: Leaving directory 'C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/build_windows/CMakeFiles/CMakeScratch/TryCompile-7acpms'
         
       exitCode: 0
   -
@@ -3232,13 +3363,13 @@ events:
       Parsed CXX implicit link information:
         link line regex: [^( *|.*[/\\])(ld[0-9]*(|\\.[a-rt-z][a-z]*|\\.s[a-np-z][a-z]*|\\.so[a-z]+)|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\\]+-)?ld|collect2)[^/\\]*( |$)]
         linker tool regex: [^[ 	]*(->|")?[ 	]*(([^"]*[/\\])?(ld[0-9]*(|\\.[a-rt-z][a-z]*|\\.s[a-np-z][a-z]*|\\.so[a-z]+)))("|,| |$)]
-        ignore line: [Change Dir: 'C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/build_windows/CMakeFiles/CMakeScratch/TryCompile-e0demk']
+        ignore line: [Change Dir: 'C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/build_windows/CMakeFiles/CMakeScratch/TryCompile-7acpms']
         ignore line: []
-        ignore line: [Run Build Command(s): "C:/Program Files/CMake/bin/cmake.exe" -E env VERBOSE=1 C:/msys64/mingw64/bin/mingw32-make.exe -f Makefile cmTC_57ac3/fast]
-        ignore line: [C:/msys64/mingw64/bin/mingw32-make.exe  -f CMakeFiles\\cmTC_57ac3.dir\\build.make CMakeFiles/cmTC_57ac3.dir/build]
-        ignore line: [mingw32-make[1]: Entering directory 'C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/build_windows/CMakeFiles/CMakeScratch/TryCompile-e0demk']
-        ignore line: [Building CXX object CMakeFiles/cmTC_57ac3.dir/CMakeCXXCompilerABI.cpp.obj]
-        ignore line: [C:\\msys64\\mingw64\\bin\\c++.exe   -v -o CMakeFiles\\cmTC_57ac3.dir\\CMakeCXXCompilerABI.cpp.obj -c "C:\\Program Files\\CMake\\share\\cmake-4.1\\Modules\\CMakeCXXCompilerABI.cpp"]
+        ignore line: [Run Build Command(s): "C:/Program Files/CMake/bin/cmake.exe" -E env VERBOSE=1 C:/msys64/mingw64/bin/mingw32-make.exe -f Makefile cmTC_7e703/fast]
+        ignore line: [C:/msys64/mingw64/bin/mingw32-make.exe  -f CMakeFiles\\cmTC_7e703.dir\\build.make CMakeFiles/cmTC_7e703.dir/build]
+        ignore line: [mingw32-make[1]: Entering directory 'C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/build_windows/CMakeFiles/CMakeScratch/TryCompile-7acpms']
+        ignore line: [Building CXX object CMakeFiles/cmTC_7e703.dir/CMakeCXXCompilerABI.cpp.obj]
+        ignore line: [C:\\msys64\\mingw64\\bin\\c++.exe   -v -o CMakeFiles\\cmTC_7e703.dir\\CMakeCXXCompilerABI.cpp.obj -c "C:\\Program Files\\CMake\\share\\cmake-4.1\\Modules\\CMakeCXXCompilerABI.cpp"]
         ignore line: [Using built-in specs.]
         ignore line: [COLLECT_GCC=C:\\msys64\\mingw64\\bin\\c++.exe]
         ignore line: [Target: x86_64-w64-mingw32]
@@ -3246,8 +3377,8 @@ events:
         ignore line: [Thread model: posix]
         ignore line: [Supported LTO compression algorithms: zlib zstd]
         ignore line: [gcc version 11.2.0 (Rev1  Built by MSYS2 project) ]
-        ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles\\cmTC_57ac3.dir\\CMakeCXXCompilerABI.cpp.obj' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles\\cmTC_57ac3.dir\\']
-        ignore line: [ C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/cc1plus.exe -quiet -v -iprefix C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/ -D_REENTRANT C:\\Program Files\\CMake\\share\\cmake-4.1\\Modules\\CMakeCXXCompilerABI.cpp -quiet -dumpdir CMakeFiles\\cmTC_57ac3.dir\\ -dumpbase CMakeCXXCompilerABI.cpp.cpp -dumpbase-ext .cpp -mtune=generic -march=x86-64 -version -o C:\\Users\\Asus\\AppData\\Local\\Temp\\ccyy4jFG.s]
+        ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles\\cmTC_7e703.dir\\CMakeCXXCompilerABI.cpp.obj' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles\\cmTC_7e703.dir\\']
+        ignore line: [ C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/cc1plus.exe -quiet -v -iprefix C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/ -D_REENTRANT C:\\Program Files\\CMake\\share\\cmake-4.1\\Modules\\CMakeCXXCompilerABI.cpp -quiet -dumpdir CMakeFiles\\cmTC_7e703.dir\\ -dumpbase CMakeCXXCompilerABI.cpp.cpp -dumpbase-ext .cpp -mtune=generic -march=x86-64 -version -o C:\\Users\\Asus\\AppData\\Local\\Temp\\cceWDkwE.s]
         ignore line: [GNU C++17 (Rev1  Built by MSYS2 project) version 11.2.0 (x86_64-w64-mingw32)]
         ignore line: [	compiled by GNU C version 11.2.0  GMP version 6.2.1  MPFR version 4.1.0-p13  MPC version 1.2.1  isl version isl-0.24-GMP]
         ignore line: []
@@ -3276,8 +3407,8 @@ events:
         ignore line: []
         ignore line: [GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072]
         ignore line: [Compiler executable checksum: cb8d24b0bda2fdc2f4bb48fa7a04a068]
-        ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles\\cmTC_57ac3.dir\\CMakeCXXCompilerABI.cpp.obj' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles\\cmTC_57ac3.dir\\']
-        ignore line: [ C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/bin/as.exe -v -o CMakeFiles\\cmTC_57ac3.dir\\CMakeCXXCompilerABI.cpp.obj C:\\Users\\Asus\\AppData\\Local\\Temp\\ccyy4jFG.s]
+        ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles\\cmTC_7e703.dir\\CMakeCXXCompilerABI.cpp.obj' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles\\cmTC_7e703.dir\\']
+        ignore line: [ C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/bin/as.exe -v -o CMakeFiles\\cmTC_7e703.dir\\CMakeCXXCompilerABI.cpp.obj C:\\Users\\Asus\\AppData\\Local\\Temp\\cceWDkwE.s]
         ignore line: [GNU assembler version 2.37 (x86_64-w64-mingw32) using BFD version (GNU Binutils) 2.37]
         ignore line: [COMPILER_PATH=C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/]
         ignore line: [C:/msys64/mingw64/bin/../lib/gcc/]
@@ -3288,9 +3419,9 @@ events:
         ignore line: [C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../lib/]
         ignore line: [C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/]
         ignore line: [C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../]
-        ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles\\cmTC_57ac3.dir\\CMakeCXXCompilerABI.cpp.obj' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles\\cmTC_57ac3.dir\\CMakeCXXCompilerABI.cpp.']
-        ignore line: [Linking CXX executable cmTC_57ac3.exe]
-        ignore line: ["C:\\Program Files\\CMake\\bin\\cmake.exe" -E cmake_link_script CMakeFiles\\cmTC_57ac3.dir\\link.txt --verbose=1]
+        ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles\\cmTC_7e703.dir\\CMakeCXXCompilerABI.cpp.obj' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles\\cmTC_7e703.dir\\CMakeCXXCompilerABI.cpp.']
+        ignore line: [Linking CXX executable cmTC_7e703.exe]
+        ignore line: ["C:\\Program Files\\CMake\\bin\\cmake.exe" -E cmake_link_script CMakeFiles\\cmTC_7e703.dir\\link.txt --verbose=1]
         ignore line: [Using built-in specs.]
         ignore line: [COLLECT_GCC=C:\\msys64\\mingw64\\bin\\c++.exe]
         ignore line: [COLLECT_LTO_WRAPPER=C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/lto-wrapper.exe]
@@ -3308,13 +3439,13 @@ events:
         ignore line: [C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../lib/]
         ignore line: [C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/]
         ignore line: [C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../]
-        ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_57ac3.exe' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'cmTC_57ac3.']
-        link line: [ C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/collect2.exe -plugin C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/liblto_plugin.dll -plugin-opt=C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/lto-wrapper.exe -plugin-opt=-fresolution=C:\\Users\\Asus\\AppData\\Local\\Temp\\ccUjxy6j.res -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmoldname -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lpthread -plugin-opt=-pass-through=-ladvapi32 -plugin-opt=-pass-through=-lshell32 -plugin-opt=-pass-through=-luser32 -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmoldname -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 -m i386pep -Bdynamic -o cmTC_57ac3.exe C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/crt2.o C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/crtbegin.o -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0 -LC:/msys64/mingw64/bin/../lib/gcc -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../lib -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../.. -v --whole-archive CMakeFiles\\cmTC_57ac3.dir/objects.a --no-whole-archive --out-implib libcmTC_57ac3.dll.a --major-image-version 0 --minor-image-version 0 -lstdc++ -lmingw32 -lgcc_s -lgcc -lmoldname -lmingwex -lmsvcrt -lkernel32 -lpthread -ladvapi32 -lshell32 -luser32 -lkernel32 -lmingw32 -lgcc_s -lgcc -lmoldname -lmingwex -lmsvcrt -lkernel32 C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/default-manifest.o C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/crtend.o]
+        ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_7e703.exe' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'cmTC_7e703.']
+        link line: [ C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/collect2.exe -plugin C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/liblto_plugin.dll -plugin-opt=C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/lto-wrapper.exe -plugin-opt=-fresolution=C:\\Users\\Asus\\AppData\\Local\\Temp\\ccq4qNof.res -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmoldname -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lpthread -plugin-opt=-pass-through=-ladvapi32 -plugin-opt=-pass-through=-lshell32 -plugin-opt=-pass-through=-luser32 -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmoldname -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 -m i386pep -Bdynamic -o cmTC_7e703.exe C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/crt2.o C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/crtbegin.o -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0 -LC:/msys64/mingw64/bin/../lib/gcc -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../lib -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../.. -v --whole-archive CMakeFiles\\cmTC_7e703.dir/objects.a --no-whole-archive --out-implib libcmTC_7e703.dll.a --major-image-version 0 --minor-image-version 0 -lstdc++ -lmingw32 -lgcc_s -lgcc -lmoldname -lmingwex -lmsvcrt -lkernel32 -lpthread -ladvapi32 -lshell32 -luser32 -lkernel32 -lmingw32 -lgcc_s -lgcc -lmoldname -lmingwex -lmsvcrt -lkernel32 C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/default-manifest.o C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/crtend.o]
           arg [C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/collect2.exe] ==> ignore
           arg [-plugin] ==> ignore
           arg [C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/liblto_plugin.dll] ==> ignore
           arg [-plugin-opt=C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/lto-wrapper.exe] ==> ignore
-          arg [-plugin-opt=-fresolution=C:\\Users\\Asus\\AppData\\Local\\Temp\\ccUjxy6j.res] ==> ignore
+          arg [-plugin-opt=-fresolution=C:\\Users\\Asus\\AppData\\Local\\Temp\\ccq4qNof.res] ==> ignore
           arg [-plugin-opt=-pass-through=-lmingw32] ==> ignore
           arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
           arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
@@ -3338,7 +3469,7 @@ events:
           arg [i386pep] ==> ignore
           arg [-Bdynamic] ==> search dynamic
           arg [-o] ==> ignore
-          arg [cmTC_57ac3.exe] ==> ignore
+          arg [cmTC_7e703.exe] ==> ignore
           arg [C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/crt2.o] ==> obj [C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/crt2.o]
           arg [C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/crtbegin.o] ==> obj [C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/crtbegin.o]
           arg [-LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0] ==> dir [C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0]
@@ -3349,10 +3480,10 @@ events:
           arg [-LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../..] ==> dir [C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../..]
           arg [-v] ==> ignore
           arg [--whole-archive] ==> ignore
-          arg [CMakeFiles\\cmTC_57ac3.dir/objects.a] ==> ignore
+          arg [CMakeFiles\\cmTC_7e703.dir/objects.a] ==> ignore
           arg [--no-whole-archive] ==> ignore
           arg [--out-implib] ==> ignore
-          arg [libcmTC_57ac3.dll.a] ==> ignore
+          arg [libcmTC_7e703.dll.a] ==> ignore
           arg [--major-image-version] ==> ignore
           arg [0] ==> ignore
           arg [--minor-image-version] ==> ignore
@@ -3380,7 +3511,7 @@ events:
           arg [C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/default-manifest.o] ==> obj [C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/default-manifest.o]
           arg [C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/crtend.o] ==> obj [C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/crtend.o]
         ignore line: [collect2 version 11.2.0]
-        ignore line: [C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe -plugin C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/liblto_plugin.dll -plugin-opt=C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/lto-wrapper.exe -plugin-opt=-fresolution=C:\\Users\\Asus\\AppData\\Local\\Temp\\ccUjxy6j.res -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmoldname -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lpthread -plugin-opt=-pass-through=-ladvapi32 -plugin-opt=-pass-through=-lshell32 -plugin-opt=-pass-through=-luser32 -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmoldname -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 -m i386pep -Bdynamic -o cmTC_57ac3.exe C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/crt2.o C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/crtbegin.o -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0 -LC:/msys64/mingw64/bin/../lib/gcc -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../lib -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../.. -v --whole-archive CMakeFiles\\cmTC_57ac3.dir/objects.a --no-whole-archive --out-implib libcmTC_57ac3.dll.a --major-image-version 0 --minor-image-version 0 -lstdc++ -lmingw32 -lgcc_s -lgcc -lmoldname -lmingwex -lmsvcrt -lkernel32 -lpthread -ladvapi32 -lshell32 -luser32 -lkernel32 -lmingw32 -lgcc_s -lgcc -lmoldname -lmingwex -lmsvcrt -lkernel32 C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/default-manifest.o C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/crtend.o]
+        ignore line: [C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe -plugin C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/liblto_plugin.dll -plugin-opt=C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/lto-wrapper.exe -plugin-opt=-fresolution=C:\\Users\\Asus\\AppData\\Local\\Temp\\ccq4qNof.res -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmoldname -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lpthread -plugin-opt=-pass-through=-ladvapi32 -plugin-opt=-pass-through=-lshell32 -plugin-opt=-pass-through=-luser32 -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmoldname -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 -m i386pep -Bdynamic -o cmTC_7e703.exe C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/crt2.o C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/crtbegin.o -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0 -LC:/msys64/mingw64/bin/../lib/gcc -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../lib -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../.. -v --whole-archive CMakeFiles\\cmTC_7e703.dir/objects.a --no-whole-archive --out-implib libcmTC_7e703.dll.a --major-image-version 0 --minor-image-version 0 -lstdc++ -lmingw32 -lgcc_s -lgcc -lmoldname -lmingwex -lmsvcrt -lkernel32 -lpthread -ladvapi32 -lshell32 -luser32 -lkernel32 -lmingw32 -lgcc_s -lgcc -lmoldname -lmingwex -lmsvcrt -lkernel32 C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/default-manifest.o C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/crtend.o]
         linker tool for 'CXX': C:/msys64/mingw64/x86_64-w64-mingw32/bin/ld.exe
         remove lib [msvcrt]
         remove lib [msvcrt]
@@ -3442,6 +3573,7 @@ events:
     found: "C:/msys64/mingw64/bin/cc.exe"
     search_context:
       ENV{PATH}:
+        - "C:\\Flutter\\flutter\\bin\\cache\\dart-sdk\\bin\\"
         - "C:\\VulkanSDK\\1.4.328.1\\Bin"
         - "C:\\Program Files\\Python312\\Scripts\\"
         - "C:\\Program Files\\Python312\\"
@@ -3487,6 +3619,7 @@ events:
         - "C:\\Users\\Asus\\AppData\\Local\\Microsoft\\WindowsApps"
         - "C:\\Program Files\\JetBrains\\IntelliJ IDEA 2024.3.2.2\\bin"
         - "C:\\Program Files\\JetBrains\\CLion 2024.3.2\\bin"
+        - "c:\\Users\\Asus\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
       CMAKE_INSTALL_PREFIX: "C:/Program Files (x86)/telemetry_vulkan"
       CMAKE_SYSTEM_PREFIX_PATH:
         - "C:/Program Files"
@@ -3520,6 +3653,7 @@ events:
     found: "C:/Program Files/CMake/share/cmake-4.1/Modules/CMakeCCompilerId.c.in"
     search_context:
       ENV{PATH}:
+        - "C:\\Flutter\\flutter\\bin\\cache\\dart-sdk\\bin\\"
         - "C:\\VulkanSDK\\1.4.328.1\\Bin"
         - "C:\\Program Files\\Python312\\Scripts\\"
         - "C:\\Program Files\\Python312\\"
@@ -3565,6 +3699,7 @@ events:
         - "C:\\Users\\Asus\\AppData\\Local\\Microsoft\\WindowsApps"
         - "C:\\Program Files\\JetBrains\\IntelliJ IDEA 2024.3.2.2\\bin"
         - "C:\\Program Files\\JetBrains\\CLion 2024.3.2\\bin"
+        - "c:\\Users\\Asus\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
       CMAKE_INSTALL_PREFIX: "C:/Program Files (x86)/telemetry_vulkan"
       CMAKE_SYSTEM_PREFIX_PATH:
         - "C:/Program Files"
@@ -3617,6 +3752,7 @@ events:
       - "gcc-ar"
     candidate_directories:
       - "C:/msys64/mingw64/bin/"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/"
       - "C:/VulkanSDK/1.4.328.1/Bin/"
       - "C:/Program Files/Python312/Scripts/"
       - "C:/Program Files/Python312/"
@@ -3659,6 +3795,7 @@ events:
       - "C:/Users/Asus/AppData/Local/Coursier/data/bin/"
       - "C:/Program Files/JetBrains/IntelliJ IDEA 2024.3.2.2/bin/"
       - "C:/Program Files/JetBrains/CLion 2024.3.2/bin/"
+      - "C:/Users/Asus/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/"
       - "C:/Program Files/bin/"
       - "C:/Program Files/sbin/"
       - "C:/Program Files/"
@@ -3675,6 +3812,9 @@ events:
       - "C:/msys64/mingw64/bin/gcc-ar-11.2.com"
       - "C:/msys64/mingw64/bin/gcc-ar-11.2.exe"
       - "C:/msys64/mingw64/bin/gcc-ar-11.2"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/gcc-ar-11.2.com"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/gcc-ar-11.2.exe"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/gcc-ar-11.2"
       - "C:/VulkanSDK/1.4.328.1/Bin/gcc-ar-11.2.com"
       - "C:/VulkanSDK/1.4.328.1/Bin/gcc-ar-11.2.exe"
       - "C:/VulkanSDK/1.4.328.1/Bin/gcc-ar-11.2"
@@ -3801,6 +3941,9 @@ events:
       - "C:/Program Files/JetBrains/CLion 2024.3.2/bin/gcc-ar-11.2.com"
       - "C:/Program Files/JetBrains/CLion 2024.3.2/bin/gcc-ar-11.2.exe"
       - "C:/Program Files/JetBrains/CLion 2024.3.2/bin/gcc-ar-11.2"
+      - "C:/Users/Asus/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/gcc-ar-11.2.com"
+      - "C:/Users/Asus/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/gcc-ar-11.2.exe"
+      - "C:/Users/Asus/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/gcc-ar-11.2"
       - "C:/Program Files/bin/gcc-ar-11.2.com"
       - "C:/Program Files/bin/gcc-ar-11.2.exe"
       - "C:/Program Files/bin/gcc-ar-11.2"
@@ -3840,6 +3983,9 @@ events:
       - "C:/msys64/mingw64/bin/gcc-ar-11.com"
       - "C:/msys64/mingw64/bin/gcc-ar-11.exe"
       - "C:/msys64/mingw64/bin/gcc-ar-11"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/gcc-ar-11.com"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/gcc-ar-11.exe"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/gcc-ar-11"
       - "C:/VulkanSDK/1.4.328.1/Bin/gcc-ar-11.com"
       - "C:/VulkanSDK/1.4.328.1/Bin/gcc-ar-11.exe"
       - "C:/VulkanSDK/1.4.328.1/Bin/gcc-ar-11"
@@ -3966,6 +4112,9 @@ events:
       - "C:/Program Files/JetBrains/CLion 2024.3.2/bin/gcc-ar-11.com"
       - "C:/Program Files/JetBrains/CLion 2024.3.2/bin/gcc-ar-11.exe"
       - "C:/Program Files/JetBrains/CLion 2024.3.2/bin/gcc-ar-11"
+      - "C:/Users/Asus/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/gcc-ar-11.com"
+      - "C:/Users/Asus/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/gcc-ar-11.exe"
+      - "C:/Users/Asus/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/gcc-ar-11"
       - "C:/Program Files/bin/gcc-ar-11.com"
       - "C:/Program Files/bin/gcc-ar-11.exe"
       - "C:/Program Files/bin/gcc-ar-11"
@@ -4005,6 +4154,9 @@ events:
       - "C:/msys64/mingw64/bin/gcc-ar11.com"
       - "C:/msys64/mingw64/bin/gcc-ar11.exe"
       - "C:/msys64/mingw64/bin/gcc-ar11"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/gcc-ar11.com"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/gcc-ar11.exe"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/gcc-ar11"
       - "C:/VulkanSDK/1.4.328.1/Bin/gcc-ar11.com"
       - "C:/VulkanSDK/1.4.328.1/Bin/gcc-ar11.exe"
       - "C:/VulkanSDK/1.4.328.1/Bin/gcc-ar11"
@@ -4131,6 +4283,9 @@ events:
       - "C:/Program Files/JetBrains/CLion 2024.3.2/bin/gcc-ar11.com"
       - "C:/Program Files/JetBrains/CLion 2024.3.2/bin/gcc-ar11.exe"
       - "C:/Program Files/JetBrains/CLion 2024.3.2/bin/gcc-ar11"
+      - "C:/Users/Asus/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/gcc-ar11.com"
+      - "C:/Users/Asus/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/gcc-ar11.exe"
+      - "C:/Users/Asus/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/gcc-ar11"
       - "C:/Program Files/bin/gcc-ar11.com"
       - "C:/Program Files/bin/gcc-ar11.exe"
       - "C:/Program Files/bin/gcc-ar11"
@@ -4171,6 +4326,7 @@ events:
     found: "C:/msys64/mingw64/bin/gcc-ar.exe"
     search_context:
       ENV{PATH}:
+        - "C:\\Flutter\\flutter\\bin\\cache\\dart-sdk\\bin\\"
         - "C:\\VulkanSDK\\1.4.328.1\\Bin"
         - "C:\\Program Files\\Python312\\Scripts\\"
         - "C:\\Program Files\\Python312\\"
@@ -4216,6 +4372,7 @@ events:
         - "C:\\Users\\Asus\\AppData\\Local\\Microsoft\\WindowsApps"
         - "C:\\Program Files\\JetBrains\\IntelliJ IDEA 2024.3.2.2\\bin"
         - "C:\\Program Files\\JetBrains\\CLion 2024.3.2\\bin"
+        - "c:\\Users\\Asus\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
       CMAKE_INSTALL_PREFIX: "C:/Program Files (x86)/telemetry_vulkan"
       CMAKE_SYSTEM_PREFIX_PATH:
         - "C:/Program Files"
@@ -4246,6 +4403,7 @@ events:
       - "gcc-ranlib"
     candidate_directories:
       - "C:/msys64/mingw64/bin/"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/"
       - "C:/VulkanSDK/1.4.328.1/Bin/"
       - "C:/Program Files/Python312/Scripts/"
       - "C:/Program Files/Python312/"
@@ -4288,6 +4446,7 @@ events:
       - "C:/Users/Asus/AppData/Local/Coursier/data/bin/"
       - "C:/Program Files/JetBrains/IntelliJ IDEA 2024.3.2.2/bin/"
       - "C:/Program Files/JetBrains/CLion 2024.3.2/bin/"
+      - "C:/Users/Asus/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/"
       - "C:/Program Files/bin/"
       - "C:/Program Files/sbin/"
       - "C:/Program Files/"
@@ -4304,6 +4463,9 @@ events:
       - "C:/msys64/mingw64/bin/gcc-ranlib-11.2.com"
       - "C:/msys64/mingw64/bin/gcc-ranlib-11.2.exe"
       - "C:/msys64/mingw64/bin/gcc-ranlib-11.2"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/gcc-ranlib-11.2.com"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/gcc-ranlib-11.2.exe"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/gcc-ranlib-11.2"
       - "C:/VulkanSDK/1.4.328.1/Bin/gcc-ranlib-11.2.com"
       - "C:/VulkanSDK/1.4.328.1/Bin/gcc-ranlib-11.2.exe"
       - "C:/VulkanSDK/1.4.328.1/Bin/gcc-ranlib-11.2"
@@ -4430,6 +4592,9 @@ events:
       - "C:/Program Files/JetBrains/CLion 2024.3.2/bin/gcc-ranlib-11.2.com"
       - "C:/Program Files/JetBrains/CLion 2024.3.2/bin/gcc-ranlib-11.2.exe"
       - "C:/Program Files/JetBrains/CLion 2024.3.2/bin/gcc-ranlib-11.2"
+      - "C:/Users/Asus/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/gcc-ranlib-11.2.com"
+      - "C:/Users/Asus/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/gcc-ranlib-11.2.exe"
+      - "C:/Users/Asus/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/gcc-ranlib-11.2"
       - "C:/Program Files/bin/gcc-ranlib-11.2.com"
       - "C:/Program Files/bin/gcc-ranlib-11.2.exe"
       - "C:/Program Files/bin/gcc-ranlib-11.2"
@@ -4469,6 +4634,9 @@ events:
       - "C:/msys64/mingw64/bin/gcc-ranlib-11.com"
       - "C:/msys64/mingw64/bin/gcc-ranlib-11.exe"
       - "C:/msys64/mingw64/bin/gcc-ranlib-11"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/gcc-ranlib-11.com"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/gcc-ranlib-11.exe"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/gcc-ranlib-11"
       - "C:/VulkanSDK/1.4.328.1/Bin/gcc-ranlib-11.com"
       - "C:/VulkanSDK/1.4.328.1/Bin/gcc-ranlib-11.exe"
       - "C:/VulkanSDK/1.4.328.1/Bin/gcc-ranlib-11"
@@ -4595,6 +4763,9 @@ events:
       - "C:/Program Files/JetBrains/CLion 2024.3.2/bin/gcc-ranlib-11.com"
       - "C:/Program Files/JetBrains/CLion 2024.3.2/bin/gcc-ranlib-11.exe"
       - "C:/Program Files/JetBrains/CLion 2024.3.2/bin/gcc-ranlib-11"
+      - "C:/Users/Asus/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/gcc-ranlib-11.com"
+      - "C:/Users/Asus/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/gcc-ranlib-11.exe"
+      - "C:/Users/Asus/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/gcc-ranlib-11"
       - "C:/Program Files/bin/gcc-ranlib-11.com"
       - "C:/Program Files/bin/gcc-ranlib-11.exe"
       - "C:/Program Files/bin/gcc-ranlib-11"
@@ -4634,6 +4805,9 @@ events:
       - "C:/msys64/mingw64/bin/gcc-ranlib11.com"
       - "C:/msys64/mingw64/bin/gcc-ranlib11.exe"
       - "C:/msys64/mingw64/bin/gcc-ranlib11"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/gcc-ranlib11.com"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/gcc-ranlib11.exe"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/gcc-ranlib11"
       - "C:/VulkanSDK/1.4.328.1/Bin/gcc-ranlib11.com"
       - "C:/VulkanSDK/1.4.328.1/Bin/gcc-ranlib11.exe"
       - "C:/VulkanSDK/1.4.328.1/Bin/gcc-ranlib11"
@@ -4760,6 +4934,9 @@ events:
       - "C:/Program Files/JetBrains/CLion 2024.3.2/bin/gcc-ranlib11.com"
       - "C:/Program Files/JetBrains/CLion 2024.3.2/bin/gcc-ranlib11.exe"
       - "C:/Program Files/JetBrains/CLion 2024.3.2/bin/gcc-ranlib11"
+      - "C:/Users/Asus/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/gcc-ranlib11.com"
+      - "C:/Users/Asus/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/gcc-ranlib11.exe"
+      - "C:/Users/Asus/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/gcc-ranlib11"
       - "C:/Program Files/bin/gcc-ranlib11.com"
       - "C:/Program Files/bin/gcc-ranlib11.exe"
       - "C:/Program Files/bin/gcc-ranlib11"
@@ -4800,6 +4977,7 @@ events:
     found: "C:/msys64/mingw64/bin/gcc-ranlib.exe"
     search_context:
       ENV{PATH}:
+        - "C:\\Flutter\\flutter\\bin\\cache\\dart-sdk\\bin\\"
         - "C:\\VulkanSDK\\1.4.328.1\\Bin"
         - "C:\\Program Files\\Python312\\Scripts\\"
         - "C:\\Program Files\\Python312\\"
@@ -4845,6 +5023,7 @@ events:
         - "C:\\Users\\Asus\\AppData\\Local\\Microsoft\\WindowsApps"
         - "C:\\Program Files\\JetBrains\\IntelliJ IDEA 2024.3.2.2\\bin"
         - "C:\\Program Files\\JetBrains\\CLion 2024.3.2\\bin"
+        - "c:\\Users\\Asus\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
       CMAKE_INSTALL_PREFIX: "C:/Program Files (x86)/telemetry_vulkan"
       CMAKE_SYSTEM_PREFIX_PATH:
         - "C:/Program Files"
@@ -4860,8 +5039,8 @@ events:
     checks:
       - "Detecting C compiler ABI info"
     directories:
-      source: "C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/build_windows/CMakeFiles/CMakeScratch/TryCompile-u1baa7"
-      binary: "C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/build_windows/CMakeFiles/CMakeScratch/TryCompile-u1baa7"
+      source: "C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/build_windows/CMakeFiles/CMakeScratch/TryCompile-owqbqz"
+      binary: "C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/build_windows/CMakeFiles/CMakeScratch/TryCompile-owqbqz"
     cmakeVariables:
       CMAKE_C_FLAGS: ""
       CMAKE_C_FLAGS_DEBUG: "-g"
@@ -4870,13 +5049,13 @@ events:
       variable: "CMAKE_C_ABI_COMPILED"
       cached: true
       stdout: |
-        Change Dir: 'C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/build_windows/CMakeFiles/CMakeScratch/TryCompile-u1baa7'
+        Change Dir: 'C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/build_windows/CMakeFiles/CMakeScratch/TryCompile-owqbqz'
         
-        Run Build Command(s): "C:/Program Files/CMake/bin/cmake.exe" -E env VERBOSE=1 C:/msys64/mingw64/bin/mingw32-make.exe -f Makefile cmTC_1e13d/fast
-        C:/msys64/mingw64/bin/mingw32-make.exe  -f CMakeFiles\\cmTC_1e13d.dir\\build.make CMakeFiles/cmTC_1e13d.dir/build
-        mingw32-make[1]: Entering directory 'C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/build_windows/CMakeFiles/CMakeScratch/TryCompile-u1baa7'
-        Building C object CMakeFiles/cmTC_1e13d.dir/CMakeCCompilerABI.c.obj
-        C:\\msys64\\mingw64\\bin\\cc.exe   -v -o CMakeFiles\\cmTC_1e13d.dir\\CMakeCCompilerABI.c.obj -c "C:\\Program Files\\CMake\\share\\cmake-4.1\\Modules\\CMakeCCompilerABI.c"
+        Run Build Command(s): "C:/Program Files/CMake/bin/cmake.exe" -E env VERBOSE=1 C:/msys64/mingw64/bin/mingw32-make.exe -f Makefile cmTC_4242e/fast
+        C:/msys64/mingw64/bin/mingw32-make.exe  -f CMakeFiles\\cmTC_4242e.dir\\build.make CMakeFiles/cmTC_4242e.dir/build
+        mingw32-make[1]: Entering directory 'C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/build_windows/CMakeFiles/CMakeScratch/TryCompile-owqbqz'
+        Building C object CMakeFiles/cmTC_4242e.dir/CMakeCCompilerABI.c.obj
+        C:\\msys64\\mingw64\\bin\\cc.exe   -v -o CMakeFiles\\cmTC_4242e.dir\\CMakeCCompilerABI.c.obj -c "C:\\Program Files\\CMake\\share\\cmake-4.1\\Modules\\CMakeCCompilerABI.c"
         Using built-in specs.
         COLLECT_GCC=C:\\msys64\\mingw64\\bin\\cc.exe
         Target: x86_64-w64-mingw32
@@ -4884,8 +5063,8 @@ events:
         Thread model: posix
         Supported LTO compression algorithms: zlib zstd
         gcc version 11.2.0 (Rev1, Built by MSYS2 project) 
-        COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles\\cmTC_1e13d.dir\\CMakeCCompilerABI.c.obj' '-c' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles\\cmTC_1e13d.dir\\'
-         C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/cc1.exe -quiet -v -iprefix C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/ -D_REENTRANT C:\\Program Files\\CMake\\share\\cmake-4.1\\Modules\\CMakeCCompilerABI.c -quiet -dumpdir CMakeFiles\\cmTC_1e13d.dir\\ -dumpbase CMakeCCompilerABI.c.c -dumpbase-ext .c -mtune=generic -march=x86-64 -version -o C:\\Users\\Asus\\AppData\\Local\\Temp\\cceVtyhw.s
+        COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles\\cmTC_4242e.dir\\CMakeCCompilerABI.c.obj' '-c' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles\\cmTC_4242e.dir\\'
+         C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/cc1.exe -quiet -v -iprefix C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/ -D_REENTRANT C:\\Program Files\\CMake\\share\\cmake-4.1\\Modules\\CMakeCCompilerABI.c -quiet -dumpdir CMakeFiles\\cmTC_4242e.dir\\ -dumpbase CMakeCCompilerABI.c.c -dumpbase-ext .c -mtune=generic -march=x86-64 -version -o C:\\Users\\Asus\\AppData\\Local\\Temp\\ccW7nzjM.s
         GNU C17 (Rev1, Built by MSYS2 project) version 11.2.0 (x86_64-w64-mingw32)
         	compiled by GNU C version 11.2.0, GMP version 6.2.1, MPFR version 4.1.0-p13, MPC version 1.2.1, isl version isl-0.24-GMP
         
@@ -4908,14 +5087,14 @@ events:
         
         GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
         Compiler executable checksum: 897684f6bd95d46b7e0f23c8f6f5aafc
-        COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles\\cmTC_1e13d.dir\\CMakeCCompilerABI.c.obj' '-c' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles\\cmTC_1e13d.dir\\'
-         C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/bin/as.exe -v -o CMakeFiles\\cmTC_1e13d.dir\\CMakeCCompilerABI.c.obj C:\\Users\\Asus\\AppData\\Local\\Temp\\cceVtyhw.s
+        COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles\\cmTC_4242e.dir\\CMakeCCompilerABI.c.obj' '-c' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles\\cmTC_4242e.dir\\'
+         C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/bin/as.exe -v -o CMakeFiles\\cmTC_4242e.dir\\CMakeCCompilerABI.c.obj C:\\Users\\Asus\\AppData\\Local\\Temp\\ccW7nzjM.s
         GNU assembler version 2.37 (x86_64-w64-mingw32) using BFD version (GNU Binutils) 2.37
         COMPILER_PATH=C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/;C:/msys64/mingw64/bin/../lib/gcc/;C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/bin/
         LIBRARY_PATH=C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/;C:/msys64/mingw64/bin/../lib/gcc/;C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/;C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../lib/;C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/;C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../
-        COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles\\cmTC_1e13d.dir\\CMakeCCompilerABI.c.obj' '-c' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles\\cmTC_1e13d.dir\\CMakeCCompilerABI.c.'
-        Linking C executable cmTC_1e13d.exe
-        "C:\\Program Files\\CMake\\bin\\cmake.exe" -E cmake_link_script CMakeFiles\\cmTC_1e13d.dir\\link.txt --verbose=1
+        COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles\\cmTC_4242e.dir\\CMakeCCompilerABI.c.obj' '-c' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles\\cmTC_4242e.dir\\CMakeCCompilerABI.c.'
+        Linking C executable cmTC_4242e.exe
+        "C:\\Program Files\\CMake\\bin\\cmake.exe" -E cmake_link_script CMakeFiles\\cmTC_4242e.dir\\link.txt --verbose=1
         Using built-in specs.
         COLLECT_GCC=C:\\msys64\\mingw64\\bin\\cc.exe
         COLLECT_LTO_WRAPPER=C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/lto-wrapper.exe
@@ -4926,16 +5105,16 @@ events:
         gcc version 11.2.0 (Rev1, Built by MSYS2 project) 
         COMPILER_PATH=C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/;C:/msys64/mingw64/bin/../lib/gcc/;C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/bin/
         LIBRARY_PATH=C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/;C:/msys64/mingw64/bin/../lib/gcc/;C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/;C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../lib/;C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/;C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../
-        COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_1e13d.exe' '-mtune=generic' '-march=x86-64' '-dumpdir' 'cmTC_1e13d.'
-         C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/collect2.exe -plugin C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/liblto_plugin.dll -plugin-opt=C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/lto-wrapper.exe -plugin-opt=-fresolution=C:\\Users\\Asus\\AppData\\Local\\Temp\\cc87EX0b.res -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_eh -plugin-opt=-pass-through=-lmoldname -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lpthread -plugin-opt=-pass-through=-ladvapi32 -plugin-opt=-pass-through=-lshell32 -plugin-opt=-pass-through=-luser32 -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_eh -plugin-opt=-pass-through=-lmoldname -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 -m i386pep -Bdynamic -o cmTC_1e13d.exe C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/crt2.o C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/crtbegin.o -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0 -LC:/msys64/mingw64/bin/../lib/gcc -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../lib -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../.. -v --whole-archive CMakeFiles\\cmTC_1e13d.dir/objects.a --no-whole-archive --out-implib libcmTC_1e13d.dll.a --major-image-version 0 --minor-image-version 0 -lmingw32 -lgcc -lgcc_eh -lmoldname -lmingwex -lmsvcrt -lkernel32 -lpthread -ladvapi32 -lshell32 -luser32 -lkernel32 -lmingw32 -lgcc -lgcc_eh -lmoldname -lmingwex -lmsvcrt -lkernel32 C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/default-manifest.o C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/crtend.o
+        COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_4242e.exe' '-mtune=generic' '-march=x86-64' '-dumpdir' 'cmTC_4242e.'
+         C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/collect2.exe -plugin C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/liblto_plugin.dll -plugin-opt=C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/lto-wrapper.exe -plugin-opt=-fresolution=C:\\Users\\Asus\\AppData\\Local\\Temp\\ccL3Dpsl.res -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_eh -plugin-opt=-pass-through=-lmoldname -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lpthread -plugin-opt=-pass-through=-ladvapi32 -plugin-opt=-pass-through=-lshell32 -plugin-opt=-pass-through=-luser32 -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_eh -plugin-opt=-pass-through=-lmoldname -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 -m i386pep -Bdynamic -o cmTC_4242e.exe C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/crt2.o C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/crtbegin.o -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0 -LC:/msys64/mingw64/bin/../lib/gcc -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../lib -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../.. -v --whole-archive CMakeFiles\\cmTC_4242e.dir/objects.a --no-whole-archive --out-implib libcmTC_4242e.dll.a --major-image-version 0 --minor-image-version 0 -lmingw32 -lgcc -lgcc_eh -lmoldname -lmingwex -lmsvcrt -lkernel32 -lpthread -ladvapi32 -lshell32 -luser32 -lkernel32 -lmingw32 -lgcc -lgcc_eh -lmoldname -lmingwex -lmsvcrt -lkernel32 C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/default-manifest.o C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/crtend.o
         collect2 version 11.2.0
-        C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe -plugin C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/liblto_plugin.dll -plugin-opt=C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/lto-wrapper.exe -plugin-opt=-fresolution=C:\\Users\\Asus\\AppData\\Local\\Temp\\cc87EX0b.res -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_eh -plugin-opt=-pass-through=-lmoldname -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lpthread -plugin-opt=-pass-through=-ladvapi32 -plugin-opt=-pass-through=-lshell32 -plugin-opt=-pass-through=-luser32 -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_eh -plugin-opt=-pass-through=-lmoldname -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 -m i386pep -Bdynamic -o cmTC_1e13d.exe C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/crt2.o C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/crtbegin.o -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0 -LC:/msys64/mingw64/bin/../lib/gcc -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../lib -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../.. -v --whole-archive CMakeFiles\\cmTC_1e13d.dir/objects.a --no-whole-archive --out-implib libcmTC_1e13d.dll.a --major-image-version 0 --minor-image-version 0 -lmingw32 -lgcc -lgcc_eh -lmoldname -lmingwex -lmsvcrt -lkernel32 -lpthread -ladvapi32 -lshell32 -luser32 -lkernel32 -lmingw32 -lgcc -lgcc_eh -lmoldname -lmingwex -lmsvcrt -lkernel32 C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/default-manifest.o C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/crtend.o
+        C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe -plugin C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/liblto_plugin.dll -plugin-opt=C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/lto-wrapper.exe -plugin-opt=-fresolution=C:\\Users\\Asus\\AppData\\Local\\Temp\\ccL3Dpsl.res -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_eh -plugin-opt=-pass-through=-lmoldname -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lpthread -plugin-opt=-pass-through=-ladvapi32 -plugin-opt=-pass-through=-lshell32 -plugin-opt=-pass-through=-luser32 -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_eh -plugin-opt=-pass-through=-lmoldname -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 -m i386pep -Bdynamic -o cmTC_4242e.exe C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/crt2.o C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/crtbegin.o -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0 -LC:/msys64/mingw64/bin/../lib/gcc -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../lib -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../.. -v --whole-archive CMakeFiles\\cmTC_4242e.dir/objects.a --no-whole-archive --out-implib libcmTC_4242e.dll.a --major-image-version 0 --minor-image-version 0 -lmingw32 -lgcc -lgcc_eh -lmoldname -lmingwex -lmsvcrt -lkernel32 -lpthread -ladvapi32 -lshell32 -luser32 -lkernel32 -lmingw32 -lgcc -lgcc_eh -lmoldname -lmingwex -lmsvcrt -lkernel32 C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/default-manifest.o C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/crtend.o
         GNU ld (GNU Binutils) 2.37
-        COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_1e13d.exe' '-mtune=generic' '-march=x86-64' '-dumpdir' 'cmTC_1e13d.'
-        "C:\\Program Files\\CMake\\bin\\cmake.exe" -E rm -f CMakeFiles\\cmTC_1e13d.dir/objects.a
-        C:\\msys64\\mingw64\\bin\\ar.exe qc CMakeFiles\\cmTC_1e13d.dir/objects.a @CMakeFiles\\cmTC_1e13d.dir\\objects1.rsp
-        C:\\msys64\\mingw64\\bin\\cc.exe  -v -Wl,-v -Wl,--whole-archive CMakeFiles\\cmTC_1e13d.dir/objects.a -Wl,--no-whole-archive -o cmTC_1e13d.exe -Wl,--out-implib,libcmTC_1e13d.dll.a -Wl,--major-image-version,0,--minor-image-version,0
-        mingw32-make[1]: Leaving directory 'C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/build_windows/CMakeFiles/CMakeScratch/TryCompile-u1baa7'
+        COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_4242e.exe' '-mtune=generic' '-march=x86-64' '-dumpdir' 'cmTC_4242e.'
+        "C:\\Program Files\\CMake\\bin\\cmake.exe" -E rm -f CMakeFiles\\cmTC_4242e.dir/objects.a
+        C:\\msys64\\mingw64\\bin\\ar.exe qc CMakeFiles\\cmTC_4242e.dir/objects.a @CMakeFiles\\cmTC_4242e.dir\\objects1.rsp
+        C:\\msys64\\mingw64\\bin\\cc.exe  -v -Wl,-v -Wl,--whole-archive CMakeFiles\\cmTC_4242e.dir/objects.a -Wl,--no-whole-archive -o cmTC_4242e.exe -Wl,--out-implib,libcmTC_4242e.dll.a -Wl,--major-image-version,0,--minor-image-version,0
+        mingw32-make[1]: Leaving directory 'C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/build_windows/CMakeFiles/CMakeScratch/TryCompile-owqbqz'
         
       exitCode: 0
   -
@@ -4970,13 +5149,13 @@ events:
       Parsed C implicit link information:
         link line regex: [^( *|.*[/\\])(ld[0-9]*(|\\.[a-rt-z][a-z]*|\\.s[a-np-z][a-z]*|\\.so[a-z]+)|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\\]+-)?ld|collect2)[^/\\]*( |$)]
         linker tool regex: [^[ 	]*(->|")?[ 	]*(([^"]*[/\\])?(ld[0-9]*(|\\.[a-rt-z][a-z]*|\\.s[a-np-z][a-z]*|\\.so[a-z]+)))("|,| |$)]
-        ignore line: [Change Dir: 'C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/build_windows/CMakeFiles/CMakeScratch/TryCompile-u1baa7']
+        ignore line: [Change Dir: 'C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/build_windows/CMakeFiles/CMakeScratch/TryCompile-owqbqz']
         ignore line: []
-        ignore line: [Run Build Command(s): "C:/Program Files/CMake/bin/cmake.exe" -E env VERBOSE=1 C:/msys64/mingw64/bin/mingw32-make.exe -f Makefile cmTC_1e13d/fast]
-        ignore line: [C:/msys64/mingw64/bin/mingw32-make.exe  -f CMakeFiles\\cmTC_1e13d.dir\\build.make CMakeFiles/cmTC_1e13d.dir/build]
-        ignore line: [mingw32-make[1]: Entering directory 'C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/build_windows/CMakeFiles/CMakeScratch/TryCompile-u1baa7']
-        ignore line: [Building C object CMakeFiles/cmTC_1e13d.dir/CMakeCCompilerABI.c.obj]
-        ignore line: [C:\\msys64\\mingw64\\bin\\cc.exe   -v -o CMakeFiles\\cmTC_1e13d.dir\\CMakeCCompilerABI.c.obj -c "C:\\Program Files\\CMake\\share\\cmake-4.1\\Modules\\CMakeCCompilerABI.c"]
+        ignore line: [Run Build Command(s): "C:/Program Files/CMake/bin/cmake.exe" -E env VERBOSE=1 C:/msys64/mingw64/bin/mingw32-make.exe -f Makefile cmTC_4242e/fast]
+        ignore line: [C:/msys64/mingw64/bin/mingw32-make.exe  -f CMakeFiles\\cmTC_4242e.dir\\build.make CMakeFiles/cmTC_4242e.dir/build]
+        ignore line: [mingw32-make[1]: Entering directory 'C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/build_windows/CMakeFiles/CMakeScratch/TryCompile-owqbqz']
+        ignore line: [Building C object CMakeFiles/cmTC_4242e.dir/CMakeCCompilerABI.c.obj]
+        ignore line: [C:\\msys64\\mingw64\\bin\\cc.exe   -v -o CMakeFiles\\cmTC_4242e.dir\\CMakeCCompilerABI.c.obj -c "C:\\Program Files\\CMake\\share\\cmake-4.1\\Modules\\CMakeCCompilerABI.c"]
         ignore line: [Using built-in specs.]
         ignore line: [COLLECT_GCC=C:\\msys64\\mingw64\\bin\\cc.exe]
         ignore line: [Target: x86_64-w64-mingw32]
@@ -4984,8 +5163,8 @@ events:
         ignore line: [Thread model: posix]
         ignore line: [Supported LTO compression algorithms: zlib zstd]
         ignore line: [gcc version 11.2.0 (Rev1  Built by MSYS2 project) ]
-        ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles\\cmTC_1e13d.dir\\CMakeCCompilerABI.c.obj' '-c' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles\\cmTC_1e13d.dir\\']
-        ignore line: [ C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/cc1.exe -quiet -v -iprefix C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/ -D_REENTRANT C:\\Program Files\\CMake\\share\\cmake-4.1\\Modules\\CMakeCCompilerABI.c -quiet -dumpdir CMakeFiles\\cmTC_1e13d.dir\\ -dumpbase CMakeCCompilerABI.c.c -dumpbase-ext .c -mtune=generic -march=x86-64 -version -o C:\\Users\\Asus\\AppData\\Local\\Temp\\cceVtyhw.s]
+        ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles\\cmTC_4242e.dir\\CMakeCCompilerABI.c.obj' '-c' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles\\cmTC_4242e.dir\\']
+        ignore line: [ C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/cc1.exe -quiet -v -iprefix C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/ -D_REENTRANT C:\\Program Files\\CMake\\share\\cmake-4.1\\Modules\\CMakeCCompilerABI.c -quiet -dumpdir CMakeFiles\\cmTC_4242e.dir\\ -dumpbase CMakeCCompilerABI.c.c -dumpbase-ext .c -mtune=generic -march=x86-64 -version -o C:\\Users\\Asus\\AppData\\Local\\Temp\\ccW7nzjM.s]
         ignore line: [GNU C17 (Rev1  Built by MSYS2 project) version 11.2.0 (x86_64-w64-mingw32)]
         ignore line: [	compiled by GNU C version 11.2.0  GMP version 6.2.1  MPFR version 4.1.0-p13  MPC version 1.2.1  isl version isl-0.24-GMP]
         ignore line: []
@@ -5008,8 +5187,8 @@ events:
         ignore line: []
         ignore line: [GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072]
         ignore line: [Compiler executable checksum: 897684f6bd95d46b7e0f23c8f6f5aafc]
-        ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles\\cmTC_1e13d.dir\\CMakeCCompilerABI.c.obj' '-c' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles\\cmTC_1e13d.dir\\']
-        ignore line: [ C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/bin/as.exe -v -o CMakeFiles\\cmTC_1e13d.dir\\CMakeCCompilerABI.c.obj C:\\Users\\Asus\\AppData\\Local\\Temp\\cceVtyhw.s]
+        ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles\\cmTC_4242e.dir\\CMakeCCompilerABI.c.obj' '-c' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles\\cmTC_4242e.dir\\']
+        ignore line: [ C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/bin/as.exe -v -o CMakeFiles\\cmTC_4242e.dir\\CMakeCCompilerABI.c.obj C:\\Users\\Asus\\AppData\\Local\\Temp\\ccW7nzjM.s]
         ignore line: [GNU assembler version 2.37 (x86_64-w64-mingw32) using BFD version (GNU Binutils) 2.37]
         ignore line: [COMPILER_PATH=C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/]
         ignore line: [C:/msys64/mingw64/bin/../lib/gcc/]
@@ -5020,9 +5199,9 @@ events:
         ignore line: [C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../lib/]
         ignore line: [C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/]
         ignore line: [C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../]
-        ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles\\cmTC_1e13d.dir\\CMakeCCompilerABI.c.obj' '-c' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles\\cmTC_1e13d.dir\\CMakeCCompilerABI.c.']
-        ignore line: [Linking C executable cmTC_1e13d.exe]
-        ignore line: ["C:\\Program Files\\CMake\\bin\\cmake.exe" -E cmake_link_script CMakeFiles\\cmTC_1e13d.dir\\link.txt --verbose=1]
+        ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles\\cmTC_4242e.dir\\CMakeCCompilerABI.c.obj' '-c' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles\\cmTC_4242e.dir\\CMakeCCompilerABI.c.']
+        ignore line: [Linking C executable cmTC_4242e.exe]
+        ignore line: ["C:\\Program Files\\CMake\\bin\\cmake.exe" -E cmake_link_script CMakeFiles\\cmTC_4242e.dir\\link.txt --verbose=1]
         ignore line: [Using built-in specs.]
         ignore line: [COLLECT_GCC=C:\\msys64\\mingw64\\bin\\cc.exe]
         ignore line: [COLLECT_LTO_WRAPPER=C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/lto-wrapper.exe]
@@ -5040,13 +5219,13 @@ events:
         ignore line: [C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../lib/]
         ignore line: [C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/]
         ignore line: [C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../]
-        ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_1e13d.exe' '-mtune=generic' '-march=x86-64' '-dumpdir' 'cmTC_1e13d.']
-        link line: [ C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/collect2.exe -plugin C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/liblto_plugin.dll -plugin-opt=C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/lto-wrapper.exe -plugin-opt=-fresolution=C:\\Users\\Asus\\AppData\\Local\\Temp\\cc87EX0b.res -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_eh -plugin-opt=-pass-through=-lmoldname -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lpthread -plugin-opt=-pass-through=-ladvapi32 -plugin-opt=-pass-through=-lshell32 -plugin-opt=-pass-through=-luser32 -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_eh -plugin-opt=-pass-through=-lmoldname -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 -m i386pep -Bdynamic -o cmTC_1e13d.exe C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/crt2.o C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/crtbegin.o -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0 -LC:/msys64/mingw64/bin/../lib/gcc -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../lib -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../.. -v --whole-archive CMakeFiles\\cmTC_1e13d.dir/objects.a --no-whole-archive --out-implib libcmTC_1e13d.dll.a --major-image-version 0 --minor-image-version 0 -lmingw32 -lgcc -lgcc_eh -lmoldname -lmingwex -lmsvcrt -lkernel32 -lpthread -ladvapi32 -lshell32 -luser32 -lkernel32 -lmingw32 -lgcc -lgcc_eh -lmoldname -lmingwex -lmsvcrt -lkernel32 C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/default-manifest.o C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/crtend.o]
+        ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_4242e.exe' '-mtune=generic' '-march=x86-64' '-dumpdir' 'cmTC_4242e.']
+        link line: [ C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/collect2.exe -plugin C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/liblto_plugin.dll -plugin-opt=C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/lto-wrapper.exe -plugin-opt=-fresolution=C:\\Users\\Asus\\AppData\\Local\\Temp\\ccL3Dpsl.res -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_eh -plugin-opt=-pass-through=-lmoldname -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lpthread -plugin-opt=-pass-through=-ladvapi32 -plugin-opt=-pass-through=-lshell32 -plugin-opt=-pass-through=-luser32 -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_eh -plugin-opt=-pass-through=-lmoldname -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 -m i386pep -Bdynamic -o cmTC_4242e.exe C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/crt2.o C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/crtbegin.o -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0 -LC:/msys64/mingw64/bin/../lib/gcc -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../lib -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../.. -v --whole-archive CMakeFiles\\cmTC_4242e.dir/objects.a --no-whole-archive --out-implib libcmTC_4242e.dll.a --major-image-version 0 --minor-image-version 0 -lmingw32 -lgcc -lgcc_eh -lmoldname -lmingwex -lmsvcrt -lkernel32 -lpthread -ladvapi32 -lshell32 -luser32 -lkernel32 -lmingw32 -lgcc -lgcc_eh -lmoldname -lmingwex -lmsvcrt -lkernel32 C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/default-manifest.o C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/crtend.o]
           arg [C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/collect2.exe] ==> ignore
           arg [-plugin] ==> ignore
           arg [C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/liblto_plugin.dll] ==> ignore
           arg [-plugin-opt=C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/lto-wrapper.exe] ==> ignore
-          arg [-plugin-opt=-fresolution=C:\\Users\\Asus\\AppData\\Local\\Temp\\cc87EX0b.res] ==> ignore
+          arg [-plugin-opt=-fresolution=C:\\Users\\Asus\\AppData\\Local\\Temp\\ccL3Dpsl.res] ==> ignore
           arg [-plugin-opt=-pass-through=-lmingw32] ==> ignore
           arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
           arg [-plugin-opt=-pass-through=-lgcc_eh] ==> ignore
@@ -5070,7 +5249,7 @@ events:
           arg [i386pep] ==> ignore
           arg [-Bdynamic] ==> search dynamic
           arg [-o] ==> ignore
-          arg [cmTC_1e13d.exe] ==> ignore
+          arg [cmTC_4242e.exe] ==> ignore
           arg [C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/crt2.o] ==> obj [C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/crt2.o]
           arg [C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/crtbegin.o] ==> obj [C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/crtbegin.o]
           arg [-LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0] ==> dir [C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0]
@@ -5081,10 +5260,10 @@ events:
           arg [-LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../..] ==> dir [C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../..]
           arg [-v] ==> ignore
           arg [--whole-archive] ==> ignore
-          arg [CMakeFiles\\cmTC_1e13d.dir/objects.a] ==> ignore
+          arg [CMakeFiles\\cmTC_4242e.dir/objects.a] ==> ignore
           arg [--no-whole-archive] ==> ignore
           arg [--out-implib] ==> ignore
-          arg [libcmTC_1e13d.dll.a] ==> ignore
+          arg [libcmTC_4242e.dll.a] ==> ignore
           arg [--major-image-version] ==> ignore
           arg [0] ==> ignore
           arg [--minor-image-version] ==> ignore
@@ -5111,7 +5290,7 @@ events:
           arg [C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/default-manifest.o] ==> obj [C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/default-manifest.o]
           arg [C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/crtend.o] ==> obj [C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/crtend.o]
         ignore line: [collect2 version 11.2.0]
-        ignore line: [C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe -plugin C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/liblto_plugin.dll -plugin-opt=C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/lto-wrapper.exe -plugin-opt=-fresolution=C:\\Users\\Asus\\AppData\\Local\\Temp\\cc87EX0b.res -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_eh -plugin-opt=-pass-through=-lmoldname -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lpthread -plugin-opt=-pass-through=-ladvapi32 -plugin-opt=-pass-through=-lshell32 -plugin-opt=-pass-through=-luser32 -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_eh -plugin-opt=-pass-through=-lmoldname -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 -m i386pep -Bdynamic -o cmTC_1e13d.exe C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/crt2.o C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/crtbegin.o -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0 -LC:/msys64/mingw64/bin/../lib/gcc -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../lib -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../.. -v --whole-archive CMakeFiles\\cmTC_1e13d.dir/objects.a --no-whole-archive --out-implib libcmTC_1e13d.dll.a --major-image-version 0 --minor-image-version 0 -lmingw32 -lgcc -lgcc_eh -lmoldname -lmingwex -lmsvcrt -lkernel32 -lpthread -ladvapi32 -lshell32 -luser32 -lkernel32 -lmingw32 -lgcc -lgcc_eh -lmoldname -lmingwex -lmsvcrt -lkernel32 C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/default-manifest.o C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/crtend.o]
+        ignore line: [C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe -plugin C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/liblto_plugin.dll -plugin-opt=C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/lto-wrapper.exe -plugin-opt=-fresolution=C:\\Users\\Asus\\AppData\\Local\\Temp\\ccL3Dpsl.res -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_eh -plugin-opt=-pass-through=-lmoldname -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lpthread -plugin-opt=-pass-through=-ladvapi32 -plugin-opt=-pass-through=-lshell32 -plugin-opt=-pass-through=-luser32 -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_eh -plugin-opt=-pass-through=-lmoldname -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 -m i386pep -Bdynamic -o cmTC_4242e.exe C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/crt2.o C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/crtbegin.o -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0 -LC:/msys64/mingw64/bin/../lib/gcc -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../lib -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib -LC:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../.. -v --whole-archive CMakeFiles\\cmTC_4242e.dir/objects.a --no-whole-archive --out-implib libcmTC_4242e.dll.a --major-image-version 0 --minor-image-version 0 -lmingw32 -lgcc -lgcc_eh -lmoldname -lmingwex -lmsvcrt -lkernel32 -lpthread -ladvapi32 -lshell32 -luser32 -lkernel32 -lmingw32 -lgcc -lgcc_eh -lmoldname -lmingwex -lmsvcrt -lkernel32 C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/default-manifest.o C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/crtend.o]
         linker tool for 'C': C:/msys64/mingw64/x86_64-w64-mingw32/bin/ld.exe
         remove lib [gcc_eh]
         remove lib [msvcrt]
@@ -5154,8 +5333,8 @@ events:
     checks:
       - "Performing Test CMAKE_HAVE_LIBC_PTHREAD"
     directories:
-      source: "C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/build_windows/CMakeFiles/CMakeScratch/TryCompile-zzeszs"
-      binary: "C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/build_windows/CMakeFiles/CMakeScratch/TryCompile-zzeszs"
+      source: "C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/build_windows/CMakeFiles/CMakeScratch/TryCompile-wojp2x"
+      binary: "C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/build_windows/CMakeFiles/CMakeScratch/TryCompile-wojp2x"
     cmakeVariables:
       CMAKE_C_FLAGS: ""
       CMAKE_C_FLAGS_DEBUG: "-g"
@@ -5165,19 +5344,19 @@ events:
       variable: "CMAKE_HAVE_LIBC_PTHREAD"
       cached: true
       stdout: |
-        Change Dir: 'C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/build_windows/CMakeFiles/CMakeScratch/TryCompile-zzeszs'
+        Change Dir: 'C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/build_windows/CMakeFiles/CMakeScratch/TryCompile-wojp2x'
         
-        Run Build Command(s): "C:/Program Files/CMake/bin/cmake.exe" -E env VERBOSE=1 C:/msys64/mingw64/bin/mingw32-make.exe -f Makefile cmTC_4a7e7/fast
-        C:/msys64/mingw64/bin/mingw32-make.exe  -f CMakeFiles\\cmTC_4a7e7.dir\\build.make CMakeFiles/cmTC_4a7e7.dir/build
-        mingw32-make[1]: Entering directory 'C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/build_windows/CMakeFiles/CMakeScratch/TryCompile-zzeszs'
-        Building C object CMakeFiles/cmTC_4a7e7.dir/src.c.obj
-        C:\\msys64\\mingw64\\bin\\cc.exe -DCMAKE_HAVE_LIBC_PTHREAD   -o CMakeFiles\\cmTC_4a7e7.dir\\src.c.obj -c C:\\Users\\Asus\\Documents\\ERB\\git_telemetria\\telemetry\\build_windows\\CMakeFiles\\CMakeScratch\\TryCompile-zzeszs\\src.c
-        Linking C executable cmTC_4a7e7.exe
-        "C:\\Program Files\\CMake\\bin\\cmake.exe" -E cmake_link_script CMakeFiles\\cmTC_4a7e7.dir\\link.txt --verbose=1
-        "C:\\Program Files\\CMake\\bin\\cmake.exe" -E rm -f CMakeFiles\\cmTC_4a7e7.dir/objects.a
-        C:\\msys64\\mingw64\\bin\\ar.exe qc CMakeFiles\\cmTC_4a7e7.dir/objects.a @CMakeFiles\\cmTC_4a7e7.dir\\objects1.rsp
-        C:\\msys64\\mingw64\\bin\\cc.exe -Wl,--whole-archive CMakeFiles\\cmTC_4a7e7.dir/objects.a -Wl,--no-whole-archive -o cmTC_4a7e7.exe -Wl,--out-implib,libcmTC_4a7e7.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\\cmTC_4a7e7.dir\\linkLibs.rsp
-        mingw32-make[1]: Leaving directory 'C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/build_windows/CMakeFiles/CMakeScratch/TryCompile-zzeszs'
+        Run Build Command(s): "C:/Program Files/CMake/bin/cmake.exe" -E env VERBOSE=1 C:/msys64/mingw64/bin/mingw32-make.exe -f Makefile cmTC_cffbd/fast
+        C:/msys64/mingw64/bin/mingw32-make.exe  -f CMakeFiles\\cmTC_cffbd.dir\\build.make CMakeFiles/cmTC_cffbd.dir/build
+        mingw32-make[1]: Entering directory 'C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/build_windows/CMakeFiles/CMakeScratch/TryCompile-wojp2x'
+        Building C object CMakeFiles/cmTC_cffbd.dir/src.c.obj
+        C:\\msys64\\mingw64\\bin\\cc.exe -DCMAKE_HAVE_LIBC_PTHREAD   -o CMakeFiles\\cmTC_cffbd.dir\\src.c.obj -c C:\\Users\\Asus\\Documents\\ERB\\git_telemetria\\telemetry\\build_windows\\CMakeFiles\\CMakeScratch\\TryCompile-wojp2x\\src.c
+        Linking C executable cmTC_cffbd.exe
+        "C:\\Program Files\\CMake\\bin\\cmake.exe" -E cmake_link_script CMakeFiles\\cmTC_cffbd.dir\\link.txt --verbose=1
+        "C:\\Program Files\\CMake\\bin\\cmake.exe" -E rm -f CMakeFiles\\cmTC_cffbd.dir/objects.a
+        C:\\msys64\\mingw64\\bin\\ar.exe qc CMakeFiles\\cmTC_cffbd.dir/objects.a @CMakeFiles\\cmTC_cffbd.dir\\objects1.rsp
+        C:\\msys64\\mingw64\\bin\\cc.exe -Wl,--whole-archive CMakeFiles\\cmTC_cffbd.dir/objects.a -Wl,--no-whole-archive -o cmTC_cffbd.exe -Wl,--out-implib,libcmTC_cffbd.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\\cmTC_cffbd.dir\\linkLibs.rsp
+        mingw32-make[1]: Leaving directory 'C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/build_windows/CMakeFiles/CMakeScratch/TryCompile-wojp2x'
         
       exitCode: 0
   -
@@ -5200,6 +5379,7 @@ events:
     names:
       - "doxygen"
     candidate_directories:
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/"
       - "C:/VulkanSDK/1.4.328.1/Bin/"
       - "C:/Program Files/Python312/Scripts/"
       - "C:/Program Files/Python312/"
@@ -5243,6 +5423,7 @@ events:
       - "C:/Users/Asus/AppData/Local/Coursier/data/bin/"
       - "C:/Program Files/JetBrains/IntelliJ IDEA 2024.3.2.2/bin/"
       - "C:/Program Files/JetBrains/CLion 2024.3.2/bin/"
+      - "C:/Users/Asus/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/"
       - "C:/Program Files/bin/"
       - "C:/Program Files/sbin/"
       - "C:/Program Files/"
@@ -5261,6 +5442,9 @@ events:
       - "/Applications/Utilities/Doxygen.app/Contents/Resources/"
       - "/Applications/Utilities/Doxygen.app/Contents/MacOS/"
     searched_directories:
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/doxygen.com"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/doxygen.exe"
+      - "C:/Flutter/flutter/bin/cache/dart-sdk/bin/doxygen"
       - "C:/VulkanSDK/1.4.328.1/Bin/doxygen.com"
       - "C:/VulkanSDK/1.4.328.1/Bin/doxygen.exe"
       - "C:/VulkanSDK/1.4.328.1/Bin/doxygen"
@@ -5390,6 +5574,9 @@ events:
       - "C:/Program Files/JetBrains/CLion 2024.3.2/bin/doxygen.com"
       - "C:/Program Files/JetBrains/CLion 2024.3.2/bin/doxygen.exe"
       - "C:/Program Files/JetBrains/CLion 2024.3.2/bin/doxygen"
+      - "C:/Users/Asus/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/doxygen.com"
+      - "C:/Users/Asus/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/doxygen.exe"
+      - "C:/Users/Asus/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/doxygen"
       - "C:/Program Files/bin/doxygen.com"
       - "C:/Program Files/bin/doxygen.exe"
       - "C:/Program Files/bin/doxygen"
@@ -5444,6 +5631,7 @@ events:
     found: false
     search_context:
       ENV{PATH}:
+        - "C:\\Flutter\\flutter\\bin\\cache\\dart-sdk\\bin\\"
         - "C:\\VulkanSDK\\1.4.328.1\\Bin"
         - "C:\\Program Files\\Python312\\Scripts\\"
         - "C:\\Program Files\\Python312\\"
@@ -5489,6 +5677,7 @@ events:
         - "C:\\Users\\Asus\\AppData\\Local\\Microsoft\\WindowsApps"
         - "C:\\Program Files\\JetBrains\\IntelliJ IDEA 2024.3.2.2\\bin"
         - "C:\\Program Files\\JetBrains\\CLion 2024.3.2\\bin"
+        - "c:\\Users\\Asus\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
       CMAKE_INSTALL_PREFIX: "C:/Program Files (x86)/telemetry_vulkan"
       CMAKE_SYSTEM_PREFIX_PATH:
         - "C:/Program Files"

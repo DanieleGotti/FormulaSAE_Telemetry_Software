@@ -8,10 +8,9 @@
 class DataManager {
 public:
     void addSubscriber(std::shared_ptr<IWritingSubscriber> subscriber);
-    // Chiamato dal PacketParser
+    void removeSubscriber(std::shared_ptr<IWritingSubscriber> subscriber);
     void processData(const PacketParser& packet);
 private:
-    // Lista di subscriber (puntatori per evitare riferimenti circolari)
     std::vector<std::weak_ptr<IWritingSubscriber>> m_subscribers;
     std::mutex m_subscriberMutex;
 };

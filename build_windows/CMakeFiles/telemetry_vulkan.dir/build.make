@@ -71,11 +71,56 @@ include CMakeFiles/telemetry_vulkan.dir/flags.make
 CMakeFiles/telemetry_vulkan.dir/codegen:
 .PHONY : CMakeFiles/telemetry_vulkan.dir/codegen
 
+CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/NetworkService.cpp.obj: CMakeFiles/telemetry_vulkan.dir/flags.make
+CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/NetworkService.cpp.obj: CMakeFiles/telemetry_vulkan.dir/includes_CXX.rsp
+CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/NetworkService.cpp.obj: C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/src/Telemetry/Services/NetworkService.cpp
+CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/NetworkService.cpp.obj: CMakeFiles/telemetry_vulkan.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\Asus\Documents\ERB\git_telemetria\telemetry\build_windows\CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/NetworkService.cpp.obj"
+	C:\msys64\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/NetworkService.cpp.obj -MF CMakeFiles\telemetry_vulkan.dir\src\Telemetry\Services\NetworkService.cpp.obj.d -o CMakeFiles\telemetry_vulkan.dir\src\Telemetry\Services\NetworkService.cpp.obj -c C:\Users\Asus\Documents\ERB\git_telemetria\telemetry\src\Telemetry\Services\NetworkService.cpp
+
+CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/NetworkService.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/NetworkService.cpp.i"
+	C:\msys64\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E C:\Users\Asus\Documents\ERB\git_telemetria\telemetry\src\Telemetry\Services\NetworkService.cpp > CMakeFiles\telemetry_vulkan.dir\src\Telemetry\Services\NetworkService.cpp.i
+
+CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/NetworkService.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/NetworkService.cpp.s"
+	C:\msys64\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\Users\Asus\Documents\ERB\git_telemetria\telemetry\src\Telemetry\Services\NetworkService.cpp -o CMakeFiles\telemetry_vulkan.dir\src\Telemetry\Services\NetworkService.cpp.s
+
+CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/PacketParser.cpp.obj: CMakeFiles/telemetry_vulkan.dir/flags.make
+CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/PacketParser.cpp.obj: CMakeFiles/telemetry_vulkan.dir/includes_CXX.rsp
+CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/PacketParser.cpp.obj: C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/src/Telemetry/Services/PacketParser.cpp
+CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/PacketParser.cpp.obj: CMakeFiles/telemetry_vulkan.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\Asus\Documents\ERB\git_telemetria\telemetry\build_windows\CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/PacketParser.cpp.obj"
+	C:\msys64\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/PacketParser.cpp.obj -MF CMakeFiles\telemetry_vulkan.dir\src\Telemetry\Services\PacketParser.cpp.obj.d -o CMakeFiles\telemetry_vulkan.dir\src\Telemetry\Services\PacketParser.cpp.obj -c C:\Users\Asus\Documents\ERB\git_telemetria\telemetry\src\Telemetry\Services\PacketParser.cpp
+
+CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/PacketParser.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/PacketParser.cpp.i"
+	C:\msys64\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E C:\Users\Asus\Documents\ERB\git_telemetria\telemetry\src\Telemetry\Services\PacketParser.cpp > CMakeFiles\telemetry_vulkan.dir\src\Telemetry\Services\PacketParser.cpp.i
+
+CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/PacketParser.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/PacketParser.cpp.s"
+	C:\msys64\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\Users\Asus\Documents\ERB\git_telemetria\telemetry\src\Telemetry\Services\PacketParser.cpp -o CMakeFiles\telemetry_vulkan.dir\src\Telemetry\Services\PacketParser.cpp.s
+
+CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/SerialService.cpp.obj: CMakeFiles/telemetry_vulkan.dir/flags.make
+CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/SerialService.cpp.obj: CMakeFiles/telemetry_vulkan.dir/includes_CXX.rsp
+CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/SerialService.cpp.obj: C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/src/Telemetry/Services/SerialService.cpp
+CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/SerialService.cpp.obj: CMakeFiles/telemetry_vulkan.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\Asus\Documents\ERB\git_telemetria\telemetry\build_windows\CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/SerialService.cpp.obj"
+	C:\msys64\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/SerialService.cpp.obj -MF CMakeFiles\telemetry_vulkan.dir\src\Telemetry\Services\SerialService.cpp.obj.d -o CMakeFiles\telemetry_vulkan.dir\src\Telemetry\Services\SerialService.cpp.obj -c C:\Users\Asus\Documents\ERB\git_telemetria\telemetry\src\Telemetry\Services\SerialService.cpp
+
+CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/SerialService.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/SerialService.cpp.i"
+	C:\msys64\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E C:\Users\Asus\Documents\ERB\git_telemetria\telemetry\src\Telemetry\Services\SerialService.cpp > CMakeFiles\telemetry_vulkan.dir\src\Telemetry\Services\SerialService.cpp.i
+
+CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/SerialService.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/SerialService.cpp.s"
+	C:\msys64\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\Users\Asus\Documents\ERB\git_telemetria\telemetry\src\Telemetry\Services\SerialService.cpp -o CMakeFiles\telemetry_vulkan.dir\src\Telemetry\Services\SerialService.cpp.s
+
 CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/ServiceManager.cpp.obj: CMakeFiles/telemetry_vulkan.dir/flags.make
 CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/ServiceManager.cpp.obj: CMakeFiles/telemetry_vulkan.dir/includes_CXX.rsp
 CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/ServiceManager.cpp.obj: C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/src/Telemetry/Services/ServiceManager.cpp
 CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/ServiceManager.cpp.obj: CMakeFiles/telemetry_vulkan.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\Asus\Documents\ERB\git_telemetria\telemetry\build_windows\CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/ServiceManager.cpp.obj"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\Asus\Documents\ERB\git_telemetria\telemetry\build_windows\CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/ServiceManager.cpp.obj"
 	C:\msys64\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/ServiceManager.cpp.obj -MF CMakeFiles\telemetry_vulkan.dir\src\Telemetry\Services\ServiceManager.cpp.obj.d -o CMakeFiles\telemetry_vulkan.dir\src\Telemetry\Services\ServiceManager.cpp.obj -c C:\Users\Asus\Documents\ERB\git_telemetria\telemetry\src\Telemetry\Services\ServiceManager.cpp
 
 CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/ServiceManager.cpp.i: cmake_force
@@ -90,7 +135,7 @@ CMakeFiles/telemetry_vulkan.dir/src/Telemetry/data_acquisition/SerialDataSource.
 CMakeFiles/telemetry_vulkan.dir/src/Telemetry/data_acquisition/SerialDataSource.cpp.obj: CMakeFiles/telemetry_vulkan.dir/includes_CXX.rsp
 CMakeFiles/telemetry_vulkan.dir/src/Telemetry/data_acquisition/SerialDataSource.cpp.obj: C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/src/Telemetry/data_acquisition/SerialDataSource.cpp
 CMakeFiles/telemetry_vulkan.dir/src/Telemetry/data_acquisition/SerialDataSource.cpp.obj: CMakeFiles/telemetry_vulkan.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\Asus\Documents\ERB\git_telemetria\telemetry\build_windows\CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/telemetry_vulkan.dir/src/Telemetry/data_acquisition/SerialDataSource.cpp.obj"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\Asus\Documents\ERB\git_telemetria\telemetry\build_windows\CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/telemetry_vulkan.dir/src/Telemetry/data_acquisition/SerialDataSource.cpp.obj"
 	C:\msys64\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/telemetry_vulkan.dir/src/Telemetry/data_acquisition/SerialDataSource.cpp.obj -MF CMakeFiles\telemetry_vulkan.dir\src\Telemetry\data_acquisition\SerialDataSource.cpp.obj.d -o CMakeFiles\telemetry_vulkan.dir\src\Telemetry\data_acquisition\SerialDataSource.cpp.obj -c C:\Users\Asus\Documents\ERB\git_telemetria\telemetry\src\Telemetry\data_acquisition\SerialDataSource.cpp
 
 CMakeFiles/telemetry_vulkan.dir/src/Telemetry/data_acquisition/SerialDataSource.cpp.i: cmake_force
@@ -101,11 +146,56 @@ CMakeFiles/telemetry_vulkan.dir/src/Telemetry/data_acquisition/SerialDataSource.
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/telemetry_vulkan.dir/src/Telemetry/data_acquisition/SerialDataSource.cpp.s"
 	C:\msys64\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\Users\Asus\Documents\ERB\git_telemetria\telemetry\src\Telemetry\data_acquisition\SerialDataSource.cpp -o CMakeFiles\telemetry_vulkan.dir\src\Telemetry\data_acquisition\SerialDataSource.cpp.s
 
+CMakeFiles/telemetry_vulkan.dir/src/Telemetry/data_writing/DataManager.cpp.obj: CMakeFiles/telemetry_vulkan.dir/flags.make
+CMakeFiles/telemetry_vulkan.dir/src/Telemetry/data_writing/DataManager.cpp.obj: CMakeFiles/telemetry_vulkan.dir/includes_CXX.rsp
+CMakeFiles/telemetry_vulkan.dir/src/Telemetry/data_writing/DataManager.cpp.obj: C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/src/Telemetry/data_writing/DataManager.cpp
+CMakeFiles/telemetry_vulkan.dir/src/Telemetry/data_writing/DataManager.cpp.obj: CMakeFiles/telemetry_vulkan.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\Asus\Documents\ERB\git_telemetria\telemetry\build_windows\CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/telemetry_vulkan.dir/src/Telemetry/data_writing/DataManager.cpp.obj"
+	C:\msys64\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/telemetry_vulkan.dir/src/Telemetry/data_writing/DataManager.cpp.obj -MF CMakeFiles\telemetry_vulkan.dir\src\Telemetry\data_writing\DataManager.cpp.obj.d -o CMakeFiles\telemetry_vulkan.dir\src\Telemetry\data_writing\DataManager.cpp.obj -c C:\Users\Asus\Documents\ERB\git_telemetria\telemetry\src\Telemetry\data_writing\DataManager.cpp
+
+CMakeFiles/telemetry_vulkan.dir/src/Telemetry/data_writing/DataManager.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/telemetry_vulkan.dir/src/Telemetry/data_writing/DataManager.cpp.i"
+	C:\msys64\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E C:\Users\Asus\Documents\ERB\git_telemetria\telemetry\src\Telemetry\data_writing\DataManager.cpp > CMakeFiles\telemetry_vulkan.dir\src\Telemetry\data_writing\DataManager.cpp.i
+
+CMakeFiles/telemetry_vulkan.dir/src/Telemetry/data_writing/DataManager.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/telemetry_vulkan.dir/src/Telemetry/data_writing/DataManager.cpp.s"
+	C:\msys64\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\Users\Asus\Documents\ERB\git_telemetria\telemetry\src\Telemetry\data_writing\DataManager.cpp -o CMakeFiles\telemetry_vulkan.dir\src\Telemetry\data_writing\DataManager.cpp.s
+
+CMakeFiles/telemetry_vulkan.dir/src/Telemetry/data_writing/TxtWriter.cpp.obj: CMakeFiles/telemetry_vulkan.dir/flags.make
+CMakeFiles/telemetry_vulkan.dir/src/Telemetry/data_writing/TxtWriter.cpp.obj: CMakeFiles/telemetry_vulkan.dir/includes_CXX.rsp
+CMakeFiles/telemetry_vulkan.dir/src/Telemetry/data_writing/TxtWriter.cpp.obj: C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/src/Telemetry/data_writing/TxtWriter.cpp
+CMakeFiles/telemetry_vulkan.dir/src/Telemetry/data_writing/TxtWriter.cpp.obj: CMakeFiles/telemetry_vulkan.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\Asus\Documents\ERB\git_telemetria\telemetry\build_windows\CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/telemetry_vulkan.dir/src/Telemetry/data_writing/TxtWriter.cpp.obj"
+	C:\msys64\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/telemetry_vulkan.dir/src/Telemetry/data_writing/TxtWriter.cpp.obj -MF CMakeFiles\telemetry_vulkan.dir\src\Telemetry\data_writing\TxtWriter.cpp.obj.d -o CMakeFiles\telemetry_vulkan.dir\src\Telemetry\data_writing\TxtWriter.cpp.obj -c C:\Users\Asus\Documents\ERB\git_telemetria\telemetry\src\Telemetry\data_writing\TxtWriter.cpp
+
+CMakeFiles/telemetry_vulkan.dir/src/Telemetry/data_writing/TxtWriter.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/telemetry_vulkan.dir/src/Telemetry/data_writing/TxtWriter.cpp.i"
+	C:\msys64\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E C:\Users\Asus\Documents\ERB\git_telemetria\telemetry\src\Telemetry\data_writing\TxtWriter.cpp > CMakeFiles\telemetry_vulkan.dir\src\Telemetry\data_writing\TxtWriter.cpp.i
+
+CMakeFiles/telemetry_vulkan.dir/src/Telemetry/data_writing/TxtWriter.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/telemetry_vulkan.dir/src/Telemetry/data_writing/TxtWriter.cpp.s"
+	C:\msys64\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\Users\Asus\Documents\ERB\git_telemetria\telemetry\src\Telemetry\data_writing\TxtWriter.cpp -o CMakeFiles\telemetry_vulkan.dir\src\Telemetry\data_writing\TxtWriter.cpp.s
+
+CMakeFiles/telemetry_vulkan.dir/src/UI/Dashboard.cpp.obj: CMakeFiles/telemetry_vulkan.dir/flags.make
+CMakeFiles/telemetry_vulkan.dir/src/UI/Dashboard.cpp.obj: CMakeFiles/telemetry_vulkan.dir/includes_CXX.rsp
+CMakeFiles/telemetry_vulkan.dir/src/UI/Dashboard.cpp.obj: C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/src/UI/Dashboard.cpp
+CMakeFiles/telemetry_vulkan.dir/src/UI/Dashboard.cpp.obj: CMakeFiles/telemetry_vulkan.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\Asus\Documents\ERB\git_telemetria\telemetry\build_windows\CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/telemetry_vulkan.dir/src/UI/Dashboard.cpp.obj"
+	C:\msys64\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/telemetry_vulkan.dir/src/UI/Dashboard.cpp.obj -MF CMakeFiles\telemetry_vulkan.dir\src\UI\Dashboard.cpp.obj.d -o CMakeFiles\telemetry_vulkan.dir\src\UI\Dashboard.cpp.obj -c C:\Users\Asus\Documents\ERB\git_telemetria\telemetry\src\UI\Dashboard.cpp
+
+CMakeFiles/telemetry_vulkan.dir/src/UI/Dashboard.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/telemetry_vulkan.dir/src/UI/Dashboard.cpp.i"
+	C:\msys64\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E C:\Users\Asus\Documents\ERB\git_telemetria\telemetry\src\UI\Dashboard.cpp > CMakeFiles\telemetry_vulkan.dir\src\UI\Dashboard.cpp.i
+
+CMakeFiles/telemetry_vulkan.dir/src/UI/Dashboard.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/telemetry_vulkan.dir/src/UI/Dashboard.cpp.s"
+	C:\msys64\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\Users\Asus\Documents\ERB\git_telemetria\telemetry\src\UI\Dashboard.cpp -o CMakeFiles\telemetry_vulkan.dir\src\UI\Dashboard.cpp.s
+
 CMakeFiles/telemetry_vulkan.dir/src/UI/SerialDeviceSelection.cpp.obj: CMakeFiles/telemetry_vulkan.dir/flags.make
 CMakeFiles/telemetry_vulkan.dir/src/UI/SerialDeviceSelection.cpp.obj: CMakeFiles/telemetry_vulkan.dir/includes_CXX.rsp
 CMakeFiles/telemetry_vulkan.dir/src/UI/SerialDeviceSelection.cpp.obj: C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/src/UI/SerialDeviceSelection.cpp
 CMakeFiles/telemetry_vulkan.dir/src/UI/SerialDeviceSelection.cpp.obj: CMakeFiles/telemetry_vulkan.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\Asus\Documents\ERB\git_telemetria\telemetry\build_windows\CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/telemetry_vulkan.dir/src/UI/SerialDeviceSelection.cpp.obj"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\Asus\Documents\ERB\git_telemetria\telemetry\build_windows\CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/telemetry_vulkan.dir/src/UI/SerialDeviceSelection.cpp.obj"
 	C:\msys64\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/telemetry_vulkan.dir/src/UI/SerialDeviceSelection.cpp.obj -MF CMakeFiles\telemetry_vulkan.dir\src\UI\SerialDeviceSelection.cpp.obj.d -o CMakeFiles\telemetry_vulkan.dir\src\UI\SerialDeviceSelection.cpp.obj -c C:\Users\Asus\Documents\ERB\git_telemetria\telemetry\src\UI\SerialDeviceSelection.cpp
 
 CMakeFiles/telemetry_vulkan.dir/src/UI/SerialDeviceSelection.cpp.i: cmake_force
@@ -120,7 +210,7 @@ CMakeFiles/telemetry_vulkan.dir/src/UI/UIManager.cpp.obj: CMakeFiles/telemetry_v
 CMakeFiles/telemetry_vulkan.dir/src/UI/UIManager.cpp.obj: CMakeFiles/telemetry_vulkan.dir/includes_CXX.rsp
 CMakeFiles/telemetry_vulkan.dir/src/UI/UIManager.cpp.obj: C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/src/UI/UIManager.cpp
 CMakeFiles/telemetry_vulkan.dir/src/UI/UIManager.cpp.obj: CMakeFiles/telemetry_vulkan.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\Asus\Documents\ERB\git_telemetria\telemetry\build_windows\CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/telemetry_vulkan.dir/src/UI/UIManager.cpp.obj"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\Asus\Documents\ERB\git_telemetria\telemetry\build_windows\CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/telemetry_vulkan.dir/src/UI/UIManager.cpp.obj"
 	C:\msys64\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/telemetry_vulkan.dir/src/UI/UIManager.cpp.obj -MF CMakeFiles\telemetry_vulkan.dir\src\UI\UIManager.cpp.obj.d -o CMakeFiles\telemetry_vulkan.dir\src\UI\UIManager.cpp.obj -c C:\Users\Asus\Documents\ERB\git_telemetria\telemetry\src\UI\UIManager.cpp
 
 CMakeFiles/telemetry_vulkan.dir/src/UI/UIManager.cpp.i: cmake_force
@@ -135,7 +225,7 @@ CMakeFiles/telemetry_vulkan.dir/src/main.cpp.obj: CMakeFiles/telemetry_vulkan.di
 CMakeFiles/telemetry_vulkan.dir/src/main.cpp.obj: CMakeFiles/telemetry_vulkan.dir/includes_CXX.rsp
 CMakeFiles/telemetry_vulkan.dir/src/main.cpp.obj: C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/src/main.cpp
 CMakeFiles/telemetry_vulkan.dir/src/main.cpp.obj: CMakeFiles/telemetry_vulkan.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\Asus\Documents\ERB\git_telemetria\telemetry\build_windows\CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/telemetry_vulkan.dir/src/main.cpp.obj"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\Asus\Documents\ERB\git_telemetria\telemetry\build_windows\CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object CMakeFiles/telemetry_vulkan.dir/src/main.cpp.obj"
 	C:\msys64\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/telemetry_vulkan.dir/src/main.cpp.obj -MF CMakeFiles\telemetry_vulkan.dir\src\main.cpp.obj.d -o CMakeFiles\telemetry_vulkan.dir\src\main.cpp.obj -c C:\Users\Asus\Documents\ERB\git_telemetria\telemetry\src\main.cpp
 
 CMakeFiles/telemetry_vulkan.dir/src/main.cpp.i: cmake_force
@@ -148,8 +238,14 @@ CMakeFiles/telemetry_vulkan.dir/src/main.cpp.s: cmake_force
 
 # Object files for target telemetry_vulkan
 telemetry_vulkan_OBJECTS = \
+"CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/NetworkService.cpp.obj" \
+"CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/PacketParser.cpp.obj" \
+"CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/SerialService.cpp.obj" \
 "CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/ServiceManager.cpp.obj" \
 "CMakeFiles/telemetry_vulkan.dir/src/Telemetry/data_acquisition/SerialDataSource.cpp.obj" \
+"CMakeFiles/telemetry_vulkan.dir/src/Telemetry/data_writing/DataManager.cpp.obj" \
+"CMakeFiles/telemetry_vulkan.dir/src/Telemetry/data_writing/TxtWriter.cpp.obj" \
+"CMakeFiles/telemetry_vulkan.dir/src/UI/Dashboard.cpp.obj" \
 "CMakeFiles/telemetry_vulkan.dir/src/UI/SerialDeviceSelection.cpp.obj" \
 "CMakeFiles/telemetry_vulkan.dir/src/UI/UIManager.cpp.obj" \
 "CMakeFiles/telemetry_vulkan.dir/src/main.cpp.obj"
@@ -157,8 +253,14 @@ telemetry_vulkan_OBJECTS = \
 # External object files for target telemetry_vulkan
 telemetry_vulkan_EXTERNAL_OBJECTS =
 
+telemetry_vulkan.exe: CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/NetworkService.cpp.obj
+telemetry_vulkan.exe: CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/PacketParser.cpp.obj
+telemetry_vulkan.exe: CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/SerialService.cpp.obj
 telemetry_vulkan.exe: CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/ServiceManager.cpp.obj
 telemetry_vulkan.exe: CMakeFiles/telemetry_vulkan.dir/src/Telemetry/data_acquisition/SerialDataSource.cpp.obj
+telemetry_vulkan.exe: CMakeFiles/telemetry_vulkan.dir/src/Telemetry/data_writing/DataManager.cpp.obj
+telemetry_vulkan.exe: CMakeFiles/telemetry_vulkan.dir/src/Telemetry/data_writing/TxtWriter.cpp.obj
+telemetry_vulkan.exe: CMakeFiles/telemetry_vulkan.dir/src/UI/Dashboard.cpp.obj
 telemetry_vulkan.exe: CMakeFiles/telemetry_vulkan.dir/src/UI/SerialDeviceSelection.cpp.obj
 telemetry_vulkan.exe: CMakeFiles/telemetry_vulkan.dir/src/UI/UIManager.cpp.obj
 telemetry_vulkan.exe: CMakeFiles/telemetry_vulkan.dir/src/main.cpp.obj
@@ -169,7 +271,7 @@ telemetry_vulkan.exe: external/glfw/src/libglfw3.a
 telemetry_vulkan.exe: CMakeFiles/telemetry_vulkan.dir/linkLibs.rsp
 telemetry_vulkan.exe: CMakeFiles/telemetry_vulkan.dir/objects1.rsp
 telemetry_vulkan.exe: CMakeFiles/telemetry_vulkan.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=C:\Users\Asus\Documents\ERB\git_telemetria\telemetry\build_windows\CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Linking CXX executable telemetry_vulkan.exe"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=C:\Users\Asus\Documents\ERB\git_telemetria\telemetry\build_windows\CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Linking CXX executable telemetry_vulkan.exe"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles\telemetry_vulkan.dir\link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

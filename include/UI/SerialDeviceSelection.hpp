@@ -1,38 +1,24 @@
 #pragma once
 #include <string>
 #include <vector>
-#include <sstream>
-#include <bitset>
-#include <iostream>
-
-#include "Telemetry/data_acquisition/SerialDataSource.hpp"
-
+#include <functional> 
 #include "UIElement.hpp"
 
 class SerialDeviceSelection : public UIElement {
 public:
-    SerialDeviceSelection() = default;
+    // Sarà una funzione che accetta porta (stringa) e baudrate (intero)
+    using ConnectCallback = std::function<void(const std::string&, int)>;
+    // Quando di preme il pulsante "Connetti"
+    explicit SerialDeviceSelection(ConnectCallback onConnectCallback);
     void draw() override;
 
 private:
     void refreshPorts();
-    void appendLog(const std::string& msg);
 
-private:
-    SerialDataSource m_serial;
-    bool m_connected = false;
-    std::string m_selectedPort;
-    int m_selectedBaudrate;
-    int m_selectedIndex = 0;
+    ConnectCallback m_onConnectCallback;
+
+    int m_selectedPortIndex = -1;
+    int m_selectedBaudrateIndex = -1;
     std::vector<std::string> m_ports;
-    std::string m_log;
-
-private:
-    template < typename... Args >
-    std::string sstr(Args&&... args) {
-        std::ostringstream sstr;
-        sstr << std::dec;
-        (sstr << ... << args);
-        return sstr.str();
-    }
+    std::vector<int> m_baudRates;
 };

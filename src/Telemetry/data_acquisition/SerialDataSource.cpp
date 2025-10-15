@@ -1,10 +1,10 @@
-#include <Telemetry/data_acquisition/SerialDataSource.hpp>
-
 #include <iostream>
 #include <string>
 #include <cstdint>
 #include <algorithm>
 #include <filesystem>
+#include <Telemetry/data_acquisition/SerialDataSource.hpp>
+
 #if defined (_WIN32) || defined( _WIN64)
     #include <Windows.h>
 #endif

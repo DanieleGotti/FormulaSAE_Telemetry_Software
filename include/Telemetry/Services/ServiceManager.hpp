@@ -6,6 +6,7 @@
 #include <memory>
 #include "SerialService.hpp"
 #include "NetworkService.hpp"
+#include "../data_writing/DataManager.hpp"
 
 typedef enum {
     ACQUISITION_METHOD_SERIAL = 0,
@@ -16,6 +17,7 @@ class ServiceManager {
 public:
     static void initialize();
     static std::vector<std::string> getAllConnectionOptions();
+    static DataManager* getDataManager();
     static void setDBPath(const std::string& path);
     static void setAcquisitionMethod(AcquisitionMethod method);
     static bool configureSerial(const std::string& port, int baudrate);
@@ -29,4 +31,5 @@ private:
     static AcquisitionMethod m_method;
     static std::unique_ptr<SerialService> m_serialService;
     static std::unique_ptr<NetworkService> m_networkService;
+    static std::unique_ptr<DataManager> m_dataManager;
 };

@@ -1,55 +1,51 @@
 #include <sstream>
 #include <unordered_set>
+#include <iostream> 
 #include "Telemetry/data_acquisition/PacketParser.hpp"
 
+// Tipi di dato
 namespace {
-    // Tipi di dato supportati 
     const std::unordered_set<std::string> integerSensorLabels = {
         "ACC1A", "ACC2A"
     };
-
     const std::unordered_set<std::string> doubleSensorLabels = {
         "ACC1B", "ACC2B", "BRK1", "BRK2", "STEER"
     };
-
     const std::unordered_set<std::string> statusLedLabels = {
         "SDC_INPUT", "RESET_BUTTON", "TS_ON_BUTTON", "R2D_BUTTON"
     };
-
-    const std::string inverterStateKeyword = "STATE";
-
     const std::unordered_set<std::string> inverterFsmLabels = {
-        "RIGHT_INVERTER_FSM", "LEFT_INVERTER_FSM"
+        "LEFT_INVERTER_FSM", "RIGHT_INVERTER_FSM", "INV1", "INV2"
     };
+    const std::string inverterStateKeyword = "STATE";
 }
 
-PacketParser PacketParser::parse(const std::string& line) {
+PacketParser PacketParser::parse(const std::string& line,  const std::chrono::system_clock::time_point& reception_time) {
     PacketParser packet; 
-    packet.timestamp = std::chrono::system_clock::now();
-    
+    packet.timestamp = reception_time;
+
+    // Divide la riga in parti separate da spazi
     std::stringstream ss(line);
     std::string part1, part2, part3;
-    // Divido in 3 parole al massimo (3 servono per inverter, 2 per il resto)
     ss >> part1 >> part2 >> part3;
 
-    // Se è un messaggio inverter valido 3 parole
+    // I messaggi inverter hanno 3 parti: "STATE <LABEL> <VALUE>"
     if (part1 == inverterStateKeyword && inverterFsmLabels.count(part2) && !part3.empty()) {
-        packet.packetType = PacketType::INVERTER;
-        packet.label = part2; // "RIGHT_INVERTER_FSM" o "LEFT_INVERTER_FSM"
-        packet.data = part3; // "READY"
-        return packet;
+        packet.packetType = PacketType::INVERTER; 
+        packet.label = part2;
+        packet.data = part3;
+        return packet; 
     }
 
-    // Se non è un messaggio di stato 2 parole
-    if (!part1.empty() && !part2.empty() && part3.empty()) {
+    // Gli altri messaggi hanno 2 parti: "<LABEL> <VALUE>"
+    if (!part2.empty() && part3.empty()) {
         packet.label = part1;
 
-        // Controlla se l'etichetta è in uno dei nostri set
         try {
             if (integerSensorLabels.count(part1)) {
                 packet.packetType = PacketType::SENSOR_DATA;
                 packet.data = std::stoi(part2);
-                return packet;
+                return packet; 
             }
             if (doubleSensorLabels.count(part1)) {
                 packet.packetType = PacketType::SENSOR_DATA;
@@ -59,15 +55,15 @@ PacketParser PacketParser::parse(const std::string& line) {
             if (statusLedLabels.count(part1)) {
                 packet.packetType = PacketType::STATUS_LED;
                 packet.data = std::stoi(part2);
-                return packet;
+                return packet; 
             }
         }
         catch (const std::invalid_argument& e) {
-            // Errore di conversione 
+             // Errore di conversione, verrà marcato sotto come UNKNOWN
         }
     }
     
-    // Se nessuna regola ha funzionato, salviamo la riga originale comunque.
+    // Se nessuna regola ha funzionato o c'è stato un errore di conversione
     packet.packetType = PacketType::UNKNOWN;
     packet.label = "MALFORMED";
     packet.data = line;

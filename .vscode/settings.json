@@ -111,6 +111,8 @@
   "xstring": "cpp",
   "xtr1common": "cpp",
   "xutility": "cpp",
-  "ranges": "cpp"
+  "ranges": "cpp",
+  "fstream": "cpp",
+  "xtree": "cpp"
 }
 }
