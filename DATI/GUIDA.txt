@@ -1,0 +1,25 @@
+ORGANIZZAZIONE DEI FILE
+--------------------------
+In ogni cartella sono archiviate le registrazioni di una sessione di test, suddivisa in diverse registrazioni (.csv).
+
+
+STRUTTURA DEL DATABASE CSV
+-----------------------------
+Ogni file di output (.csv) e' un database  in cui ogni riga corrisponde a un timestamp univoco. Un timestamp rappresenta un "pacchetto" di dati, cioè un insieme di informazioni ricevute dal software telemetria in un preciso istante.
+
+Poiche' all'interno di un singolo pacchetto possono essere presenti piu' letture per la stessa variabile, i dati grezzi sono stati aggregati secondo le seguenti logiche specifiche per renderli significativi.
+
+
+LOGICHE DI AGGREGAZIONE DATI
+-----------------------------------
+
+  - Dati dei sensori (ACC1A, BRK1, ecc.): per ogni pacchetto viene calcolata la media di tutti i valori ricevuti per un dato sensore.
+
+  - Dati booleani (R2D_BUTTON, SDC_INPUT, ecc.): viene considerato solo l'ultimo valore ricevuto per quella variabile all'interno del pacchetto.
+
+  - Dati Inverter (LEFT_INVERTER_FSM, RIGHT_INVERTER_FSM): hanno una gestione speciale, poiche' i loro messaggi non sono ciclici ma vengono inviati solo al bisogno (cambio di stato). Se all'interno dello stesso timestamp l'inverter comunica piu' cambi di stato, questi vengono tutti riportati nella stessa cella, separati da una barra (/). I valori "null" iniziali sono normali, in quanto all'avvio della registrazione o il messaggio dell'inverter non è ancora arrivato o la registrazione è stata avviata a macchina già accesa. Inoltre, dal momento in cui viene ricevuto il primo messaggio, il suo stato viene ripetuto in tutte le celle successive, finche' non viene registrato un nuovo cambio. 
+
+
+UTILIZZO DATI
+-----------------------------------
+I file .csv si possono aprire in Excel ed essere facilmente importati in matlab con il comando nomevariabile = readtable('nomefile.csv').
