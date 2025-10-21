@@ -1,10 +1,10 @@
-#include "UI/Dashboard.hpp"
 #include <imgui.h>
 #include <variant>
 #include <string>
+#include "UI/Dashboard.hpp"
+#include "Telemetry/Services/ServiceManager.hpp"
 
-Dashboard::Dashboard(StartLoggingCallback onStart, StopLoggingCallback onStop)
-    : m_onStartCallback(std::move(onStart)), m_onStopCallback(std::move(onStop)) {}
+Dashboard::Dashboard() = default;
 
 void Dashboard::onDataReceived(const PacketParser& packet) {
     std::lock_guard<std::mutex> lock(m_dataMutex);
@@ -16,11 +16,6 @@ bool Dashboard::createFile(const std::string& directoryPath) {
     return true;
 }
 
-void Dashboard::setLoggingStatus(bool isLogging, const std::string& currentFile) {
-    m_isLogging = isLogging;
-    m_currentLogFile = currentFile;
-}
-
 void Dashboard::draw() {
     ImGui::Begin("Dashboard Telemetria");
 
@@ -28,15 +23,17 @@ void Dashboard::draw() {
     ImGui::Text("Controllo Registrazione");
     ImGui::Separator();
     
-    // Disabilita il campo di testo se stiamo registrando
-    if (!m_isLogging) {
+    bool isLogging = ServiceManager::isLogging();
+
+    if (!isLogging) {
         if (ImGui::Button("Avvia Registrazione")) {
-            if (m_onStartCallback) m_onStartCallback();
+            ServiceManager::startLogging(OUTPUT_DIRECTORY);
         }
     } else {
-        ImGui::Text("Registrazione in corso su: %s", m_currentLogFile.c_str());
+        std::string currentLogFile = ServiceManager::getCurrentLogFileName();
+        ImGui::Text("Registrazione in corso su: %s", currentLogFile.c_str());
         if (ImGui::Button("Ferma Registrazione")) {
-            if (m_onStopCallback) m_onStopCallback();
+            ServiceManager::stopLogging();
         }
     }
     ImGui::EndChild();

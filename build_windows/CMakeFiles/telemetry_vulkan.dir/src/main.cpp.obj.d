@@ -147,29 +147,48 @@ CMakeFiles/telemetry_vulkan.dir/src/main.cpp.obj: \
  C:/msys64/mingw64/include/c++/11.2.0/bits/ostream.tcc \
  C:/msys64/mingw64/include/c++/11.2.0/istream \
  C:/msys64/mingw64/include/c++/11.2.0/bits/istream.tcc \
- C:/msys64/mingw64/include/c++/11.2.0/memory \
- C:/msys64/mingw64/include/c++/11.2.0/bits/stl_uninitialized.h \
- C:/msys64/mingw64/include/c++/11.2.0/bits/stl_raw_storage_iter.h \
- C:/msys64/mingw64/include/c++/11.2.0/bits/align.h \
- C:/msys64/mingw64/include/c++/11.2.0/bit \
- C:/msys64/mingw64/include/c++/11.2.0/bits/uses_allocator.h \
- C:/msys64/mingw64/include/c++/11.2.0/bits/unique_ptr.h \
- C:/msys64/mingw64/include/c++/11.2.0/utility \
- C:/msys64/mingw64/include/c++/11.2.0/bits/stl_relops.h \
- C:/msys64/mingw64/include/c++/11.2.0/tuple \
- C:/msys64/mingw64/include/c++/11.2.0/array \
- C:/msys64/mingw64/include/c++/11.2.0/bits/invoke.h \
- C:/msys64/mingw64/include/c++/11.2.0/bits/shared_ptr.h \
- C:/msys64/mingw64/include/c++/11.2.0/bits/shared_ptr_base.h \
- C:/msys64/mingw64/include/c++/11.2.0/bits/allocated_ptr.h \
- C:/msys64/mingw64/include/c++/11.2.0/bits/refwrap.h \
- C:/msys64/mingw64/include/c++/11.2.0/ext/aligned_buffer.h \
- C:/msys64/mingw64/include/c++/11.2.0/ext/concurrence.h \
- C:/msys64/mingw64/include/c++/11.2.0/bits/shared_ptr_atomic.h \
+ C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/Telemetry/Services/ServiceManager.hpp \
+ C:/msys64/mingw64/include/c++/11.2.0/thread \
+ C:/msys64/mingw64/include/c++/11.2.0/stop_token \
+ C:/msys64/mingw64/include/c++/11.2.0/atomic \
  C:/msys64/mingw64/include/c++/11.2.0/bits/atomic_base.h \
  C:/msys64/mingw64/include/c++/11.2.0/bits/atomic_lockfree_defines.h \
  C:/msys64/mingw64/include/c++/11.2.0/bits/atomic_wait.h \
  C:/msys64/mingw64/include/c++/11.2.0/bits/std_mutex.h \
+ C:/msys64/mingw64/include/c++/11.2.0/bits/std_thread.h \
+ C:/msys64/mingw64/include/c++/11.2.0/tuple \
+ C:/msys64/mingw64/include/c++/11.2.0/utility \
+ C:/msys64/mingw64/include/c++/11.2.0/bits/stl_relops.h \
+ C:/msys64/mingw64/include/c++/11.2.0/array \
+ C:/msys64/mingw64/include/c++/11.2.0/bits/uses_allocator.h \
+ C:/msys64/mingw64/include/c++/11.2.0/bits/invoke.h \
+ C:/msys64/mingw64/include/c++/11.2.0/bits/refwrap.h \
+ C:/msys64/mingw64/include/c++/11.2.0/bits/unique_ptr.h \
+ C:/msys64/mingw64/include/c++/11.2.0/semaphore \
+ C:/msys64/mingw64/include/c++/11.2.0/bits/semaphore_base.h \
+ C:/msys64/mingw64/include/c++/11.2.0/bits/atomic_timed_wait.h \
+ C:/msys64/mingw64/include/c++/11.2.0/bits/this_thread_sleep.h \
+ C:/msys64/mingw64/include/c++/11.2.0/chrono \
+ C:/msys64/mingw64/include/c++/11.2.0/ratio \
+ C:/msys64/mingw64/include/c++/11.2.0/limits \
+ C:/msys64/mingw64/include/c++/11.2.0/ctime \
+ C:/msys64/mingw64/include/c++/11.2.0/bits/parse_numbers.h \
+ C:/msys64/mingw64/x86_64-w64-mingw32/include/semaphore.h \
+ C:/msys64/mingw64/include/c++/11.2.0/vector \
+ C:/msys64/mingw64/include/c++/11.2.0/bits/stl_uninitialized.h \
+ C:/msys64/mingw64/include/c++/11.2.0/bits/stl_vector.h \
+ C:/msys64/mingw64/include/c++/11.2.0/bits/stl_bvector.h \
+ C:/msys64/mingw64/include/c++/11.2.0/bits/vector.tcc \
+ C:/msys64/mingw64/include/c++/11.2.0/memory \
+ C:/msys64/mingw64/include/c++/11.2.0/bits/stl_raw_storage_iter.h \
+ C:/msys64/mingw64/include/c++/11.2.0/bits/align.h \
+ C:/msys64/mingw64/include/c++/11.2.0/bit \
+ C:/msys64/mingw64/include/c++/11.2.0/bits/shared_ptr.h \
+ C:/msys64/mingw64/include/c++/11.2.0/bits/shared_ptr_base.h \
+ C:/msys64/mingw64/include/c++/11.2.0/bits/allocated_ptr.h \
+ C:/msys64/mingw64/include/c++/11.2.0/ext/aligned_buffer.h \
+ C:/msys64/mingw64/include/c++/11.2.0/ext/concurrence.h \
+ C:/msys64/mingw64/include/c++/11.2.0/bits/shared_ptr_atomic.h \
  C:/msys64/mingw64/include/c++/11.2.0/backward/auto_ptr.h \
  C:/msys64/mingw64/include/c++/11.2.0/bits/ranges_uninitialized.h \
  C:/msys64/mingw64/include/c++/11.2.0/bits/ranges_algobase.h \
@@ -178,66 +197,6 @@ CMakeFiles/telemetry_vulkan.dir/src/main.cpp.obj: \
  C:/msys64/mingw64/include/c++/11.2.0/bits/uses_allocator_args.h \
  C:/msys64/mingw64/include/c++/11.2.0/pstl/glue_memory_defs.h \
  C:/msys64/mingw64/include/c++/11.2.0/pstl/execution_defs.h \
- C:/msys64/mingw64/include/c++/11.2.0/filesystem \
- C:/msys64/mingw64/include/c++/11.2.0/bits/fs_fwd.h \
- C:/msys64/mingw64/include/c++/11.2.0/chrono \
- C:/msys64/mingw64/include/c++/11.2.0/ratio \
- C:/msys64/mingw64/include/c++/11.2.0/limits \
- C:/msys64/mingw64/include/c++/11.2.0/ctime \
- C:/msys64/mingw64/include/c++/11.2.0/bits/parse_numbers.h \
- C:/msys64/mingw64/include/c++/11.2.0/bits/fs_path.h \
- C:/msys64/mingw64/include/c++/11.2.0/locale \
- C:/msys64/mingw64/include/c++/11.2.0/bits/locale_facets_nonio.h \
- C:/msys64/mingw64/include/c++/11.2.0/x86_64-w64-mingw32/bits/time_members.h \
- C:/msys64/mingw64/include/c++/11.2.0/x86_64-w64-mingw32/bits/messages_members.h \
- C:/msys64/mingw64/include/c++/11.2.0/bits/codecvt.h \
- C:/msys64/mingw64/include/c++/11.2.0/bits/locale_facets_nonio.tcc \
- C:/msys64/mingw64/include/c++/11.2.0/bits/locale_conv.h \
- C:/msys64/mingw64/include/c++/11.2.0/iomanip \
- C:/msys64/mingw64/include/c++/11.2.0/bits/quoted_string.h \
- C:/msys64/mingw64/include/c++/11.2.0/sstream \
- C:/msys64/mingw64/include/c++/11.2.0/bits/sstream.tcc \
- C:/msys64/mingw64/include/c++/11.2.0/codecvt \
- C:/msys64/mingw64/include/c++/11.2.0/algorithm \
- C:/msys64/mingw64/include/c++/11.2.0/bits/ranges_algo.h \
- C:/msys64/mingw64/include/c++/11.2.0/bits/ranges_util.h \
- C:/msys64/mingw64/include/c++/11.2.0/pstl/glue_algorithm_defs.h \
- C:/msys64/mingw64/include/c++/11.2.0/functional \
- C:/msys64/mingw64/include/c++/11.2.0/bits/std_function.h \
- C:/msys64/mingw64/include/c++/11.2.0/unordered_map \
- C:/msys64/mingw64/include/c++/11.2.0/bits/hashtable.h \
- C:/msys64/mingw64/include/c++/11.2.0/bits/hashtable_policy.h \
- C:/msys64/mingw64/include/c++/11.2.0/bits/node_handle.h \
- C:/msys64/mingw64/include/c++/11.2.0/bits/unordered_map.h \
- C:/msys64/mingw64/include/c++/11.2.0/bits/erase_if.h \
- C:/msys64/mingw64/include/c++/11.2.0/vector \
- C:/msys64/mingw64/include/c++/11.2.0/bits/stl_vector.h \
- C:/msys64/mingw64/include/c++/11.2.0/bits/stl_bvector.h \
- C:/msys64/mingw64/include/c++/11.2.0/bits/vector.tcc \
- C:/msys64/mingw64/include/c++/11.2.0/bits/fs_dir.h \
- C:/msys64/mingw64/include/c++/11.2.0/bits/fs_ops.h \
- C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/external/glfw/include/GLFW/glfw3.h \
- C:/msys64/mingw64/x86_64-w64-mingw32/include/GL/gl.h \
- C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/external/imgui/imgui.h \
- C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/external/imgui/imconfig.h \
- C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/float.h \
- C:/msys64/mingw64/x86_64-w64-mingw32/include/float.h \
- C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/stdarg.h \
- C:/msys64/mingw64/x86_64-w64-mingw32/include/stdarg.h \
- C:/msys64/mingw64/x86_64-w64-mingw32/include/_mingw_stdarg.h \
- C:/msys64/mingw64/x86_64-w64-mingw32/include/string.h \
- C:/msys64/mingw64/x86_64-w64-mingw32/include/sec_api/string_s.h \
- C:/msys64/mingw64/x86_64-w64-mingw32/include/assert.h \
- C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/Telemetry/Services/ServiceManager.hpp \
- C:/msys64/mingw64/include/c++/11.2.0/thread \
- C:/msys64/mingw64/include/c++/11.2.0/stop_token \
- C:/msys64/mingw64/include/c++/11.2.0/atomic \
- C:/msys64/mingw64/include/c++/11.2.0/bits/std_thread.h \
- C:/msys64/mingw64/include/c++/11.2.0/semaphore \
- C:/msys64/mingw64/include/c++/11.2.0/bits/semaphore_base.h \
- C:/msys64/mingw64/include/c++/11.2.0/bits/atomic_timed_wait.h \
- C:/msys64/mingw64/include/c++/11.2.0/bits/this_thread_sleep.h \
- C:/msys64/mingw64/x86_64-w64-mingw32/include/semaphore.h \
  C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/Telemetry/Services/SerialService.hpp \
  C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/Telemetry/data_acquisition/IDataSource.hpp \
  C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/Telemetry/data_writing/DataManager.hpp \
@@ -250,6 +209,7 @@ CMakeFiles/telemetry_vulkan.dir/src/main.cpp.obj: \
  C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/Telemetry/Services/NetworkService.hpp \
  C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/Telemetry/data_writing/TxtWriter.hpp \
  C:/msys64/mingw64/include/c++/11.2.0/fstream \
+ C:/msys64/mingw64/include/c++/11.2.0/bits/codecvt.h \
  C:/msys64/mingw64/include/c++/11.2.0/x86_64-w64-mingw32/bits/basic_file.h \
  C:/msys64/mingw64/include/c++/11.2.0/x86_64-w64-mingw32/bits/c++io.h \
  C:/msys64/mingw64/include/c++/11.2.0/bits/fstream.tcc \
@@ -263,9 +223,16 @@ CMakeFiles/telemetry_vulkan.dir/src/main.cpp.obj: \
  C:/msys64/mingw64/include/c++/11.2.0/optional \
  C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/UI/UIManager.hpp \
  C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/UI/UIElement.hpp \
- C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/UI/SerialDeviceSelection.hpp \
  C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/UI/Dashboard.hpp \
  C:/msys64/mingw64/include/c++/11.2.0/map \
  C:/msys64/mingw64/include/c++/11.2.0/bits/stl_tree.h \
+ C:/msys64/mingw64/include/c++/11.2.0/bits/node_handle.h \
  C:/msys64/mingw64/include/c++/11.2.0/bits/stl_map.h \
- C:/msys64/mingw64/include/c++/11.2.0/bits/stl_multimap.h
+ C:/msys64/mingw64/include/c++/11.2.0/bits/stl_multimap.h \
+ C:/msys64/mingw64/include/c++/11.2.0/bits/erase_if.h \
+ C:/msys64/mingw64/include/c++/11.2.0/functional \
+ C:/msys64/mingw64/include/c++/11.2.0/bits/std_function.h \
+ C:/msys64/mingw64/include/c++/11.2.0/unordered_map \
+ C:/msys64/mingw64/include/c++/11.2.0/bits/hashtable.h \
+ C:/msys64/mingw64/include/c++/11.2.0/bits/hashtable_policy.h \
+ C:/msys64/mingw64/include/c++/11.2.0/bits/unordered_map.h

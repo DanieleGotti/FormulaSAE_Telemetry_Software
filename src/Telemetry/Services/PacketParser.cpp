@@ -1,12 +1,13 @@
 #include <sstream>
 #include <unordered_set>
-#include <iostream> 
+#include <iostream>
+#include <map>
 #include "Telemetry/data_acquisition/PacketParser.hpp"
 
-// Tipi di dato
+// Tipi di dato che arrivano dalla centralina
 namespace {
     const std::unordered_set<std::string> integerSensorLabels = {
-        "ACC1A", "ACC2A"
+        "ACC1A", "ACC2A",
     };
     const std::unordered_set<std::string> doubleSensorLabels = {
         "ACC1B", "ACC2B", "BRK1", "BRK2", "STEER"
@@ -15,7 +16,12 @@ namespace {
         "SDC_INPUT", "RESET_BUTTON", "TS_ON_BUTTON", "R2D_BUTTON"
     };
     const std::unordered_set<std::string> inverterFsmLabels = {
-        "LEFT_INVERTER_FSM", "RIGHT_INVERTER_FSM", "INV1", "INV2"
+        "LEFT_INVERTER_FSM", "RIGHT_INVERTER_FSM"
+    };
+    const std::map<int, std::string> inverterStateMapping = {
+        {0, "OFF"}, {1, "SYSTEM_READY"}, {2, "DC_CAPACITOR_CHARGE"},
+        {3, "DC_OK"}, {4, "ENABLE_INVERTER"}, {5, "ENABLED"},
+        {6, "ON"}, {7, "OK"}, {8, "ERROR"}
     };
     const std::string inverterStateKeyword = "STATE";
 }
@@ -31,10 +37,19 @@ PacketParser PacketParser::parse(const std::string& line,  const std::chrono::sy
 
     // I messaggi inverter hanno 3 parti: "STATE <LABEL> <VALUE>"
     if (part1 == inverterStateKeyword && inverterFsmLabels.count(part2) && !part3.empty()) {
-        packet.packetType = PacketType::INVERTER; 
-        packet.label = part2;
-        packet.data = part3;
-        return packet; 
+        try {
+            // Converte la terza parte in intero e lo cerca nella mappa
+            int stateValue = std::stoi(part3);
+            auto it = inverterStateMapping.find(stateValue);
+            if (it != inverterStateMapping.end()) {
+                packet.packetType = PacketType::INVERTER; 
+                packet.label = part2;
+                packet.data = it->second; 
+                return packet; 
+            }
+        } catch (const std::exception& e) {
+            // Errore di conversione, verrà marcato sotto come UNKNOWN
+        }
     }
 
     // Gli altri messaggi hanno 2 parti: "<LABEL> <VALUE>"
@@ -59,7 +74,7 @@ PacketParser PacketParser::parse(const std::string& line,  const std::chrono::sy
             }
         }
         catch (const std::invalid_argument& e) {
-             // Errore di conversione, verrà marcato sotto come UNKNOWN
+            // Errore di conversione, verrà marcato sotto come UNKNOWN
         }
     }
     

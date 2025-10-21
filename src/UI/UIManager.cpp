@@ -1,10 +1,12 @@
-#include <UI/UIManager.hpp>
-
 #include <imgui.h>
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_opengl3.h>
 #include <GLFW/glfw3.h>
 #include <algorithm>
+#include <iostream>
+#include "UI/UIManager.hpp"
+#include "UI/SerialDeviceSelection.hpp"
+#include "Telemetry/Services/ServiceManager.hpp"
 
 UiManager::UiManager() {
     if (!glfwInit())
@@ -14,72 +16,34 @@ UiManager::UiManager() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // Necessario su macOS
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
 
-    m_window = glfwCreateWindow(1280, 720, "Telemetry Dashboard", NULL, NULL);
+    m_window = glfwCreateWindow(1280, 720, "Telemetry ", NULL, NULL);
     glfwMakeContextCurrent((GLFWwindow*)m_window);
     glfwSwapInterval(1); // vsync
 
-    // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
     (void)io;
-    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;   // Abilita Docking
-    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable; // (opzionale) Abilita finestre multiple flottanti
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 
-    // Setup Dear ImGui style
+     m_isDarkTheme = true;
     ImGui::StyleColorsDark();
-
-    // When viewports are enabled we tweak WindowRounding/WindowBg so platform windows can look identical to regular ones.
     ImGuiStyle& style = ImGui::GetStyle();
-    if (io.ConfigFlags) {
+    if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
         style.WindowRounding = 0.0f;
         style.Colors[ImGuiCol_WindowBg].w = 1.0f;
     }
     
-    // Setup Platform/Renderer bindings
     ImGui_ImplGlfw_InitForOpenGL((GLFWwindow*)m_window, true);
-
     ImGui_ImplOpenGL3_Init(glsl_version);
     glfwWindowHint(GLFW_REFRESH_RATE, 60);
-}
 
-void* UiManager::getWindowHandle() {
-    return m_window;
-}
-
-void UiManager::beginFrame() {
-    glfwPollEvents();
-    ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplGlfw_NewFrame();
-    ImGui::NewFrame();
-    showDockingSpace(); // Prepara il docking space per le finestre
-}
-
-void UiManager::endFrame() {
-    // === RENDER ===
-    ImGui::Render();
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-    
-    ImGuiIO& io = ImGui::GetIO();
-    if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
-        GLFWwindow* backup_current_context = glfwGetCurrentContext();
-        ImGui::UpdatePlatformWindows();
-        ImGui::RenderPlatformWindowsDefault();
-        glfwMakeContextCurrent(backup_current_context);
-    }
-
-    glfwSwapBuffers((GLFWwindow*)m_window);
-}
-
-
-void UiManager::draw() {
-    for (auto& element : m_uiElements) {
-        element->draw();
-    }
+    setupInitialState();
 }
 
 UiManager::~UiManager() {
@@ -90,68 +54,132 @@ UiManager::~UiManager() {
     glfwTerminate();
 }
 
+void UiManager::setupInitialState() {
+    auto onConnect = [this](const std::string& port, int baudrate) {
+        ServiceManager::configureSerial(port, baudrate);
+        ServiceManager::setAcquisitionMethod(ACQUISITION_METHOD_SERIAL);
+        
+        if (ServiceManager::startServices()) {
+            this->m_dashboard = std::make_shared<Dashboard>();
+            ServiceManager::getDataManager()->addSubscriber(this->m_dashboard);
+            if (m_serialSelectionWindow) {
+                this->removeElement(m_serialSelectionWindow);
+                m_serialSelectionWindow = nullptr;
+            }
+            this->m_currentState = AppState::CONNECTED;
+        } else {
+            std::cerr << "ERROR: Connection failed." << std::endl;
+        }
+    };
+    
+    auto selectionWindow = std::make_unique<SerialDeviceSelection>(onConnect);
+    m_serialSelectionWindow = selectionWindow.get();
+    addElement(std::move(selectionWindow));
+}
+
+void UiManager::run() {
+    while (!glfwWindowShouldClose((GLFWwindow*)m_window)) {
+        glfwPollEvents();
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+        showDockingSpace();
+        draw();
+        ImGui::ShowDemoWindow();
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    
+        ImGuiIO& io = ImGui::GetIO();
+        if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+            GLFWwindow* backup_current_context = glfwGetCurrentContext();
+            ImGui::UpdatePlatformWindows();
+            ImGui::RenderPlatformWindowsDefault();
+            glfwMakeContextCurrent(backup_current_context);
+        }
+
+        glfwSwapBuffers((GLFWwindow*)m_window);
+        processPendingRemovals();
+    }
+}
+
+void UiManager::draw() {
+    for (auto& element : m_uiElements) {
+        element->draw();
+    }
+    if (m_dashboard) {
+        m_dashboard->draw();
+    }
+}
+
 void UiManager::addElement(std::unique_ptr<UIElement> uiElement) {
     m_uiElements.push_back(std::move(uiElement));
 }
 
 void UiManager::removeElement(UIElement* uiElement) {
-    m_uiElements.erase(std::remove_if(m_uiElements.begin(), m_uiElements.end(),
-        [uiElement](const std::unique_ptr<UIElement>& elem) {
-            return elem.get() == uiElement;
-        }),
-        m_uiElements.end());
+    m_elementsToRemove.push_back(uiElement);
 }
 
+void UiManager::processPendingRemovals() {
+    if (m_elementsToRemove.empty()) {
+        return;
+    }
+
+    for (UIElement* elementToRemove : m_elementsToRemove) {
+        m_uiElements.erase(
+            std::remove_if(m_uiElements.begin(), m_uiElements.end(),
+                [elementToRemove](const std::unique_ptr<UIElement>& elem) {
+                    return elem.get() == elementToRemove;
+                }),
+            m_uiElements.end());
+    }
+    m_elementsToRemove.clear();
+}
+
+
 void UiManager::showDockingSpace() {
-    ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDocking;
+    ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
+    window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+    window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+    window_flags |= ImGuiWindowFlags_NoBackground; 
 
-    ImGuiViewport* viewport = ImGui::GetMainViewport();
-    ImGui::SetNextWindowPos(viewport->Pos);
-    ImGui::SetNextWindowSize(viewport->Size);
-    ImGui::SetNextWindowViewport(viewport->ID);
-
-    // Rimuove titolo, bordi, background
-    window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse |
-                    ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
-                    ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus |
-                    ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground;
-    // window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar;
+    const ImGuiViewport* viewport = ImGui::GetMainViewport();
     ImGui::SetNextWindowPos(viewport->WorkPos);
     ImGui::SetNextWindowSize(viewport->WorkSize);
     ImGui::SetNextWindowViewport(viewport->ID);
 
     ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-    // ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.1f, 0.1f, 0.1f, 1.0f));   // colore background finestra
-    // ImGui::PushStyleColor(ImGuiCol_Border,   ImVec4(1.0f, 0.0f, 0.0f, 1.0f));   // colore bordo rosso
-
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
     ImGui::Begin("DockSpaceHost", nullptr, window_flags);
-
     ImGui::PopStyleVar(3);
 
-    // DockSpace vero e proprio
     ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
-    ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f));
+    ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_None);
 
-
-    // QUI il menù principale
     if (ImGui::BeginMainMenuBar()) {
-        if (ImGui::BeginMenu("File")) {
-            if (ImGui::MenuItem("Esci")) {
-                // Azione uscita
-            }
-            ImGui::EndMenu();
-        }
-        if (ImGui::BeginMenu("View")) {
-            if (ImGui::MenuItem("Connessione seriale")) {
-                // Toggle finestra
+        if (ImGui::BeginMenu("Opzioni")) {
+            const char* themeLabel = m_isDarkTheme ? "Tema chiaro" : "Tema scuro";
+            if (ImGui::MenuItem(themeLabel)) {
+                toggleTheme(); 
             }
             ImGui::EndMenu();
         }
         ImGui::EndMainMenuBar();
     }
-
     ImGui::End();
-    // ImGui::PopStyleColor(2);
+}
+
+void UiManager::toggleTheme() {
+    m_isDarkTheme = !m_isDarkTheme; 
+    if (m_isDarkTheme) {
+        ImGui::StyleColorsDark();
+    } else {
+        ImGui::StyleColorsLight();
+    }
+
+    ImGuiStyle& style = ImGui::GetStyle();
+    if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+        style.WindowRounding = 0.0f;
+        style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+    }
 }

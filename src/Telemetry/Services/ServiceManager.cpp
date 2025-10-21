@@ -1,12 +1,13 @@
+#include <filesystem> 
 #include "Telemetry/Services/ServiceManager.hpp"
 #include "Telemetry/data_acquisition/SerialDataSource.hpp" 
 #include "Telemetry/data_writing/DataManager.hpp"
 
-std::string ServiceManager::dbPath;
 AcquisitionMethod ServiceManager::m_method;
 std::unique_ptr<SerialService> ServiceManager::m_serialService;
 std::unique_ptr<NetworkService> ServiceManager::m_networkService;
 std::unique_ptr<DataManager> ServiceManager::m_dataManager;
+std::shared_ptr<TxtWriter> ServiceManager::m_txtWriter = nullptr;
 
 void ServiceManager::initialize() {
     m_dataManager = std::make_unique<DataManager>();
@@ -16,17 +17,12 @@ void ServiceManager::initialize() {
 }
 
 std::vector<std::string> ServiceManager::getAllConnectionOptions() {
-    // Per ora restituisce solo le opzioni seriali
     SerialDataSource sds;
     return sds.getAvailableResources();
 }
 
 DataManager* ServiceManager::getDataManager() {
     return m_dataManager.get();
-}
-
-void ServiceManager::setDBPath(const std::string& path) {
-    dbPath = path;
 }
 
 void ServiceManager::setAcquisitionMethod(AcquisitionMethod method) {
@@ -45,18 +41,25 @@ bool ServiceManager::configureNetwork(const std::string& ip, int port) {
     return m_networkService->configure(config);
 }
 
-void ServiceManager::startServices() {
+bool ServiceManager::startServices() {
+    bool success = false;
     switch (m_method) {
         case ACQUISITION_METHOD_SERIAL:
-            if (m_serialService) m_serialService->start();
+            if (m_serialService) {
+                success = m_serialService->start();
+            }
             break;
         case ACQUISITION_METHOD_NETWORK:
-            if (m_networkService) m_networkService->start();
+            if (m_networkService) {
+                success = m_networkService->start();
+            }
             break;
         default:
             std::cerr << "ServiceManager: No acquisition method selected." << std::endl;
+            success = false;
             break;
     }
+    return success;
 }
 
 void ServiceManager::stopTasks() {
@@ -70,7 +73,54 @@ void ServiceManager::stopTasks() {
 }
 
 void ServiceManager::cleanup() {
+    if (isLogging()) {
+        stopLogging();
+    }
+    stopTasks();
     m_serialService.reset();
     m_networkService.reset();
+    m_dataManager.reset(); 
     std::cout << "ServiceManager cleaned up." << std::endl;
+}
+
+bool ServiceManager::startLogging(const std::string& outputDirectory) {
+    if (m_txtWriter) return true; 
+
+    std::filesystem::create_directories(outputDirectory);
+    m_txtWriter = std::make_shared<TxtWriter>();
+
+    if (m_txtWriter->createFile(outputDirectory)) {
+        if (getDataManager()) {
+            getDataManager()->addSubscriber(m_txtWriter);
+        }
+        m_txtWriter->start();
+        std::cout << "INFO: Logging started." << std::endl;
+        return true;
+    }
+    
+    m_txtWriter.reset();
+    std::cerr << "ERROR: Failed to start logging." << std::endl;
+    return false;
+}
+
+void ServiceManager::stopLogging() {
+    if (!m_txtWriter) return;
+
+    if (getDataManager()) {
+        getDataManager()->removeSubscriber(m_txtWriter);
+    }
+    m_txtWriter->stop();
+    m_txtWriter.reset();
+    std::cout << "INFO: Logging stopped." << std::endl;
+}
+
+bool ServiceManager::isLogging() {
+    return m_txtWriter != nullptr;
+}
+
+std::string ServiceManager::getCurrentLogFileName() {
+    if (m_txtWriter) {
+        return m_txtWriter->getCurrentFileName();
+    }
+    return "";
 }

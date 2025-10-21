@@ -1,11 +1,41 @@
 CMakeFiles/telemetry_vulkan.dir/src/UI/SerialDeviceSelection.cpp.obj: \
  C:\Users\Asus\Documents\ERB\git_telemetria\telemetry\src\UI\SerialDeviceSelection.cpp \
- C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/UI/SerialDeviceSelection.hpp \
- C:/msys64/mingw64/include/c++/11.2.0/string \
+ C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/external/imgui/imgui.h \
+ C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/external/imgui/imconfig.h \
+ C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/float.h \
+ C:/msys64/mingw64/x86_64-w64-mingw32/include/float.h \
+ C:/msys64/mingw64/x86_64-w64-mingw32/include/crtdefs.h \
+ C:/msys64/mingw64/x86_64-w64-mingw32/include/corecrt.h \
+ C:/msys64/mingw64/x86_64-w64-mingw32/include/_mingw.h \
+ C:/msys64/mingw64/x86_64-w64-mingw32/include/_mingw_mac.h \
+ C:/msys64/mingw64/x86_64-w64-mingw32/include/_mingw_secapi.h \
+ C:/msys64/mingw64/x86_64-w64-mingw32/include/vadefs.h \
+ C:/msys64/mingw64/x86_64-w64-mingw32/include/sdks/_mingw_ddk.h \
+ C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/stdarg.h \
+ C:/msys64/mingw64/x86_64-w64-mingw32/include/stdarg.h \
+ C:/msys64/mingw64/x86_64-w64-mingw32/include/_mingw_stdarg.h \
+ C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/stddef.h \
+ C:/msys64/mingw64/x86_64-w64-mingw32/include/stddef.h \
+ C:/msys64/mingw64/x86_64-w64-mingw32/include/string.h \
+ C:/msys64/mingw64/x86_64-w64-mingw32/include/sec_api/string_s.h \
+ C:/msys64/mingw64/x86_64-w64-mingw32/include/assert.h \
+ C:/msys64/mingw64/include/c++/11.2.0/stdlib.h \
+ C:/msys64/mingw64/include/c++/11.2.0/cstdlib \
  C:/msys64/mingw64/include/c++/11.2.0/x86_64-w64-mingw32/bits/c++config.h \
  C:/msys64/mingw64/include/c++/11.2.0/x86_64-w64-mingw32/bits/os_defines.h \
  C:/msys64/mingw64/include/c++/11.2.0/x86_64-w64-mingw32/bits/cpu_defines.h \
  C:/msys64/mingw64/include/c++/11.2.0/pstl/pstl_config.h \
+ C:/msys64/mingw64/x86_64-w64-mingw32/include/stdlib.h \
+ C:/msys64/mingw64/x86_64-w64-mingw32/include/corecrt_wstdlib.h \
+ C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/11.2.0/include-fixed/limits.h \
+ C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/11.2.0/include-fixed/syslimits.h \
+ C:/msys64/mingw64/x86_64-w64-mingw32/include/limits.h \
+ C:/msys64/mingw64/x86_64-w64-mingw32/include/sec_api/stdlib_s.h \
+ C:/msys64/mingw64/x86_64-w64-mingw32/include/malloc.h \
+ C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/mm_malloc.h \
+ C:/msys64/mingw64/x86_64-w64-mingw32/include/errno.h \
+ C:/msys64/mingw64/include/c++/11.2.0/bits/std_abs.h \
+ C:/msys64/mingw64/include/c++/11.2.0/string \
  C:/msys64/mingw64/include/c++/11.2.0/bits/stringfwd.h \
  C:/msys64/mingw64/include/c++/11.2.0/bits/memoryfwd.h \
  C:/msys64/mingw64/include/c++/11.2.0/bits/char_traits.h \
@@ -35,14 +65,7 @@ CMakeFiles/telemetry_vulkan.dir/src/UI/SerialDeviceSelection.cpp.obj: \
  C:/msys64/mingw64/include/c++/11.2.0/bits/postypes.h \
  C:/msys64/mingw64/include/c++/11.2.0/cwchar \
  C:/msys64/mingw64/x86_64-w64-mingw32/include/wchar.h \
- C:/msys64/mingw64/x86_64-w64-mingw32/include/corecrt.h \
- C:/msys64/mingw64/x86_64-w64-mingw32/include/_mingw.h \
- C:/msys64/mingw64/x86_64-w64-mingw32/include/_mingw_mac.h \
- C:/msys64/mingw64/x86_64-w64-mingw32/include/_mingw_secapi.h \
- C:/msys64/mingw64/x86_64-w64-mingw32/include/vadefs.h \
- C:/msys64/mingw64/x86_64-w64-mingw32/include/sdks/_mingw_ddk.h \
  C:/msys64/mingw64/x86_64-w64-mingw32/include/corecrt_stdio_config.h \
- C:/msys64/mingw64/x86_64-w64-mingw32/include/corecrt_wstdlib.h \
  C:/msys64/mingw64/x86_64-w64-mingw32/include/_mingw_off_t.h \
  C:/msys64/mingw64/x86_64-w64-mingw32/include/_mingw_stat64.h \
  C:/msys64/mingw64/x86_64-w64-mingw32/include/swprintf.inl \
@@ -50,9 +73,6 @@ CMakeFiles/telemetry_vulkan.dir/src/UI/SerialDeviceSelection.cpp.obj: \
  C:/msys64/mingw64/include/c++/11.2.0/cstdint \
  C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/stdint.h \
  C:/msys64/mingw64/x86_64-w64-mingw32/include/stdint.h \
- C:/msys64/mingw64/x86_64-w64-mingw32/include/crtdefs.h \
- C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/stddef.h \
- C:/msys64/mingw64/x86_64-w64-mingw32/include/stddef.h \
  C:/msys64/mingw64/include/c++/11.2.0/bits/allocator.h \
  C:/msys64/mingw64/include/c++/11.2.0/x86_64-w64-mingw32/bits/c++allocator.h \
  C:/msys64/mingw64/include/c++/11.2.0/ext/new_allocator.h \
@@ -70,17 +90,6 @@ CMakeFiles/telemetry_vulkan.dir/src/UI/SerialDeviceSelection.cpp.obj: \
  C:/msys64/mingw64/include/c++/11.2.0/bits/stl_function.h \
  C:/msys64/mingw64/include/c++/11.2.0/backward/binders.h \
  C:/msys64/mingw64/include/c++/11.2.0/bits/stl_algo.h \
- C:/msys64/mingw64/include/c++/11.2.0/cstdlib \
- C:/msys64/mingw64/x86_64-w64-mingw32/include/stdlib.h \
- C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/11.2.0/include-fixed/limits.h \
- C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/11.2.0/include-fixed/syslimits.h \
- C:/msys64/mingw64/x86_64-w64-mingw32/include/limits.h \
- C:/msys64/mingw64/x86_64-w64-mingw32/include/sec_api/stdlib_s.h \
- C:/msys64/mingw64/include/c++/11.2.0/stdlib.h \
- C:/msys64/mingw64/x86_64-w64-mingw32/include/malloc.h \
- C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/mm_malloc.h \
- C:/msys64/mingw64/x86_64-w64-mingw32/include/errno.h \
- C:/msys64/mingw64/include/c++/11.2.0/bits/std_abs.h \
  C:/msys64/mingw64/include/c++/11.2.0/bits/algorithmfwd.h \
  C:/msys64/mingw64/include/c++/11.2.0/initializer_list \
  C:/msys64/mingw64/include/c++/11.2.0/bits/stl_heap.h \
@@ -120,6 +129,7 @@ CMakeFiles/telemetry_vulkan.dir/src/UI/SerialDeviceSelection.cpp.obj: \
  C:/msys64/mingw64/include/c++/11.2.0/cerrno \
  C:/msys64/mingw64/include/c++/11.2.0/bits/charconv.h \
  C:/msys64/mingw64/include/c++/11.2.0/bits/basic_string.tcc \
+ C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/UI/SerialDeviceSelection.hpp \
  C:/msys64/mingw64/include/c++/11.2.0/vector \
  C:/msys64/mingw64/include/c++/11.2.0/bits/stl_uninitialized.h \
  C:/msys64/mingw64/include/c++/11.2.0/bits/stl_vector.h \
@@ -217,15 +227,19 @@ CMakeFiles/telemetry_vulkan.dir/src/UI/SerialDeviceSelection.cpp.obj: \
  C:/msys64/mingw64/include/c++/11.2.0/variant \
  C:/msys64/mingw64/include/c++/11.2.0/bits/enable_special_members.h \
  C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/Telemetry/Services/NetworkService.hpp \
+ C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/Telemetry/data_writing/TxtWriter.hpp \
+ C:/msys64/mingw64/include/c++/11.2.0/fstream \
+ C:/msys64/mingw64/include/c++/11.2.0/bits/codecvt.h \
+ C:/msys64/mingw64/include/c++/11.2.0/x86_64-w64-mingw32/bits/basic_file.h \
+ C:/msys64/mingw64/include/c++/11.2.0/x86_64-w64-mingw32/bits/c++io.h \
+ C:/msys64/mingw64/include/c++/11.2.0/bits/fstream.tcc \
+ C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/Telemetry/data_acquisition/ThreadSafeQueue.hpp \
+ C:/msys64/mingw64/include/c++/11.2.0/queue \
+ C:/msys64/mingw64/include/c++/11.2.0/deque \
+ C:/msys64/mingw64/include/c++/11.2.0/bits/stl_deque.h \
+ C:/msys64/mingw64/include/c++/11.2.0/bits/deque.tcc \
+ C:/msys64/mingw64/include/c++/11.2.0/bits/stl_queue.h \
+ C:/msys64/mingw64/include/c++/11.2.0/condition_variable \
+ C:/msys64/mingw64/include/c++/11.2.0/optional \
  C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/Telemetry/data_acquisition/SerialDataSource.hpp \
- C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/Telemetry/data_acquisition/BaudRateQueryable.hpp \
- C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/external/imgui/imgui.h \
- C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/external/imgui/imconfig.h \
- C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/float.h \
- C:/msys64/mingw64/x86_64-w64-mingw32/include/float.h \
- C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/stdarg.h \
- C:/msys64/mingw64/x86_64-w64-mingw32/include/stdarg.h \
- C:/msys64/mingw64/x86_64-w64-mingw32/include/_mingw_stdarg.h \
- C:/msys64/mingw64/x86_64-w64-mingw32/include/string.h \
- C:/msys64/mingw64/x86_64-w64-mingw32/include/sec_api/string_s.h \
- C:/msys64/mingw64/x86_64-w64-mingw32/include/assert.h
+ C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/Telemetry/data_acquisition/BaudRateQueryable.hpp

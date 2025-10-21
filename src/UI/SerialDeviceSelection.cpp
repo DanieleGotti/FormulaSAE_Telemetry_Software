@@ -1,8 +1,8 @@
+#include <imgui.h>
+#include <string> 
 #include "UI/SerialDeviceSelection.hpp"
 #include "Telemetry/Services/ServiceManager.hpp" 
 #include "Telemetry/data_acquisition/SerialDataSource.hpp" 
-#include <imgui.h>
-#include <string> 
 
 SerialDeviceSelection::SerialDeviceSelection(ConnectCallback onConnectCallback)
     : m_onConnectCallback(std::move(onConnectCallback)) {
@@ -68,3 +68,4 @@ void SerialDeviceSelection::refreshPorts() {
         m_selectedBaudrateIndex = 0;
     }
 }
+
