@@ -221,9 +221,8 @@ CMakeFiles/telemetry_vulkan.dir/src/main.cpp.obj: \
  C:/msys64/mingw64/include/c++/11.2.0/bits/stl_queue.h \
  C:/msys64/mingw64/include/c++/11.2.0/condition_variable \
  C:/msys64/mingw64/include/c++/11.2.0/optional \
- C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/UI/UIManager.hpp \
- C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/UI/UIElement.hpp \
- C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/UI/Dashboard.hpp \
+ C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/Telemetry/data_writing/CsvWriter.hpp \
+ C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/Telemetry/data_writing/DataAggregator.hpp \
  C:/msys64/mingw64/include/c++/11.2.0/map \
  C:/msys64/mingw64/include/c++/11.2.0/bits/stl_tree.h \
  C:/msys64/mingw64/include/c++/11.2.0/bits/node_handle.h \
@@ -235,4 +234,7 @@ CMakeFiles/telemetry_vulkan.dir/src/main.cpp.obj: \
  C:/msys64/mingw64/include/c++/11.2.0/unordered_map \
  C:/msys64/mingw64/include/c++/11.2.0/bits/hashtable.h \
  C:/msys64/mingw64/include/c++/11.2.0/bits/hashtable_policy.h \
- C:/msys64/mingw64/include/c++/11.2.0/bits/unordered_map.h
+ C:/msys64/mingw64/include/c++/11.2.0/bits/unordered_map.h \
+ C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/UI/UIManager.hpp \
+ C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/UI/UIElement.hpp \
+ C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/UI/Dashboard.hpp

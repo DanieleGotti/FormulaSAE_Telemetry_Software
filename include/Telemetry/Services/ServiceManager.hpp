@@ -8,6 +8,7 @@
 #include "NetworkService.hpp"
 #include "../data_writing/DataManager.hpp"
 #include "../data_writing/TxtWriter.hpp" 
+#include "../data_writing/CsvWriter.hpp"
 
 typedef enum {
     ACQUISITION_METHOD_SERIAL = 0,
@@ -36,4 +37,5 @@ private:
     static std::unique_ptr<NetworkService> m_networkService;
     static std::unique_ptr<DataManager> m_dataManager;
     static std::shared_ptr<TxtWriter> m_txtWriter; 
+    static std::shared_ptr<CsvWriter> m_csvWriter;
 };

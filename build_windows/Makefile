@@ -561,6 +561,54 @@ src/Telemetry/data_acquisition/SerialDataSource.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\telemetry_vulkan.dir\build.make CMakeFiles/telemetry_vulkan.dir/src/Telemetry/data_acquisition/SerialDataSource.cpp.s
 .PHONY : src/Telemetry/data_acquisition/SerialDataSource.cpp.s
 
+src/Telemetry/data_writing/CsvWriter.obj: src/Telemetry/data_writing/CsvWriter.cpp.obj
+.PHONY : src/Telemetry/data_writing/CsvWriter.obj
+
+# target to build an object file
+src/Telemetry/data_writing/CsvWriter.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\telemetry_vulkan.dir\build.make CMakeFiles/telemetry_vulkan.dir/src/Telemetry/data_writing/CsvWriter.cpp.obj
+.PHONY : src/Telemetry/data_writing/CsvWriter.cpp.obj
+
+src/Telemetry/data_writing/CsvWriter.i: src/Telemetry/data_writing/CsvWriter.cpp.i
+.PHONY : src/Telemetry/data_writing/CsvWriter.i
+
+# target to preprocess a source file
+src/Telemetry/data_writing/CsvWriter.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\telemetry_vulkan.dir\build.make CMakeFiles/telemetry_vulkan.dir/src/Telemetry/data_writing/CsvWriter.cpp.i
+.PHONY : src/Telemetry/data_writing/CsvWriter.cpp.i
+
+src/Telemetry/data_writing/CsvWriter.s: src/Telemetry/data_writing/CsvWriter.cpp.s
+.PHONY : src/Telemetry/data_writing/CsvWriter.s
+
+# target to generate assembly for a file
+src/Telemetry/data_writing/CsvWriter.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\telemetry_vulkan.dir\build.make CMakeFiles/telemetry_vulkan.dir/src/Telemetry/data_writing/CsvWriter.cpp.s
+.PHONY : src/Telemetry/data_writing/CsvWriter.cpp.s
+
+src/Telemetry/data_writing/DataAggregator.obj: src/Telemetry/data_writing/DataAggregator.cpp.obj
+.PHONY : src/Telemetry/data_writing/DataAggregator.obj
+
+# target to build an object file
+src/Telemetry/data_writing/DataAggregator.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\telemetry_vulkan.dir\build.make CMakeFiles/telemetry_vulkan.dir/src/Telemetry/data_writing/DataAggregator.cpp.obj
+.PHONY : src/Telemetry/data_writing/DataAggregator.cpp.obj
+
+src/Telemetry/data_writing/DataAggregator.i: src/Telemetry/data_writing/DataAggregator.cpp.i
+.PHONY : src/Telemetry/data_writing/DataAggregator.i
+
+# target to preprocess a source file
+src/Telemetry/data_writing/DataAggregator.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\telemetry_vulkan.dir\build.make CMakeFiles/telemetry_vulkan.dir/src/Telemetry/data_writing/DataAggregator.cpp.i
+.PHONY : src/Telemetry/data_writing/DataAggregator.cpp.i
+
+src/Telemetry/data_writing/DataAggregator.s: src/Telemetry/data_writing/DataAggregator.cpp.s
+.PHONY : src/Telemetry/data_writing/DataAggregator.s
+
+# target to generate assembly for a file
+src/Telemetry/data_writing/DataAggregator.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\telemetry_vulkan.dir\build.make CMakeFiles/telemetry_vulkan.dir/src/Telemetry/data_writing/DataAggregator.cpp.s
+.PHONY : src/Telemetry/data_writing/DataAggregator.cpp.s
+
 src/Telemetry/data_writing/DataManager.obj: src/Telemetry/data_writing/DataManager.cpp.obj
 .PHONY : src/Telemetry/data_writing/DataManager.obj
 
@@ -764,6 +812,12 @@ help:
 	@echo ... src/Telemetry/data_acquisition/SerialDataSource.obj
 	@echo ... src/Telemetry/data_acquisition/SerialDataSource.i
 	@echo ... src/Telemetry/data_acquisition/SerialDataSource.s
+	@echo ... src/Telemetry/data_writing/CsvWriter.obj
+	@echo ... src/Telemetry/data_writing/CsvWriter.i
+	@echo ... src/Telemetry/data_writing/CsvWriter.s
+	@echo ... src/Telemetry/data_writing/DataAggregator.obj
+	@echo ... src/Telemetry/data_writing/DataAggregator.i
+	@echo ... src/Telemetry/data_writing/DataAggregator.s
 	@echo ... src/Telemetry/data_writing/DataManager.obj
 	@echo ... src/Telemetry/data_writing/DataManager.i
 	@echo ... src/Telemetry/data_writing/DataManager.s

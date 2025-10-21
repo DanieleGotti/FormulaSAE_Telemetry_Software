@@ -78,7 +78,7 @@ void SerialService::acquisitionLoop() {
                 if (packet.packetType != PacketType::UNKNOWN && m_dataManager) {
                     m_dataManager->processData(packet);
                 } else if (m_dataManager) { 
-                    // Logghiamo i pacchetti malformati per debug
+                    // Log dei pacchetti malformati per debug
                     std::cerr << "Raw data discarded by parser -> '" << std::get<std::string>(packet.data) << "'" << std::endl;
                 }
             }

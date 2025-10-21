@@ -8,6 +8,7 @@ std::unique_ptr<SerialService> ServiceManager::m_serialService;
 std::unique_ptr<NetworkService> ServiceManager::m_networkService;
 std::unique_ptr<DataManager> ServiceManager::m_dataManager;
 std::shared_ptr<TxtWriter> ServiceManager::m_txtWriter = nullptr;
+std::shared_ptr<CsvWriter> ServiceManager::m_csvWriter = nullptr;
 
 void ServiceManager::initialize() {
     m_dataManager = std::make_unique<DataManager>();
@@ -84,38 +85,57 @@ void ServiceManager::cleanup() {
 }
 
 bool ServiceManager::startLogging(const std::string& outputDirectory) {
-    if (m_txtWriter) return true; 
-
-    std::filesystem::create_directories(outputDirectory);
-    m_txtWriter = std::make_shared<TxtWriter>();
-
-    if (m_txtWriter->createFile(outputDirectory)) {
-        if (getDataManager()) {
+    // .txt
+    if (!m_txtWriter) {
+        std::filesystem::create_directories(outputDirectory);
+        m_txtWriter = std::make_shared<TxtWriter>();
+        if (m_txtWriter->createFile(outputDirectory)) {
             getDataManager()->addSubscriber(m_txtWriter);
+            m_txtWriter->start();
+        } else {
+            m_txtWriter.reset();
         }
-        m_txtWriter->start();
-        std::cout << "INFO: Logging started." << std::endl;
-        return true;
     }
-    
-    m_txtWriter.reset();
+    // .csv
+    if (!m_csvWriter) {
+        std::filesystem::create_directories(outputDirectory);
+        m_csvWriter = std::make_shared<CsvWriter>();
+        if(m_csvWriter->createFile(outputDirectory)) {
+            getDataManager()->addSubscriber(m_csvWriter);
+        } else {
+            m_csvWriter.reset();
+        }
+    }
+
+    if(m_txtWriter || m_csvWriter) {
+         std::cout << "INFO: Logging started." << std::endl;
+         return true;
+    }
+
     std::cerr << "ERROR: Failed to start logging." << std::endl;
     return false;
 }
 
 void ServiceManager::stopLogging() {
-    if (!m_txtWriter) return;
-
-    if (getDataManager()) {
+    if (m_txtWriter) {
         getDataManager()->removeSubscriber(m_txtWriter);
+        m_txtWriter->stop();
+        m_txtWriter.reset();
     }
-    m_txtWriter->stop();
-    m_txtWriter.reset();
-    std::cout << "INFO: Logging stopped." << std::endl;
+    
+    if (m_csvWriter) {
+        getDataManager()->removeSubscriber(m_csvWriter);
+        m_csvWriter->stop();
+        m_csvWriter.reset();
+    }
+    
+    if(!m_txtWriter && !m_csvWriter) {
+        std::cout << "INFO: Logging stopped." << std::endl;
+    }
 }
 
 bool ServiceManager::isLogging() {
-    return m_txtWriter != nullptr;
+    return m_txtWriter != nullptr || (m_csvWriter != nullptr);
 }
 
 std::string ServiceManager::getCurrentLogFileName() {

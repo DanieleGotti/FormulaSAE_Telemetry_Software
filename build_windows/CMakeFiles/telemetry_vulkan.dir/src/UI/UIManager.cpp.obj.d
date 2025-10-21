@@ -254,4 +254,6 @@ CMakeFiles/telemetry_vulkan.dir/src/UI/UIManager.cpp.obj: \
  C:/msys64/mingw64/include/c++/11.2.0/bits/deque.tcc \
  C:/msys64/mingw64/include/c++/11.2.0/bits/stl_queue.h \
  C:/msys64/mingw64/include/c++/11.2.0/condition_variable \
- C:/msys64/mingw64/include/c++/11.2.0/optional
+ C:/msys64/mingw64/include/c++/11.2.0/optional \
+ C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/Telemetry/data_writing/CsvWriter.hpp \
+ C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/Telemetry/data_writing/DataAggregator.hpp
