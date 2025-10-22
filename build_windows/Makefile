@@ -441,6 +441,30 @@ external/implot/implot_items.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\imgui.dir\build.make CMakeFiles/imgui.dir/external/implot/implot_items.cpp.s
 .PHONY : external/implot/implot_items.cpp.s
 
+src/Telemetry/Services/DataAggregatorService.obj: src/Telemetry/Services/DataAggregatorService.cpp.obj
+.PHONY : src/Telemetry/Services/DataAggregatorService.obj
+
+# target to build an object file
+src/Telemetry/Services/DataAggregatorService.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\telemetry_vulkan.dir\build.make CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/DataAggregatorService.cpp.obj
+.PHONY : src/Telemetry/Services/DataAggregatorService.cpp.obj
+
+src/Telemetry/Services/DataAggregatorService.i: src/Telemetry/Services/DataAggregatorService.cpp.i
+.PHONY : src/Telemetry/Services/DataAggregatorService.i
+
+# target to preprocess a source file
+src/Telemetry/Services/DataAggregatorService.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\telemetry_vulkan.dir\build.make CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/DataAggregatorService.cpp.i
+.PHONY : src/Telemetry/Services/DataAggregatorService.cpp.i
+
+src/Telemetry/Services/DataAggregatorService.s: src/Telemetry/Services/DataAggregatorService.cpp.s
+.PHONY : src/Telemetry/Services/DataAggregatorService.s
+
+# target to generate assembly for a file
+src/Telemetry/Services/DataAggregatorService.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\telemetry_vulkan.dir\build.make CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/DataAggregatorService.cpp.s
+.PHONY : src/Telemetry/Services/DataAggregatorService.cpp.s
+
 src/Telemetry/Services/NetworkService.obj: src/Telemetry/Services/NetworkService.cpp.obj
 .PHONY : src/Telemetry/Services/NetworkService.obj
 
@@ -797,6 +821,9 @@ help:
 	@echo ... external/implot/implot_items.obj
 	@echo ... external/implot/implot_items.i
 	@echo ... external/implot/implot_items.s
+	@echo ... src/Telemetry/Services/DataAggregatorService.obj
+	@echo ... src/Telemetry/Services/DataAggregatorService.i
+	@echo ... src/Telemetry/Services/DataAggregatorService.s
 	@echo ... src/Telemetry/Services/NetworkService.obj
 	@echo ... src/Telemetry/Services/NetworkService.i
 	@echo ... src/Telemetry/Services/NetworkService.s

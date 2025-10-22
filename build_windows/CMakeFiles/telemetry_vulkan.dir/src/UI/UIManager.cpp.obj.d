@@ -222,7 +222,8 @@ CMakeFiles/telemetry_vulkan.dir/src/UI/UIManager.cpp.obj: \
  C:/msys64/mingw64/include/c++/11.2.0/bits/stl_tree.h \
  C:/msys64/mingw64/include/c++/11.2.0/bits/stl_map.h \
  C:/msys64/mingw64/include/c++/11.2.0/bits/stl_multimap.h \
- C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/Telemetry/data_writing/IWritingSubscriber.hpp \
+ C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/Telemetry/data_writing/IAggregatedDataSubscriber.hpp \
+ C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/Telemetry/data_writing/DataAggregator.hpp \
  C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/Telemetry/data_acquisition/PacketParser.hpp \
  C:/msys64/mingw64/include/c++/11.2.0/variant \
  C:/msys64/mingw64/include/c++/11.2.0/bits/enable_special_members.h \
@@ -240,6 +241,7 @@ CMakeFiles/telemetry_vulkan.dir/src/UI/UIManager.cpp.obj: \
  C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/Telemetry/Services/SerialService.hpp \
  C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/Telemetry/data_acquisition/IDataSource.hpp \
  C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/Telemetry/data_writing/DataManager.hpp \
+ C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/Telemetry/data_writing/IWritingSubscriber.hpp \
  C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/Telemetry/Services/NetworkService.hpp \
  C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/Telemetry/data_writing/TxtWriter.hpp \
  C:/msys64/mingw64/include/c++/11.2.0/fstream \
@@ -256,4 +258,4 @@ CMakeFiles/telemetry_vulkan.dir/src/UI/UIManager.cpp.obj: \
  C:/msys64/mingw64/include/c++/11.2.0/condition_variable \
  C:/msys64/mingw64/include/c++/11.2.0/optional \
  C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/Telemetry/data_writing/CsvWriter.hpp \
- C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/Telemetry/data_writing/DataAggregator.hpp
+ C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/Telemetry/Services/DataAggregatorService.hpp

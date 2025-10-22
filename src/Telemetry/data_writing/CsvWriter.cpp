@@ -19,45 +19,18 @@ CsvWriter::~CsvWriter() {
     closeFile();
 }
 
-bool CsvWriter::createFile(const std::string& directoryPath) {
+bool CsvWriter::createFile(const std::string& directoryPath, const std::vector<std::string>& columnOrder) {
     closeFile();
+    m_columnOrder = columnOrder;
 
     std::string fileName = generate_csv_filename();
     std::filesystem::path fullPath = std::filesystem::path(directoryPath) / fileName;
-
     m_outputFile.open(fullPath, std::ios::out | std::ios::trunc);
-    if (!m_outputFile.is_open()) {
-        std::cerr << "ERROR [CsvWriter]: Impossible to create file: " << fullPath << std::endl;
-        return false;
-    }
-
-    // Configurazione colonne database
-    std::vector<ColumnConfig> config = {
-        {"ACC1A", AggregationType::AVERAGE},
-        {"ACC1B", AggregationType::AVERAGE},
-        {"ACC2A", AggregationType::AVERAGE},
-        {"ACC2B", AggregationType::AVERAGE},
-        {"BRK1", AggregationType::AVERAGE},
-        {"BRK2", AggregationType::AVERAGE},
-        {"STEER", AggregationType::AVERAGE},
-        {"LEFT_INVERTER_FSM", AggregationType::INVERTER},
-        {"RIGHT_INVERTER_FSM", AggregationType::INVERTER},
-        {"R2D_BUTTON", AggregationType::LAST},
-        {"RESET_BUTTON", AggregationType::LAST},
-        {"SDC_INPUT", AggregationType::LAST},
-        {"TS_ON_BUTTON", AggregationType::LAST}
-    };
+    if (!m_outputFile.is_open()) return false;
     
-    m_aggregator = std::make_unique<DataAggregator>(config, 
-        [this](const DbRow& row){ this->onRowReady(row); }
-    );
-    
-    // Scrive l'header del CSV
-    m_columnOrder.push_back("timestamp");
-    m_outputFile << "timestamp";
-    for(const auto& col : config) {
-        m_columnOrder.push_back(col.name);
-        m_outputFile << ";" << col.name;
+    // Scrive l'header
+    for (size_t i = 0; i < m_columnOrder.size(); ++i) {
+        m_outputFile << m_columnOrder[i] << (i == m_columnOrder.size() - 1 ? "" : ";");
     }
     m_outputFile << std::endl;
 
@@ -65,33 +38,22 @@ bool CsvWriter::createFile(const std::string& directoryPath) {
     return true;
 }
 
-void CsvWriter::onDataReceived(const PacketParser& packet) {
-    if (m_aggregator) {
-        m_aggregator->processPacket(packet);
-    }
-}
-
-void CsvWriter::onRowReady(const DbRow& row) {
+// Riceve la riga pronta
+void CsvWriter::onAggregatedDataReceived(const DbRow& dataRow) {
     if (!m_outputFile.is_open()) return;
 
     std::stringstream ss;
     for (size_t i = 0; i < m_columnOrder.size(); ++i) {
         const std::string& col_name = m_columnOrder[i];
-        ss << row.at(col_name) << (i == m_columnOrder.size() - 1 ? "" : ";");
+        ss << dataRow.at(col_name) << (i == m_columnOrder.size() - 1 ? "" : ";");
     }
     m_outputFile << ss.str() << std::endl;
 }
 
-void CsvWriter::stop() {
-    if (m_aggregator) {
-        m_aggregator->flush(); 
-    }
-    closeFile();
+void CsvWriter::stop() { 
+    closeFile(); 
 }
 
-void CsvWriter::closeFile() {
-    if (m_outputFile.is_open()) {
-        m_outputFile.close();
-    }
+void CsvWriter::closeFile() { 
+    if (m_outputFile.is_open()) m_outputFile.close(); 
 }
-

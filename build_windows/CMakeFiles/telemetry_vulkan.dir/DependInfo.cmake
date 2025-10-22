@@ -8,6 +8,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
+  "C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/src/Telemetry/Services/DataAggregatorService.cpp" "CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/DataAggregatorService.cpp.obj" "gcc" "CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/DataAggregatorService.cpp.obj.d"
   "C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/src/Telemetry/Services/NetworkService.cpp" "CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/NetworkService.cpp.obj" "gcc" "CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/NetworkService.cpp.obj.d"
   "C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/src/Telemetry/Services/PacketParser.cpp" "CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/PacketParser.cpp.obj" "gcc" "CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/PacketParser.cpp.obj.d"
   "C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/src/Telemetry/Services/SerialService.cpp" "CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/SerialService.cpp.obj" "gcc" "CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/SerialService.cpp.obj.d"

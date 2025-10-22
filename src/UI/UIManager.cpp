@@ -31,7 +31,7 @@ UiManager::UiManager() {
     io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 
-     m_isDarkTheme = true;
+    m_isDarkTheme = true;
     ImGui::StyleColorsDark();
     ImGuiStyle& style = ImGui::GetStyle();
     if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
@@ -47,6 +47,11 @@ UiManager::UiManager() {
 }
 
 UiManager::~UiManager() {
+    // Rimuovi la sottoscrizione della dashboard per evitare puntatori dangling
+    if (m_dashboard && ServiceManager::getAggregator()) {
+        ServiceManager::getAggregator()->unsubscribe(m_dashboard.get());
+    }
+
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
@@ -60,8 +65,11 @@ void UiManager::setupInitialState() {
         ServiceManager::setAcquisitionMethod(ACQUISITION_METHOD_SERIAL);
         
         if (ServiceManager::startServices()) {
+            // Crea la Dashboard
             this->m_dashboard = std::make_shared<Dashboard>();
-            ServiceManager::getDataManager()->addSubscriber(this->m_dashboard);
+            // Iscrive la Dashboard al servizio di aggregazione centrale
+            ServiceManager::getAggregator()->subscribe(this->m_dashboard.get());
+            
             if (m_serialSelectionWindow) {
                 this->removeElement(m_serialSelectionWindow);
                 m_serialSelectionWindow = nullptr;
@@ -106,6 +114,7 @@ void UiManager::draw() {
     for (auto& element : m_uiElements) {
         element->draw();
     }
+    // Disegna la dashboard se è stata creata
     if (m_dashboard) {
         m_dashboard->draw();
     }
@@ -120,9 +129,7 @@ void UiManager::removeElement(UIElement* uiElement) {
 }
 
 void UiManager::processPendingRemovals() {
-    if (m_elementsToRemove.empty()) {
-        return;
-    }
+    if (m_elementsToRemove.empty()) return;
 
     for (UIElement* elementToRemove : m_elementsToRemove) {
         m_uiElements.erase(
@@ -134,7 +141,6 @@ void UiManager::processPendingRemovals() {
     }
     m_elementsToRemove.clear();
 }
-
 
 void UiManager::showDockingSpace() {
     ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;

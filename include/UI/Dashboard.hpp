@@ -2,20 +2,21 @@
 #include <mutex>
 #include <map>
 #include <string>
-#include <functional> 
 #include "UI/UIElement.hpp"
-#include "Telemetry/data_writing/IWritingSubscriber.hpp"
-#include "Telemetry/data_acquisition/PacketParser.hpp"
+#include "Telemetry/data_writing/IAggregatedDataSubscriber.hpp" // Usa la nuova interfaccia
+#include "Telemetry/data_writing/DataAggregator.hpp" // Per AggregatedDataRow
 
-class Dashboard : public UIElement, public IWritingSubscriber {
+class Dashboard : public UIElement, public IAggregatedDataSubscriber {
 public:
-    Dashboard(); 
+    Dashboard();
     void draw() override;
-    void onDataReceived(const PacketParser& packet) override;
-    bool createFile(const std::string& directoryPath) override;
+    
+    // Metodo implementato dalla nuova interfaccia
+    void onAggregatedDataReceived(const DbRow& dataRow) override;
     
 private:
     const std::string OUTPUT_DIRECTORY = "../output_data"; 
-    std::map<std::string, PacketData> m_latestData;
+    // La mappa ora conterrà direttamente le stringhe formattate
+    std::map<std::string, std::string> m_latestData;
     std::mutex m_dataMutex;
 };

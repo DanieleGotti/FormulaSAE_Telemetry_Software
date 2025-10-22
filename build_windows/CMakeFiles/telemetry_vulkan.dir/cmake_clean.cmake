@@ -1,4 +1,6 @@
 file(REMOVE_RECURSE
+  "CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/DataAggregatorService.cpp.obj"
+  "CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/DataAggregatorService.cpp.obj.d"
   "CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/NetworkService.cpp.obj"
   "CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/NetworkService.cpp.obj.d"
   "CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/PacketParser.cpp.obj"

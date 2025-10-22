@@ -202,6 +202,7 @@ CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/ServiceManager.cpp.obj: \
  C:/msys64/mingw64/include/c++/11.2.0/pstl/execution_defs.h \
  C:/msys64/mingw64/include/c++/11.2.0/bits/fs_dir.h \
  C:/msys64/mingw64/include/c++/11.2.0/bits/fs_ops.h \
+ C:/msys64/mingw64/include/c++/11.2.0/iostream \
  C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/Telemetry/Services/ServiceManager.hpp \
  C:/msys64/mingw64/include/c++/11.2.0/thread \
  C:/msys64/mingw64/include/c++/11.2.0/stop_token \
@@ -216,7 +217,6 @@ CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/ServiceManager.cpp.obj: \
  C:/msys64/mingw64/include/c++/11.2.0/bits/atomic_timed_wait.h \
  C:/msys64/mingw64/include/c++/11.2.0/bits/this_thread_sleep.h \
  C:/msys64/mingw64/x86_64-w64-mingw32/include/semaphore.h \
- C:/msys64/mingw64/include/c++/11.2.0/iostream \
  C:/msys64/mingw64/include/c++/11.2.0/memory \
  C:/msys64/mingw64/include/c++/11.2.0/bits/stl_raw_storage_iter.h \
  C:/msys64/mingw64/include/c++/11.2.0/bits/align.h \
@@ -250,10 +250,12 @@ CMakeFiles/telemetry_vulkan.dir/src/Telemetry/Services/ServiceManager.cpp.obj: \
  C:/msys64/mingw64/include/c++/11.2.0/condition_variable \
  C:/msys64/mingw64/include/c++/11.2.0/optional \
  C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/Telemetry/data_writing/CsvWriter.hpp \
+ C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/Telemetry/data_writing/IAggregatedDataSubscriber.hpp \
  C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/Telemetry/data_writing/DataAggregator.hpp \
  C:/msys64/mingw64/include/c++/11.2.0/map \
  C:/msys64/mingw64/include/c++/11.2.0/bits/stl_tree.h \
  C:/msys64/mingw64/include/c++/11.2.0/bits/stl_map.h \
  C:/msys64/mingw64/include/c++/11.2.0/bits/stl_multimap.h \
+ C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/Telemetry/Services/DataAggregatorService.hpp \
  C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/Telemetry/data_acquisition/SerialDataSource.hpp \
  C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/Telemetry/data_acquisition/BaudRateQueryable.hpp

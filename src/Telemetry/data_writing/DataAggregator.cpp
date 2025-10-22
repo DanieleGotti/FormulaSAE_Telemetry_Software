@@ -7,7 +7,6 @@
 
 DataAggregator::DataAggregator(std::vector<ColumnConfig> config, std::function<void(const DbRow&)> onRowReady)
     : m_config(std::move(config)), m_onRowReadyCallback(std::move(onRowReady)) {
-    // Creiamo una mappa per un accesso rapido alla configurazione
     for (const auto& col : m_config) {
         m_configMap[col.name] = col.type;
     }
@@ -84,8 +83,7 @@ void DataAggregator::finalizeAndEmitRow() {
                     }
                     finalRow[col_name] = combined_states;
                     
-                    // --- CORREZIONE LOGICA DI PROPAGAZIONE ---
-                    // Se abbiamo ricevuto almeno uno stato, aggiorniamo l'ultimo stato conosciuto usando solo l'ultimo valore della sequenza
+                    // Se ricevo almeno uno stato, aggiorno l'ultimo stato conosciuto usando solo l'ultimo valore della sequenza
                     if (!data.stringValues.empty()) {
                         if (col_name == "LEFT_INVERTER_FSM") {
                             m_lastLeftInverterState = data.stringValues.back();
@@ -122,3 +120,4 @@ void DataAggregator::finalizeAndEmitRow() {
 void DataAggregator::flush() {
     finalizeAndEmitRow();
 }
+
