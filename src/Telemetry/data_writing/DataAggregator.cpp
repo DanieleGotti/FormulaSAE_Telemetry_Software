@@ -30,7 +30,7 @@ void DataAggregator::processPacket(const PacketParser& packet) {
         m_currentTimestamp = packet.timestamp;
     }
 
-    // Aggiungi i dati del pacchetto corrente all'aggregazione
+    // Aggiunge i dati del pacchetto corrente all'aggregazione
     auto it = m_configMap.find(packet.label);
     if (it != m_configMap.end()) {
         AggregationData& data = m_currentRowData[packet.label];

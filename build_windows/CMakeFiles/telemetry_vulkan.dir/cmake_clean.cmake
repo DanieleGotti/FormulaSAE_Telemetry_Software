@@ -21,6 +21,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/telemetry_vulkan.dir/src/Telemetry/data_writing/TxtWriter.cpp.obj.d"
   "CMakeFiles/telemetry_vulkan.dir/src/UI/Dashboard.cpp.obj"
   "CMakeFiles/telemetry_vulkan.dir/src/UI/Dashboard.cpp.obj.d"
+  "CMakeFiles/telemetry_vulkan.dir/src/UI/LogTerminal.cpp.obj"
+  "CMakeFiles/telemetry_vulkan.dir/src/UI/LogTerminal.cpp.obj.d"
   "CMakeFiles/telemetry_vulkan.dir/src/UI/SerialDeviceSelection.cpp.obj"
   "CMakeFiles/telemetry_vulkan.dir/src/UI/SerialDeviceSelection.cpp.obj.d"
   "CMakeFiles/telemetry_vulkan.dir/src/UI/UIManager.cpp.obj"

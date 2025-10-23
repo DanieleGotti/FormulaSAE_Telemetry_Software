@@ -21,7 +21,7 @@ void ServiceManager::initialize() {
     m_aggregatorService = std::make_unique<DataAggregatorService>();
     m_dataManager->addSubscriber(m_aggregatorService.get());
 
-    std::cout << "ServiceManager initialized." << std::endl;
+    std::cout << "INFO [ServiceManager]: ServiceManager inizializzato." << std::endl;
 }
 
 std::vector<std::string> ServiceManager::getAllConnectionOptions() {
@@ -63,7 +63,7 @@ bool ServiceManager::startServices() {
             if (m_networkService) success = m_networkService->start();
             break;
         default:
-            std::cerr << "ServiceManager: No acquisition method selected." << std::endl;
+            std::cerr << "ERRORE [ServiceManager]: Nessun metodo di acquisizione selezionato." << std::endl;
             success = false;
             break;
     }
@@ -82,7 +82,7 @@ void ServiceManager::stopTasks() {
         m_aggregatorService->flush();
     }
 
-    std::cout << "All services stopped." << std::endl;
+    std::cout << "INFO [ServiceManager]: Tutti i servizi sono stati fermati." << std::endl;
 }
 
 void ServiceManager::cleanup() {
@@ -94,7 +94,7 @@ void ServiceManager::cleanup() {
     m_networkService.reset();
     m_aggregatorService.reset();
     m_dataManager.reset(); 
-    std::cout << "ServiceManager cleaned up." << std::endl;
+    std::cout << "INFO [ServiceManager]: ServiceManager pulito." << std::endl;
 }
 
 bool ServiceManager::startLogging(const std::string& outputDirectory) {
@@ -120,11 +120,11 @@ bool ServiceManager::startLogging(const std::string& outputDirectory) {
     }
 
     if(m_txtWriter || m_csvWriter) {
-         std::cout << "INFO: Logging started." << std::endl;
+         std::cout << "INFO [ServiceManager]: Registrazione avviata." << std::endl;
          return true;
     }
     
-    std::cerr << "ERROR: Failed to start logging." << std::endl;
+    std::cerr << "ERRORE [ServiceManager]: Registrazione fallita." << std::endl;
     return false;
 }
 
@@ -141,7 +141,7 @@ void ServiceManager::stopLogging() {
         m_txtWriter.reset();
     }
     
-    std::cout << "INFO: Logging stopped." << std::endl;
+    std::cout << "INFO [ServiceManager]: Registrazione fermata." << std::endl;
 }
 
 bool ServiceManager::isLogging() {

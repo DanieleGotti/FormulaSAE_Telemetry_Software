@@ -13,7 +13,7 @@ SerialService::~SerialService() {
 
 bool SerialService::configure(const SerialConfig& config) {
     if (m_running) {
-        std::cerr << "Cannot configure SerialService while it is running." << std::endl;
+        std::cerr << "ERRORE [SerialService]: Impossibile configurare SerialService mentre è in esecuzione." << std::endl;
         return false;
     }
     m_config = config;
@@ -22,18 +22,18 @@ bool SerialService::configure(const SerialConfig& config) {
 
 bool SerialService::start() {
     if (m_running) {
-        std::cerr << "SerialService is already running." << std::endl;
+        std::cerr << "ERRORE [SerialService]: SerialService è già in esecuzione." << std::endl;
         return true;
     }
 
     if (!m_dataSource->open(m_config.port, m_config.baudrate)) {
-        std::cerr << "Failed to open data source for SerialService." << std::endl;
+        std::cerr << "ERRORE [SerialService]: Impossibile aprire la sorgente dati." << std::endl;
         return false;
     }
 
     m_running = true;
     m_thread = std::thread(&SerialService::acquisitionLoop, this);
-    std::cout << "SerialService started on port " << m_config.port << std::endl;
+    std::cout << "INFO [SerialService]: SerialService avviato sulla porta " << m_config.port << std::endl;
     return true;
 }
 
@@ -48,7 +48,7 @@ void SerialService::stop() {
     }
     
     m_dataSource->close();
-    std::cout << "SerialService stopped." << std::endl;
+    std::cout << "INFO [SerialService]: SerialService fermato." << std::endl;
 }
 
 bool SerialService::isRunning() const {
@@ -79,10 +79,10 @@ void SerialService::acquisitionLoop() {
                     m_dataManager->processData(packet);
                 } else if (m_dataManager) { 
                     // Log dei pacchetti malformati per debug
-                    std::cerr << "Raw data discarded by parser -> '" << std::get<std::string>(packet.data) << "'" << std::endl;
+                    std::cerr << "INFO [SerialService]: dato scartato dal parser: '" << std::get<std::string>(packet.data) << "'." << std::endl;
                 }
             }
-            std::cout << "SerialService: Received " << rawData.size() << " bytes." << std::endl;
+            std::cout << "INFO [SerialService]: Ricevuti " << rawData.size() << " byte." << std::endl;
         } else {
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }

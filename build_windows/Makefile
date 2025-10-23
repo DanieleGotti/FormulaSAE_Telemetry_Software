@@ -705,6 +705,30 @@ src/UI/Dashboard.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\telemetry_vulkan.dir\build.make CMakeFiles/telemetry_vulkan.dir/src/UI/Dashboard.cpp.s
 .PHONY : src/UI/Dashboard.cpp.s
 
+src/UI/LogTerminal.obj: src/UI/LogTerminal.cpp.obj
+.PHONY : src/UI/LogTerminal.obj
+
+# target to build an object file
+src/UI/LogTerminal.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\telemetry_vulkan.dir\build.make CMakeFiles/telemetry_vulkan.dir/src/UI/LogTerminal.cpp.obj
+.PHONY : src/UI/LogTerminal.cpp.obj
+
+src/UI/LogTerminal.i: src/UI/LogTerminal.cpp.i
+.PHONY : src/UI/LogTerminal.i
+
+# target to preprocess a source file
+src/UI/LogTerminal.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\telemetry_vulkan.dir\build.make CMakeFiles/telemetry_vulkan.dir/src/UI/LogTerminal.cpp.i
+.PHONY : src/UI/LogTerminal.cpp.i
+
+src/UI/LogTerminal.s: src/UI/LogTerminal.cpp.s
+.PHONY : src/UI/LogTerminal.s
+
+# target to generate assembly for a file
+src/UI/LogTerminal.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\telemetry_vulkan.dir\build.make CMakeFiles/telemetry_vulkan.dir/src/UI/LogTerminal.cpp.s
+.PHONY : src/UI/LogTerminal.cpp.s
+
 src/UI/SerialDeviceSelection.obj: src/UI/SerialDeviceSelection.cpp.obj
 .PHONY : src/UI/SerialDeviceSelection.obj
 
@@ -854,6 +878,9 @@ help:
 	@echo ... src/UI/Dashboard.obj
 	@echo ... src/UI/Dashboard.i
 	@echo ... src/UI/Dashboard.s
+	@echo ... src/UI/LogTerminal.obj
+	@echo ... src/UI/LogTerminal.i
+	@echo ... src/UI/LogTerminal.s
 	@echo ... src/UI/SerialDeviceSelection.obj
 	@echo ... src/UI/SerialDeviceSelection.i
 	@echo ... src/UI/SerialDeviceSelection.s

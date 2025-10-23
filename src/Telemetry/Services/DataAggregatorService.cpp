@@ -20,7 +20,9 @@ DataAggregatorService::DataAggregatorService() {
 }
 
 // Non è usato 
-bool DataAggregatorService::createFile(const std::string& directoryPath) { return true; }
+bool DataAggregatorService::createFile(const std::string& directoryPath) { 
+    return true; 
+}
 
 void DataAggregatorService::onDataReceived(const PacketParser& packet) {
     if (m_aggregator) {

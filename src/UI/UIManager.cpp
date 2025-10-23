@@ -6,6 +6,7 @@
 #include <iostream>
 #include "UI/UIManager.hpp"
 #include "UI/SerialDeviceSelection.hpp"
+#include "UI/LogTerminal.hpp"
 #include "Telemetry/Services/ServiceManager.hpp"
 
 UiManager::UiManager() {
@@ -43,6 +44,8 @@ UiManager::UiManager() {
     ImGui_ImplOpenGL3_Init(glsl_version);
     glfwWindowHint(GLFW_REFRESH_RATE, 60);
 
+    addElement(std::make_unique<LogTerminal>());    
+
     setupInitialState();
 }
 
@@ -76,7 +79,7 @@ void UiManager::setupInitialState() {
             }
             this->m_currentState = AppState::CONNECTED;
         } else {
-            std::cerr << "ERROR: Connection failed." << std::endl;
+            std::cerr << "ERRORE [UIManager]: Connessione fallita." << std::endl;
         }
     };
     

@@ -10,10 +10,10 @@ SerialDeviceSelection::SerialDeviceSelection(ConnectCallback onConnectCallback)
 }
 
 void SerialDeviceSelection::draw() {
-    ImGui::Begin("Configurazione Connessione");
+    ImGui::Begin("Configurazione connessione");
 
-    const char* current_port_label = (m_selectedPortIndex != -1) ? m_ports[m_selectedPortIndex].c_str() : "Seleziona una porta...";
-    if (ImGui::BeginCombo("Porta Seriale", current_port_label)) {
+    const char* current_port_label = (m_selectedPortIndex != -1) ? m_ports[m_selectedPortIndex].c_str() : "Seleziona una porta.";
+    if (ImGui::BeginCombo("Porta seriale", current_port_label)) {
         for (int i = 0; i < m_ports.size(); ++i) {
             if (ImGui::Selectable(m_ports[i].c_str(), m_selectedPortIndex == i)) {
                 m_selectedPortIndex = i;
@@ -22,8 +22,8 @@ void SerialDeviceSelection::draw() {
         ImGui::EndCombo();
     }
 
-    const char* current_baud_label = (m_selectedBaudrateIndex != -1) ? std::to_string(m_baudRates[m_selectedBaudrateIndex]).c_str() : "Seleziona un baudrate...";
-    if (ImGui::BeginCombo("Baud Rate", current_baud_label)) {
+    const char* current_baud_label = (m_selectedBaudrateIndex != -1) ? std::to_string(m_baudRates[m_selectedBaudrateIndex]).c_str() : "Seleziona un baudrate.";
+    if (ImGui::BeginCombo("Baud rate", current_baud_label)) {
         for (int i = 0; i < m_baudRates.size(); ++i) {
             if (ImGui::Selectable(std::to_string(m_baudRates[i]).c_str(), m_selectedBaudrateIndex == i)) {
                 m_selectedBaudrateIndex = i;
@@ -34,7 +34,7 @@ void SerialDeviceSelection::draw() {
 
     ImGui::Separator();
 
-    if (ImGui::Button("Aggiorna Porte")) {
+    if (ImGui::Button("Aggiorna porte")) {
         refreshPorts();
     }
     ImGui::SameLine();

@@ -34,7 +34,7 @@ bool CsvWriter::createFile(const std::string& directoryPath, const std::vector<s
     }
     m_outputFile << std::endl;
 
-    std::cout << "INFO [CsvWriter]: Recording started on file: " << fullPath << std::endl;
+    std::cout << "INFO [CsvWriter]: Registrazione avviata sul file: " << fullPath << "." << std::endl;
     return true;
 }
 

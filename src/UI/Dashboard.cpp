@@ -12,33 +12,32 @@ void Dashboard::onAggregatedDataReceived(const DbRow& dataRow) {
 }
 
 void Dashboard::draw() {
-    ImGui::Begin("Dashboard Telemetria");
+    ImGui::Begin("Telemetria");
 
     // Pannello di controllo per avviare/fermare la registrazione
     ImGui::BeginChild("ControlPanel", ImVec2(0, 80), true);
-    ImGui::Text("Controllo Registrazione");
+    ImGui::Text("Controllo registrazione");
     ImGui::Separator();
     
     bool isLogging = ServiceManager::isLogging();
 
     if (!isLogging) {
-        if (ImGui::Button("Avvia Registrazione")) {
+        if (ImGui::Button("Avvia registrazione")) {
             ServiceManager::startLogging(OUTPUT_DIRECTORY);
         }
     } else {
-        ImGui::Text("Registrazione in corso...");
-        ImGui::Text("Salvataggio in: %s/", OUTPUT_DIRECTORY.c_str());
+        ImGui::Text("Regitrazione in corso. Salvataggio in: %s.", OUTPUT_DIRECTORY.c_str());
         
-        if (ImGui::Button("Ferma Registrazione")) {
+        if (ImGui::Button("Ferma registrazione")) {
             ServiceManager::stopLogging();
         }
     }
     ImGui::EndChild();
 
-    ImGui::Text("Dati in Tempo Reale (Aggregati per Timestamp)");
+    ImGui::Text("Dati");
     if (ImGui::BeginTable("DataTable", 2, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY)) {
-        ImGui::TableSetupColumn("Sensore/Stato");
-        ImGui::TableSetupColumn("Valore Attuale");
+        ImGui::TableSetupColumn("Tipo");
+        ImGui::TableSetupColumn("Valore");
         ImGui::TableHeadersRow();
 
         std::map<std::string, std::string> dataCopy;

@@ -35,19 +35,19 @@ bool TxtWriter::createFile(const std::string& directoryPath) {
 
     m_outputFile.open(fullPath, std::ios::out | std::ios::trunc);
     if (!m_outputFile.is_open()) {
-        std::cerr << "ERROR [TxtWriter]: Impossible to create file: " << fullPath << std::endl;
+        std::cerr << "ERRORE [TxtWriter]: Impossibile creare il file: " << fullPath << "." << std::endl;
         m_currentFileName.clear();
         return false;
     }
 
-    std::cout << "INFO [TxtWriter]: Recording started on file: " << fullPath << std::endl;
+    std::cout << "INFO [TxtWriter]: Registrazione avviata sul file: " << fullPath << "." << std::endl;
     m_outputFile << "timestamp;label;value" << std::endl;
     return true;
 }
 
 void TxtWriter::start() {
     if (!m_outputFile.is_open()) {
-        std::cerr << "ERROR [TxtWriter]: Impossible to start, no file created. Call createFile() first." << std::endl;
+        std::cerr << "ERRORE [TxtWriter]: Impossibile avviare, nessun file creato." << std::endl;
         return;
     }
     m_shouldStop = false;
@@ -61,7 +61,6 @@ void TxtWriter::start() {
 
 void TxtWriter::stop() {
     m_shouldStop = true;
-    
     // Attendere che il thread finisca la sua esecuzione
     if (m_thread.joinable()) {
         m_thread.join();
@@ -86,11 +85,11 @@ void TxtWriter::processingLoop() {
     }
 
     // I pacchetti rimasti vengono svuotati velocemente
-    std::cout << "INFO [TxtWriter]: Starting draining the queue..." << std::endl;
+    std::cout << "INFO [TxtWriter]: Inizio svuotamento della coda." << std::endl;
     while (auto optional_packet = m_queue.try_pop()) {
         writePacketToFile(*optional_packet);
     }
-    std::cout << "INFO [TxtWriter]: Draining completed. Thread terminated." << std::endl;
+    std::cout << "INFO [TxtWriter]: Svuotamento completato." << std::endl;
 }
 
 void TxtWriter::writePacketToFile(const PacketParser& packet) {

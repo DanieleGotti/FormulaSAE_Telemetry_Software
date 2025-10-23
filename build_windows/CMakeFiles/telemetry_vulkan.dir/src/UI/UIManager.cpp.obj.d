@@ -228,6 +228,7 @@ CMakeFiles/telemetry_vulkan.dir/src/UI/UIManager.cpp.obj: \
  C:/msys64/mingw64/include/c++/11.2.0/variant \
  C:/msys64/mingw64/include/c++/11.2.0/bits/enable_special_members.h \
  C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/UI/SerialDeviceSelection.hpp \
+ C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/UI/LogTerminal.hpp \
  C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/Telemetry/Services/ServiceManager.hpp \
  C:/msys64/mingw64/include/c++/11.2.0/thread \
  C:/msys64/mingw64/include/c++/11.2.0/stop_token \

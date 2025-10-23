@@ -16,8 +16,6 @@ void DataManager::removeSubscriber(IWritingSubscriber* subscriberToRemove) {
 
 void DataManager::processData(const PacketParser& packet) {
     std::lock_guard<std::mutex> lock(m_subscriberMutex);
-    
-    // Ora il ciclo è molto più semplice
     for (IWritingSubscriber* subscriber : m_subscribers) {
         if (subscriber) {
             subscriber->onDataReceived(packet);

@@ -3,7 +3,8 @@
 #include "UI/UIManager.hpp"
 
 int main() {
-    
+
+    std::cout << "INFO [Main]: Avvio in corso." << std::endl;    
     ServiceManager::initialize();
 
     {
@@ -12,7 +13,7 @@ int main() {
     } 
     
     ServiceManager::cleanup();
-    std::cout << "Cleanup completed. Exiting." << std::endl;
+    std::cout << "INFO [Main]: Chiusura in corso." << std::endl;
 
     return 0;
 }
