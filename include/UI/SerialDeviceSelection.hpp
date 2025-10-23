@@ -4,17 +4,20 @@
 #include <functional> 
 #include "UIElement.hpp"
 
+class UiManager;
+
 class SerialDeviceSelection : public UIElement {
 public:
-    // Sarà una funzione che accetta porta (stringa) e baudrate (intero)
+    // Funzione che accetta porta (stringa) e baudrate (intero)
     using ConnectCallback = std::function<void(const std::string&, int)>;
-    // Quando di preme il pulsante "Connetti"
-    explicit SerialDeviceSelection(ConnectCallback onConnectCallback);
+    // Quando si preme il pulsante "Connetti"
+    explicit SerialDeviceSelection(UiManager* manager, ConnectCallback onConnectCallback);
     void draw() override;
 
 private:
     void refreshPorts();
 
+    UiManager* m_uiManager; 
     ConnectCallback m_onConnectCallback;
 
     int m_selectedPortIndex = -1;

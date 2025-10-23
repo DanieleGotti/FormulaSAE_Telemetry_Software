@@ -79,7 +79,7 @@ void SerialService::acquisitionLoop() {
                     m_dataManager->processData(packet);
                 } else if (m_dataManager) { 
                     // Log dei pacchetti malformati per debug
-                    std::cerr << "INFO [SerialService]: dato scartato dal parser: '" << std::get<std::string>(packet.data) << "'." << std::endl;
+                    std::cerr << "ATTENZIONE [SerialService]: Dato scartato dal parser: '" << std::get<std::string>(packet.data) << "'." << std::endl;
                 }
             }
             std::cout << "INFO [SerialService]: Ricevuti " << rawData.size() << " byte." << std::endl;

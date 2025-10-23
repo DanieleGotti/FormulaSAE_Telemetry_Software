@@ -4,7 +4,9 @@
 #include <GLFW/glfw3.h>
 #include <algorithm>
 #include <iostream>
+#include <cassert>
 #include "UI/UIManager.hpp"
+#include "UI/Theme.hpp"
 #include "UI/SerialDeviceSelection.hpp"
 #include "UI/LogTerminal.hpp"
 #include "Telemetry/Services/ServiceManager.hpp"
@@ -32,25 +34,28 @@ UiManager::UiManager() {
     io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 
+    std::cout << "INFO [UIManager]: Caricamento dei font." << std::endl;
+    io.Fonts->Clear(); 
+    font_body = io.Fonts->AddFontFromFileTTF("../external/fonts/RobotoCondensed-Regular.ttf", 18.0f);
+    font_label = io.Fonts->AddFontFromFileTTF("../external/fonts/RobotoCondensed-Bold.ttf", 18.0f);
+    font_data = io.Fonts->AddFontFromFileTTF("../external/fonts/RobotoCondensed-Regular.ttf", 20.0f);
+    font_title = io.Fonts->AddFontFromFileTTF("../external/fonts/RobotoCondensed-Bold.ttf", 20.0f);
+    assert(font_body != nullptr && "ERRORE: Impossibile caricare i font. Controlla i percorsi."); 
+    std::cout << "INFO [UIManager]: Font caricati." << std::endl;    
+    
     m_isDarkTheme = true;
-    ImGui::StyleColorsDark();
-    ImGuiStyle& style = ImGui::GetStyle();
-    if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
-        style.WindowRounding = 0.0f;
-        style.Colors[ImGuiCol_WindowBg].w = 1.0f;
-    }
+    ApplyTheme(ImGui::GetStyle(), m_isDarkTheme);
     
     ImGui_ImplGlfw_InitForOpenGL((GLFWwindow*)m_window, true);
     ImGui_ImplOpenGL3_Init(glsl_version);
     glfwWindowHint(GLFW_REFRESH_RATE, 60);
 
-    addElement(std::make_unique<LogTerminal>());    
-
+    addElement(std::make_unique<LogTerminal>(this));    
     setupInitialState();
 }
 
 UiManager::~UiManager() {
-    // Rimuovi la sottoscrizione della dashboard per evitare puntatori dangling
+    // Rimuove la sottoscrizione della dashboard per evitare puntatori dangling
     if (m_dashboard && ServiceManager::getAggregator()) {
         ServiceManager::getAggregator()->unsubscribe(m_dashboard.get());
     }
@@ -64,13 +69,9 @@ UiManager::~UiManager() {
 
 void UiManager::setupInitialState() {
     auto onConnect = [this](const std::string& port, int baudrate) {
-        ServiceManager::configureSerial(port, baudrate);
-        ServiceManager::setAcquisitionMethod(ACQUISITION_METHOD_SERIAL);
-        
-        if (ServiceManager::startServices()) {
-            // Crea la Dashboard
-            this->m_dashboard = std::make_shared<Dashboard>();
-            // Iscrive la Dashboard al servizio di aggregazione centrale
+        if (ServiceManager::configureSerial(port, baudrate) && ServiceManager::startServices()) {
+            // Passo un puntatore a UiManager per accedere ai font
+            this->m_dashboard = std::make_shared<Dashboard>(this);
             ServiceManager::getAggregator()->subscribe(this->m_dashboard.get());
             
             if (m_serialSelectionWindow) {
@@ -83,7 +84,7 @@ void UiManager::setupInitialState() {
         }
     };
     
-    auto selectionWindow = std::make_unique<SerialDeviceSelection>(onConnect);
+    auto selectionWindow = std::make_unique<SerialDeviceSelection>(this, onConnect);
     m_serialSelectionWindow = selectionWindow.get();
     addElement(std::move(selectionWindow));
 }
@@ -94,14 +95,17 @@ void UiManager::run() {
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
+        
+        ImGui::PushFont(font_body);
         showDockingSpace();
         draw();
+        
         ImGui::ShowDemoWindow();
+        ImGui::PopFont();
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     
-        ImGuiIO& io = ImGui::GetIO();
-        if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+        if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
             GLFWwindow* backup_current_context = glfwGetCurrentContext();
             ImGui::UpdatePlatformWindows();
             ImGui::RenderPlatformWindowsDefault();
@@ -169,7 +173,8 @@ void UiManager::showDockingSpace() {
         if (ImGui::BeginMenu("Opzioni")) {
             const char* themeLabel = m_isDarkTheme ? "Tema chiaro" : "Tema scuro";
             if (ImGui::MenuItem(themeLabel)) {
-                toggleTheme(); 
+                m_isDarkTheme = !m_isDarkTheme;
+                ApplyTheme(ImGui::GetStyle(), m_isDarkTheme); 
             }
             ImGui::EndMenu();
         }

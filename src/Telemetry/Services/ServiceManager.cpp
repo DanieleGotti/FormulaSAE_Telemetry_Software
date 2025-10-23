@@ -120,7 +120,7 @@ bool ServiceManager::startLogging(const std::string& outputDirectory) {
     }
 
     if(m_txtWriter || m_csvWriter) {
-         std::cout << "INFO [ServiceManager]: Registrazione avviata." << std::endl;
+         std::cout << "REGISTRAZIONE [ServiceManager]: Registrazione avviata." << std::endl;
          return true;
     }
     
@@ -141,7 +141,7 @@ void ServiceManager::stopLogging() {
         m_txtWriter.reset();
     }
     
-    std::cout << "INFO [ServiceManager]: Registrazione fermata." << std::endl;
+    std::cout << "REGISTRAZIONE [ServiceManager]: Registrazione fermata." << std::endl;
 }
 
 bool ServiceManager::isLogging() {

@@ -1,14 +1,16 @@
 #pragma once
-#include "UI/UIElement.hpp"
 #include <memory>
 #include <vector>
 #include <string>
 #include <streambuf>
 #include <mutex>
+#include "UI/UIElement.hpp"
+
+class UiManager;
 
 class LogTerminal : public UIElement {
 public:
-    LogTerminal();
+    explicit LogTerminal(UiManager* manager);
     ~LogTerminal() override;
 
     // No copia e spostamento
@@ -20,6 +22,8 @@ public:
 private:
     void addMessage(const std::string& message);
     void clear();
+
+    UiManager* m_uiManager;
 
     std::vector<std::string> m_messages;
     std::string m_line_buffer; 

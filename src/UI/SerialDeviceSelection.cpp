@@ -2,15 +2,22 @@
 #include <string> 
 #include "UI/SerialDeviceSelection.hpp"
 #include "Telemetry/Services/ServiceManager.hpp" 
-#include "Telemetry/data_acquisition/SerialDataSource.hpp" 
+#include "Telemetry/data_acquisition/SerialDataSource.hpp"
+#include "UI/UIManager.hpp" 
 
-SerialDeviceSelection::SerialDeviceSelection(ConnectCallback onConnectCallback)
-    : m_onConnectCallback(std::move(onConnectCallback)) {
+SerialDeviceSelection::SerialDeviceSelection(UiManager* manager, ConnectCallback onConnectCallback)
+    : m_uiManager(manager), m_onConnectCallback(std::move(onConnectCallback)) {
     refreshPorts();
 }
 
 void SerialDeviceSelection::draw() {
-    ImGui::Begin("Configurazione connessione");
+    ImGui::PushFont(m_uiManager->font_title);
+    ImGui::Begin("Configurazione Connessione");
+    ImGui::PopFont();
+
+    ImGui::PushFont(m_uiManager->font_label);
+    ImGui::Text("Porta Seriale");
+    ImGui::PopFont();
 
     const char* current_port_label = (m_selectedPortIndex != -1) ? m_ports[m_selectedPortIndex].c_str() : "Seleziona una porta.";
     if (ImGui::BeginCombo("Porta seriale", current_port_label)) {
@@ -21,6 +28,10 @@ void SerialDeviceSelection::draw() {
         }
         ImGui::EndCombo();
     }
+
+    ImGui::PushFont(m_uiManager->font_label);
+    ImGui::Text("Baud Rate");
+    ImGui::PopFont();
 
     const char* current_baud_label = (m_selectedBaudrateIndex != -1) ? std::to_string(m_baudRates[m_selectedBaudrateIndex]).c_str() : "Seleziona un baudrate.";
     if (ImGui::BeginCombo("Baud rate", current_baud_label)) {

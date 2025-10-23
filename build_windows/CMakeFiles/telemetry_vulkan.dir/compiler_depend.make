@@ -2348,6 +2348,7 @@ CMakeFiles/telemetry_vulkan.dir/src/UI/Dashboard.cpp.obj: C:/Users/Asus/Document
   C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/Telemetry/data_writing/TxtWriter.hpp \
   C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/UI/Dashboard.hpp \
   C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/UI/UIElement.hpp \
+  C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/UI/UIManager.hpp \
   C:/msys64/mingw64/include/c++/11.2.0/array \
   C:/msys64/mingw64/include/c++/11.2.0/atomic \
   C:/msys64/mingw64/include/c++/11.2.0/backward/auto_ptr.h \
@@ -2584,8 +2585,13 @@ CMakeFiles/telemetry_vulkan.dir/src/UI/Dashboard.cpp.obj: C:/Users/Asus/Document
 CMakeFiles/telemetry_vulkan.dir/src/UI/LogTerminal.cpp.obj: C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/src/UI/LogTerminal.cpp \
   C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/external/imgui/imconfig.h \
   C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/external/imgui/imgui.h \
+  C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/Telemetry/data_acquisition/PacketParser.hpp \
+  C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/Telemetry/data_writing/DataAggregator.hpp \
+  C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/Telemetry/data_writing/IAggregatedDataSubscriber.hpp \
+  C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/UI/Dashboard.hpp \
   C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/UI/LogTerminal.hpp \
   C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/UI/UIElement.hpp \
+  C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/UI/UIManager.hpp \
   C:/msys64/mingw64/include/c++/11.2.0/array \
   C:/msys64/mingw64/include/c++/11.2.0/backward/auto_ptr.h \
   C:/msys64/mingw64/include/c++/11.2.0/backward/binders.h \
@@ -2608,6 +2614,7 @@ CMakeFiles/telemetry_vulkan.dir/src/UI/LogTerminal.cpp.obj: C:/Users/Asus/Docume
   C:/msys64/mingw64/include/c++/11.2.0/bits/cpp_type_traits.h \
   C:/msys64/mingw64/include/c++/11.2.0/bits/cxxabi_forced.h \
   C:/msys64/mingw64/include/c++/11.2.0/bits/cxxabi_init_exception.h \
+  C:/msys64/mingw64/include/c++/11.2.0/bits/enable_special_members.h \
   C:/msys64/mingw64/include/c++/11.2.0/bits/erase_if.h \
   C:/msys64/mingw64/include/c++/11.2.0/bits/exception.h \
   C:/msys64/mingw64/include/c++/11.2.0/bits/exception_defines.h \
@@ -2659,10 +2666,13 @@ CMakeFiles/telemetry_vulkan.dir/src/UI/LogTerminal.cpp.obj: C:/Users/Asus/Docume
   C:/msys64/mingw64/include/c++/11.2.0/bits/stl_iterator.h \
   C:/msys64/mingw64/include/c++/11.2.0/bits/stl_iterator_base_funcs.h \
   C:/msys64/mingw64/include/c++/11.2.0/bits/stl_iterator_base_types.h \
+  C:/msys64/mingw64/include/c++/11.2.0/bits/stl_map.h \
+  C:/msys64/mingw64/include/c++/11.2.0/bits/stl_multimap.h \
   C:/msys64/mingw64/include/c++/11.2.0/bits/stl_pair.h \
   C:/msys64/mingw64/include/c++/11.2.0/bits/stl_raw_storage_iter.h \
   C:/msys64/mingw64/include/c++/11.2.0/bits/stl_relops.h \
   C:/msys64/mingw64/include/c++/11.2.0/bits/stl_tempbuf.h \
+  C:/msys64/mingw64/include/c++/11.2.0/bits/stl_tree.h \
   C:/msys64/mingw64/include/c++/11.2.0/bits/stl_uninitialized.h \
   C:/msys64/mingw64/include/c++/11.2.0/bits/stl_vector.h \
   C:/msys64/mingw64/include/c++/11.2.0/bits/stream_iterator.h \
@@ -2708,6 +2718,7 @@ CMakeFiles/telemetry_vulkan.dir/src/UI/LogTerminal.cpp.obj: C:/Users/Asus/Docume
   C:/msys64/mingw64/include/c++/11.2.0/istream \
   C:/msys64/mingw64/include/c++/11.2.0/iterator \
   C:/msys64/mingw64/include/c++/11.2.0/limits \
+  C:/msys64/mingw64/include/c++/11.2.0/map \
   C:/msys64/mingw64/include/c++/11.2.0/memory \
   C:/msys64/mingw64/include/c++/11.2.0/mutex \
   C:/msys64/mingw64/include/c++/11.2.0/new \
@@ -2729,6 +2740,7 @@ CMakeFiles/telemetry_vulkan.dir/src/UI/LogTerminal.cpp.obj: C:/Users/Asus/Docume
   C:/msys64/mingw64/include/c++/11.2.0/typeinfo \
   C:/msys64/mingw64/include/c++/11.2.0/unordered_map \
   C:/msys64/mingw64/include/c++/11.2.0/utility \
+  C:/msys64/mingw64/include/c++/11.2.0/variant \
   C:/msys64/mingw64/include/c++/11.2.0/vector \
   C:/msys64/mingw64/include/c++/11.2.0/x86_64-w64-mingw32/bits/atomic_word.h \
   C:/msys64/mingw64/include/c++/11.2.0/x86_64-w64-mingw32/bits/c++allocator.h \
@@ -2812,8 +2824,10 @@ CMakeFiles/telemetry_vulkan.dir/src/UI/SerialDeviceSelection.cpp.obj: C:/Users/A
   C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/Telemetry/data_writing/IAggregatedDataSubscriber.hpp \
   C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/Telemetry/data_writing/IWritingSubscriber.hpp \
   C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/Telemetry/data_writing/TxtWriter.hpp \
+  C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/UI/Dashboard.hpp \
   C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/UI/SerialDeviceSelection.hpp \
   C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/UI/UIElement.hpp \
+  C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/UI/UIManager.hpp \
   C:/msys64/mingw64/include/c++/11.2.0/array \
   C:/msys64/mingw64/include/c++/11.2.0/atomic \
   C:/msys64/mingw64/include/c++/11.2.0/backward/auto_ptr.h \
@@ -3069,6 +3083,7 @@ CMakeFiles/telemetry_vulkan.dir/src/UI/UIManager.cpp.obj: C:/Users/Asus/Document
   C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/UI/Dashboard.hpp \
   C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/UI/LogTerminal.hpp \
   C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/UI/SerialDeviceSelection.hpp \
+  C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/UI/Theme.hpp \
   C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/UI/UIElement.hpp \
   C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/UI/UIManager.hpp \
   C:/msys64/mingw64/include/c++/11.2.0/algorithm \
@@ -3178,6 +3193,7 @@ CMakeFiles/telemetry_vulkan.dir/src/UI/UIManager.cpp.obj: C:/Users/Asus/Document
   C:/msys64/mingw64/include/c++/11.2.0/bits/uses_allocator.h \
   C:/msys64/mingw64/include/c++/11.2.0/bits/uses_allocator_args.h \
   C:/msys64/mingw64/include/c++/11.2.0/bits/vector.tcc \
+  C:/msys64/mingw64/include/c++/11.2.0/cassert \
   C:/msys64/mingw64/include/c++/11.2.0/cctype \
   C:/msys64/mingw64/include/c++/11.2.0/cerrno \
   C:/msys64/mingw64/include/c++/11.2.0/chrono \
@@ -4014,6 +4030,8 @@ C:/msys64/mingw64/include/c++/11.2.0/new:
 
 C:/msys64/mingw64/include/c++/11.2.0/ostream:
 
+C:/msys64/mingw64/include/c++/11.2.0/cassert:
+
 C:/msys64/mingw64/include/c++/11.2.0/pstl/execution_defs.h:
 
 C:/msys64/mingw64/include/c++/11.2.0/string:
@@ -4611,5 +4629,7 @@ C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/UI/LogTerminal.hpp:
 C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/src/UI/SerialDeviceSelection.cpp:
 
 C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/external/imgui/backends/imgui_impl_opengl3.h:
+
+C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/UI/Theme.hpp:
 
 C:/msys64/mingw64/x86_64-w64-mingw32/include/GL/gl.h:

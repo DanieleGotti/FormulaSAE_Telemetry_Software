@@ -190,6 +190,7 @@ CMakeFiles/telemetry_vulkan.dir/src/UI/UIManager.cpp.obj: \
  C:/msys64/mingw64/include/c++/11.2.0/bits/ostream.tcc \
  C:/msys64/mingw64/include/c++/11.2.0/istream \
  C:/msys64/mingw64/include/c++/11.2.0/bits/istream.tcc \
+ C:/msys64/mingw64/include/c++/11.2.0/cassert \
  C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/UI/UIManager.hpp \
  C:/msys64/mingw64/include/c++/11.2.0/memory \
  C:/msys64/mingw64/include/c++/11.2.0/bits/stl_raw_storage_iter.h \
@@ -227,6 +228,7 @@ CMakeFiles/telemetry_vulkan.dir/src/UI/UIManager.cpp.obj: \
  C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/Telemetry/data_acquisition/PacketParser.hpp \
  C:/msys64/mingw64/include/c++/11.2.0/variant \
  C:/msys64/mingw64/include/c++/11.2.0/bits/enable_special_members.h \
+ C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/UI/Theme.hpp \
  C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/UI/SerialDeviceSelection.hpp \
  C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/UI/LogTerminal.hpp \
  C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/Telemetry/Services/ServiceManager.hpp \

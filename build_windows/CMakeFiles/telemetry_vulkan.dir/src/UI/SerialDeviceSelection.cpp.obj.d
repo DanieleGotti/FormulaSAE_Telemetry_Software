@@ -250,4 +250,6 @@ CMakeFiles/telemetry_vulkan.dir/src/UI/SerialDeviceSelection.cpp.obj: \
  C:/msys64/mingw64/include/c++/11.2.0/bits/stl_multimap.h \
  C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/Telemetry/Services/DataAggregatorService.hpp \
  C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/Telemetry/data_acquisition/SerialDataSource.hpp \
- C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/Telemetry/data_acquisition/BaudRateQueryable.hpp
+ C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/Telemetry/data_acquisition/BaudRateQueryable.hpp \
+ C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/UI/UIManager.hpp \
+ C:/Users/Asus/Documents/ERB/git_telemetria/telemetry/include/UI/Dashboard.hpp
