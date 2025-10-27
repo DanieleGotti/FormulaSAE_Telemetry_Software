@@ -115,6 +115,10 @@ void UiManager::run() {
         glfwSwapBuffers((GLFWwindow*)m_window);
         processPendingRemovals();
     }
+
+    if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+        ImGui::DestroyPlatformWindows();
+    }
 }
 
 void UiManager::draw() {
