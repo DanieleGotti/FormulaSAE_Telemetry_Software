@@ -8,7 +8,7 @@
       "program": "${workspaceFolder}/build/telemetry_vulkan",
       "args": [],
       "stopAtEntry": false,
-      "cwd": "${fileDirname}",
+      "cwd": "${workspaceFolder}/build/",
       "environment": [],
       "externalConsole": false,
       "MIMode": "lldb",
