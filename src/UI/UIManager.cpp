@@ -5,10 +5,12 @@
 #include <algorithm>
 #include <iostream>
 #include <cassert>
+#include <implot.h>
 #include "UI/UIManager.hpp"
 #include "UI/Theme.hpp"
 #include "UI/SerialDeviceSelection.hpp"
 #include "UI/LogTerminal.hpp"
+#include "UI/AccBrkWindow.hpp"
 #include "Telemetry/Services/ServiceManager.hpp"
 
 UiManager::UiManager() {
@@ -28,6 +30,7 @@ UiManager::UiManager() {
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
+    ImPlot::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
     (void)io;
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
@@ -36,10 +39,10 @@ UiManager::UiManager() {
 
     std::cout << "INFO [UIManager]: Caricamento dei font." << std::endl;
     io.Fonts->Clear(); 
-    font_body = io.Fonts->AddFontFromFileTTF("../external/fonts/RobotoCondensed-Regular.ttf", 18.0f);
-    font_label = io.Fonts->AddFontFromFileTTF("../external/fonts/RobotoCondensed-Bold.ttf", 18.0f);
-    font_data = io.Fonts->AddFontFromFileTTF("../external/fonts/RobotoCondensed-Regular.ttf", 20.0f);
-    font_title = io.Fonts->AddFontFromFileTTF("../external/fonts/RobotoCondensed-Bold.ttf", 20.0f);
+    font_body = io.Fonts->AddFontFromFileTTF("../external/fonts/RobotoCondensed-Regular.ttf", 20.0f);
+    font_label = io.Fonts->AddFontFromFileTTF("../external/fonts/RobotoCondensed-Bold.ttf", 20.0f);
+    font_data = io.Fonts->AddFontFromFileTTF("../external/fonts/RobotoCondensed-Regular.ttf", 22.0f);
+    font_title = io.Fonts->AddFontFromFileTTF("../external/fonts/RobotoCondensed-Bold.ttf", 22.0f);
     assert(font_body != nullptr && "ERRORE: Impossibile caricare i font. Controlla i percorsi."); 
     std::cout << "INFO [UIManager]: Font caricati." << std::endl;    
     
@@ -55,13 +58,19 @@ UiManager::UiManager() {
 }
 
 UiManager::~UiManager() {
-    // Rimuove la sottoscrizione della dashboard per evitare puntatori dangling
-    if (m_dashboard && ServiceManager::getAggregator()) {
-        ServiceManager::getAggregator()->unsubscribe(m_dashboard.get());
+    // Rimuove la sottoscrizione della finestre per evitare puntatori dangling
+    if (ServiceManager::getAggregator()) {
+        if (m_dashboard) {
+            ServiceManager::getAggregator()->unsubscribe(m_dashboard.get());
+        }
+        if (m_accBrkWindow) { 
+            ServiceManager::getAggregator()->unsubscribe(m_accBrkWindow.get());
+        }
     }
-
+    
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
+    ImPlot::DestroyContext();
     ImGui::DestroyContext();
     glfwDestroyWindow((GLFWwindow*)m_window);
     glfwTerminate();
@@ -70,9 +79,13 @@ UiManager::~UiManager() {
 void UiManager::setupInitialState() {
     auto onConnect = [this](const std::string& port, int baudrate) {
         if (ServiceManager::configureSerial(port, baudrate) && ServiceManager::startServices()) {
+           
             // Passo un puntatore a UiManager per accedere ai font
             this->m_dashboard = std::make_shared<Dashboard>(this);
             ServiceManager::getAggregator()->subscribe(this->m_dashboard.get());
+            
+            this->m_accBrkWindow = std::make_shared<AccBrkWindow>(this); 
+            ServiceManager::getAggregator()->subscribe(this->m_accBrkWindow.get());
             
             if (m_serialSelectionWindow) {
                 this->removeElement(m_serialSelectionWindow);
@@ -100,7 +113,8 @@ void UiManager::run() {
         showDockingSpace();
         draw();
         
-        ImGui::ShowDemoWindow();
+        //ImGui::ShowDemoWindow();
+        
         ImGui::PopFont();
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -125,9 +139,12 @@ void UiManager::draw() {
     for (auto& element : m_uiElements) {
         element->draw();
     }
-    // Disegna la dashboard se è stata creata
+    // Disegna le finestre se sono state create
     if (m_dashboard) {
         m_dashboard->draw();
+    }
+    if (m_accBrkWindow) { 
+        m_accBrkWindow->draw();
     }
 }
 

@@ -3,6 +3,7 @@
 #include <vector>
 #include "UIElement.hpp"
 #include "Dashboard.hpp"
+#include "AccBrkWindow.hpp"
 
 struct ImFont;
 
@@ -21,10 +22,10 @@ public:
     void addElement(std::unique_ptr<UIElement> uiElement);
     void removeElement(UIElement* uiElement);
 
-    ImFont* font_body;    // Regular 16px: Testo standard, log, pulsanti
-    ImFont* font_label;   // Bold 16px:    Etichette dei dati (es. "ACC1A")
-    ImFont* font_data;    // Regular 18px: Valori numerici importanti
-    ImFont* font_title;   // Bold 20px:    Titoli delle finestre, sezioni
+    ImFont* font_body;    // Testo standard, log, pulsanti
+    ImFont* font_label;   // Etichette dei dati (es. "ACC1A")
+    ImFont* font_data;    // Valori numerici importanti
+    ImFont* font_title;   // Titoli delle finestre, sezioni
 
 private:    
     void draw();
@@ -39,6 +40,7 @@ private:
     AppState m_currentState = AppState::CONFIGURING;
     UIElement* m_serialSelectionWindow = nullptr;
     std::shared_ptr<Dashboard> m_dashboard;
+    std::shared_ptr<AccBrkWindow> m_accBrkWindow;
     std::vector<std::unique_ptr<UIElement>> m_uiElements;
     std::vector<UIElement*> m_elementsToRemove;
 

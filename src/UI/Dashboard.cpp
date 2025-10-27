@@ -17,7 +17,7 @@ void Dashboard::draw() {
 
     // Pannello di controllo per avviare/fermare la registrazione
     ImGui::BeginChild("ControlPanel", ImVec2(0, 100), true);
-    ImGui::PushFont(m_uiManager->font_title);
+    ImGui::PushFont(m_uiManager->font_label);
     ImGui::Text("Controllo registrazione");
     ImGui::PopFont();
     ImGui::Separator();
@@ -36,7 +36,7 @@ void Dashboard::draw() {
     }
     ImGui::EndChild();
 
-    ImGui::PushFont(m_uiManager->font_title);
+    ImGui::PushFont(m_uiManager->font_label);
     ImGui::Text("Dati in arrivo");
     ImGui::PopFont();
 
@@ -56,9 +56,7 @@ void Dashboard::draw() {
 
             ImGui::TableNextRow();
             ImGui::TableSetColumnIndex(0);         
-            ImGui::PushFont(m_uiManager->font_label);
             ImGui::TextUnformatted(label.c_str());
-            ImGui::PopFont();
             ImGui::TableSetColumnIndex(1);
 
             std::string displayValue = value;

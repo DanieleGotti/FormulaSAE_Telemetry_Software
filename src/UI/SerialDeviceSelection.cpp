@@ -12,15 +12,12 @@ SerialDeviceSelection::SerialDeviceSelection(UiManager* manager, ConnectCallback
 
 void SerialDeviceSelection::draw() {
     ImGui::PushFont(m_uiManager->font_title);
-    ImGui::Begin("Configurazione Connessione");
+    ImGui::Begin("Configurazione connessione");
     ImGui::PopFont();
 
-    ImGui::PushFont(m_uiManager->font_label);
-    ImGui::Text("Porta Seriale");
-    ImGui::PopFont();
-
+   ImGui::Text("Porta Seriale");
     const char* current_port_label = (m_selectedPortIndex != -1) ? m_ports[m_selectedPortIndex].c_str() : "Seleziona una porta.";
-    if (ImGui::BeginCombo("Porta seriale", current_port_label)) {
+    if (ImGui::BeginCombo("##Porta seriale", current_port_label)) {
         for (int i = 0; i < m_ports.size(); ++i) {
             if (ImGui::Selectable(m_ports[i].c_str(), m_selectedPortIndex == i)) {
                 m_selectedPortIndex = i;
@@ -29,12 +26,9 @@ void SerialDeviceSelection::draw() {
         ImGui::EndCombo();
     }
 
-    ImGui::PushFont(m_uiManager->font_label);
     ImGui::Text("Baud Rate");
-    ImGui::PopFont();
-
     const char* current_baud_label = (m_selectedBaudrateIndex != -1) ? std::to_string(m_baudRates[m_selectedBaudrateIndex]).c_str() : "Seleziona un baudrate.";
-    if (ImGui::BeginCombo("Baud rate", current_baud_label)) {
+    if (ImGui::BeginCombo("##Baud rate", current_baud_label)) {
         for (int i = 0; i < m_baudRates.size(); ++i) {
             if (ImGui::Selectable(std::to_string(m_baudRates[i]).c_str(), m_selectedBaudrateIndex == i)) {
                 m_selectedBaudrateIndex = i;

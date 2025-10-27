@@ -89,7 +89,7 @@ void LogTerminal::clear() {
 void LogTerminal::draw() {
     ImGui::SetNextWindowSize(ImVec2(520, 400), ImGuiCond_FirstUseEver);
     ImGui::PushFont(m_uiManager->font_title);
-    ImGui::Begin("Terminale di Log");
+    ImGui::Begin("Terminale di log");
     ImGui::PopFont();
 
     if (ImGui::Button("Pulisci")) { clear(); }
@@ -108,13 +108,13 @@ void LogTerminal::draw() {
     for (const auto& message : messages_copy) {
         if (message.rfind("ERRORE", 0) == 0) {
             // Colore ERRORE
-            ImGui::TextColored(ImVec4(1.0f, 0.4f, 0.4f, 1.0f), "%s", message.c_str());
+            ImGui::TextColored(ImVec4(0.85f, 0.10f, 0.10f, 1.00f), "%s", message.c_str());
         } else if (message.rfind("ATTENZIONE", 0) == 0) {
             // Colore ATTENZIONE
-            ImGui::TextColored(ImVec4(1.0f, 0.7f, 0.3f, 1.0f), "%s", message.c_str());
+            ImGui::TextColored(ImVec4(1.00f, 0.50f, 0.00f, 1.00f), "%s", message.c_str());
         } else if (message.rfind("REGISTRAZIONE", 0) == 0) {
-            // Colore REC
-            ImGui::TextColored(ImVec4(1.0f, 0.7f, 1.0f, 1.0f), "%s", message.c_str());
+            // Colore REGISTRAZIONE
+            ImGui::TextColored(ImVec4(0.60f, 0.2f, 0.85f, 1.00f), "%s", message.c_str());
         } else {
             ImGui::TextUnformatted(message.c_str());
         }
