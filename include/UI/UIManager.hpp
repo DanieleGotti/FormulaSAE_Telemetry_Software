@@ -4,6 +4,7 @@
 #include "UIElement.hpp"
 #include "Dashboard.hpp"
 #include "AccBrkWindow.hpp"
+#include "StatusWindow.hpp"
 
 struct ImFont;
 
@@ -41,6 +42,7 @@ private:
     UIElement* m_serialSelectionWindow = nullptr;
     std::shared_ptr<Dashboard> m_dashboard;
     std::shared_ptr<AccBrkWindow> m_accBrkWindow;
+    std::shared_ptr<StatusWindow> m_statusWindow;
     std::vector<std::unique_ptr<UIElement>> m_uiElements;
     std::vector<UIElement*> m_elementsToRemove;
 

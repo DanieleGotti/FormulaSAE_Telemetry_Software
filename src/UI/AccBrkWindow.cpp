@@ -73,7 +73,7 @@ void AccBrkWindow::onAggregatedDataReceived(const DbRow& dataRow) {
             PlotLineData& line_data = pair.second;
 
             if (dataRow.count(label)) {
-                // Salva il timestamp UNIX sull'asse X
+                // Salva il timestamp UNIX sull'asse x
                 line_data.X.push_back(unix_timestamp);
                 line_data.Y.push_back(std::stod(dataRow.at(label)));
                 // La logica per pulire i dati vecchi rimane utile per la memoria
@@ -92,15 +92,16 @@ void AccBrkWindow::draw() {
     ImGui::Begin("Acceleratori e freni", nullptr, ImGuiWindowFlags_NoScrollbar);
     
     float available_height = ImGui::GetContentRegionAvail().y;
-    float plot_height = (available_height - ImGui::GetStyle().ItemSpacing.y * 3 - ImGui::GetTextLineHeightWithSpacing() * 2) / 2.0f;
+    float plot_height = (available_height - ImGui::GetStyle().ItemSpacing.y * 3 - ImGui::GetTextLineHeightWithSpacing()) / 2.0f;
     if (plot_height < 100) plot_height = 100;
     
-    // Preparazione per entrambi i grafici
     ImPlotAxisFlags x_flags = ImPlotAxisFlags_NoHighlight;
-    ImPlotAxisFlags y_flags = ImPlotAxisFlags_AutoFit | ImPlotAxisFlags_NoHighlight;
+    ImPlotAxisFlags y_flags = ImPlotAxisFlags_NoHighlight; 
+
     double now_time = std::chrono::duration<double>(std::chrono::system_clock::now().time_since_epoch()).count();
     double window_start_time = now_time - 10;
 
+    // La logica per i tick dell'asse x 
     float plot_width_pixels = ImGui::GetContentRegionAvail().x;
     if (plot_width_pixels <= 0) plot_width_pixels = 1;
 
@@ -116,7 +117,6 @@ void AccBrkWindow::draw() {
         }
     }
 
-    // Se siamo già a 1 secondo non aggiunge altri tick nel mezzo
     if (chosen_step < 1.0)
         chosen_step = 1.0;
 
@@ -155,6 +155,34 @@ void AccBrkWindow::draw() {
         
         {
             std::lock_guard<std::mutex> lock(m_dataMutex);
+            
+            // Calcola limiti y 
+            double min_y = std::numeric_limits<double>::max();
+            double max_y = std::numeric_limits<double>::lowest();
+            bool has_data = false;
+
+            const std::vector<std::string> acc_keys = {"ACC1A", "ACC1B", "ACC2A", "ACC2B"};
+            for (const auto& key : acc_keys) {
+                const auto& line_data = m_plotData[key];
+                for (size_t i = 0; i < line_data.X.size(); ++i) {
+                    if (line_data.X[i] >= window_start_time) {
+                        if (line_data.Y[i] < min_y) min_y = line_data.Y[i];
+                        if (line_data.Y[i] > max_y) max_y = line_data.Y[i];
+                        has_data = true;
+                    }
+                }
+            }
+
+            if (has_data) {
+                if (std::abs(max_y - min_y) < 1.0) {
+                     max_y += 5.0; // Aggiunge un piccolo margine
+                }
+                double padding = (max_y - min_y) * 0.10; // Margine del 10% 
+                ImPlot::SetupAxisLimits(ImAxis_Y1, min_y - padding, max_y + padding, ImGuiCond_Always);
+            } else {
+                ImPlot::SetupAxisLimits(ImAxis_Y1, 0, 100, ImGuiCond_Always);
+            }
+
             ImPlot::PlotLine("ACC1A", m_plotData["ACC1A"].X.data(), m_plotData["ACC1A"].Y.data(), m_plotData["ACC1A"].X.size());
             ImPlot::PlotLine("ACC1B", m_plotData["ACC1B"].X.data(), m_plotData["ACC1B"].Y.data(), m_plotData["ACC1B"].X.size());
             ImPlot::PlotLine("ACC2A", m_plotData["ACC2A"].X.data(), m_plotData["ACC2A"].Y.data(), m_plotData["ACC2A"].X.size());
@@ -186,6 +214,34 @@ void AccBrkWindow::draw() {
 
         {
             std::lock_guard<std::mutex> lock(m_dataMutex);
+
+            // Calcola limiti y
+            double min_y = std::numeric_limits<double>::max();
+            double max_y = std::numeric_limits<double>::lowest();
+            bool has_data = false;
+
+            const std::vector<std::string> brk_keys = {"BRK1", "BRK2"};
+            for (const auto& key : brk_keys) {
+                const auto& line_data = m_plotData[key];
+                 for (size_t i = 0; i < line_data.X.size(); ++i) {
+                    if (line_data.X[i] >= window_start_time) {
+                        if (line_data.Y[i] < min_y) min_y = line_data.Y[i];
+                        if (line_data.Y[i] > max_y) max_y = line_data.Y[i];
+                        has_data = true;
+                    }
+                }
+            }
+
+            if (has_data) {
+                if (std::abs(max_y - min_y) < 1.0) {
+                     max_y += 5.0;
+                }
+                double padding = (max_y - min_y) * 0.10; // Margine del 10%
+                ImPlot::SetupAxisLimits(ImAxis_Y1, min_y - padding, max_y + padding, ImGuiCond_Always);
+            } else {
+                ImPlot::SetupAxisLimits(ImAxis_Y1, 0, 100, ImGuiCond_Always);
+            }
+
             ImPlot::PlotLine("BRK1", m_plotData["BRK1"].X.data(), m_plotData["BRK1"].Y.data(), m_plotData["BRK1"].X.size());
             ImPlot::PlotLine("BRK2", m_plotData["BRK2"].X.data(), m_plotData["BRK2"].Y.data(), m_plotData["BRK2"].X.size());
         }
