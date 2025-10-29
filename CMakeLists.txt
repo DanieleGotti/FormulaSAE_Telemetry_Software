@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.15)
+set(CMAKE_POLICY_VERSION_MINIMUM 3.15)
 project(telemetry_vulkan LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -46,8 +47,12 @@ include(FetchContent)
 FetchContent_Declare(
   jsoncons
   GIT_REPOSITORY https://github.com/danielaparker/jsoncons.git
-  GIT_TAG master  # o un tag specifico, es. v0.172.0
+  GIT_TAG v0.177.0  # o un tag specifico, es. v0.172.0
 )
+
+# Disabilita la compilazione dei test e degli esempi di jsoncons
+set(JSONCONS_BUILD_TESTS OFF CACHE BOOL "Disable jsoncons tests")
+set(JSONCONS_BUILD_EXAMPLES OFF CACHE BOOL "Disable jsoncons examples")
 
 FetchContent_MakeAvailable(jsoncons)
 
@@ -72,6 +77,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     glfw
     imgui
     jsoncons
+    opengl32
 )
 
 if(APPLE)

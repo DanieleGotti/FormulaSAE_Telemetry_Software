@@ -13,7 +13,7 @@ void Dashboard::onAggregatedDataReceived(const DbRow& dataRow) {
 }
 
 void Dashboard::draw() {
-    ImGui::Begin("Telemetria");
+    ImGui::Begin("Gestione dati in arrivo");
 
     // Pannello di controllo per avviare/fermare la registrazione
     ImGui::BeginChild("ControlPanel", ImVec2(0, 100), true);

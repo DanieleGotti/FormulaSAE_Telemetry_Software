@@ -25,7 +25,7 @@ UiManager::UiManager() {
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
 
-    m_window = glfwCreateWindow(1280, 720, "Telemetry ", NULL, NULL);
+    m_window = glfwCreateWindow(1280, 720, "ERB - Telemetria", NULL, NULL);
     glfwMakeContextCurrent((GLFWwindow*)m_window);
     glfwSwapInterval(1); // vsync
 
@@ -42,9 +42,9 @@ UiManager::UiManager() {
     io.Fonts->Clear(); 
     font_body = io.Fonts->AddFontFromFileTTF("../external/fonts/RobotoCondensed-Regular.ttf", 20.0f);
     font_label = io.Fonts->AddFontFromFileTTF("../external/fonts/RobotoCondensed-Bold.ttf", 20.0f);
-    font_data = io.Fonts->AddFontFromFileTTF("../external/fonts/RobotoCondensed-Regular.ttf", 22.0f);
+    font_data = io.Fonts->AddFontFromFileTTF("../external/fonts/RobotoCondensed-Regular.ttf", 20.0f);
     font_title = io.Fonts->AddFontFromFileTTF("../external/fonts/RobotoCondensed-Bold.ttf", 22.0f);
-    assert(font_body != nullptr && "ERRORE: Impossibile caricare i font. Controlla i percorsi."); 
+    assert(font_body != nullptr && "ERRORE [UIManager]: Impossibile caricare i font. Controlla i percorsi."); 
     std::cout << "INFO [UIManager]: Font caricati." << std::endl;    
     
     m_isDarkTheme = true;
@@ -70,6 +70,9 @@ UiManager::~UiManager() {
         if (m_statusWindow) { 
             ServiceManager::getAggregator()->unsubscribe(m_statusWindow.get());
         }
+        if (m_steerWindow) { 
+            ServiceManager::getAggregator()->unsubscribe(m_steerWindow.get());
+        }
     }
     
     ImGui_ImplOpenGL3_Shutdown();
@@ -93,6 +96,9 @@ void UiManager::setupInitialState() {
             
             this->m_statusWindow = std::make_shared<StatusWindow>(this);
             ServiceManager::getAggregator()->subscribe(this->m_statusWindow.get());
+
+            this->m_steerWindow = std::make_shared<SteerWindow>(this); 
+            ServiceManager::getAggregator()->subscribe(this->m_steerWindow.get());
 
             if (m_serialSelectionWindow) {
                 this->removeElement(m_serialSelectionWindow);
@@ -155,6 +161,9 @@ void UiManager::draw() {
     }
     if (m_statusWindow) {
         m_statusWindow->draw();
+    }
+    if (m_steerWindow) {
+        m_steerWindow->draw();
     }
 }
 
