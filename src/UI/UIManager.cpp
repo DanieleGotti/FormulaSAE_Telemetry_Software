@@ -192,11 +192,32 @@ void UiManager::showDockingSpace() {
 
     if (ImGui::BeginMainMenuBar()) {
         if (ImGui::BeginMenu("Opzioni")) {
-            const char* themeLabel = m_isDarkTheme ? "Tema chiaro" : "Tema scuro";
-            if (ImGui::MenuItem(themeLabel)) {
-                m_isDarkTheme = !m_isDarkTheme;
-                ApplyTheme(ImGui::GetStyle(), m_isDarkTheme); 
+            if (ImGui::BeginMenu("Aspetto")) {
+                const char* themeLabel = m_isDarkTheme ? "Tema chiaro" : "Tema scuro";
+                if (ImGui::MenuItem(themeLabel)) {
+                    m_isDarkTheme = !m_isDarkTheme;
+                    ApplyTheme(ImGui::GetStyle(), m_isDarkTheme);
+                }
+
+                ImGui::Separator();
+
+                // Controllo dimensione font
+                ImGui::Text("Dimensione testo");
+                ImGui::SameLine();
+
+                if (ImGui::Button("-")) {
+                    ImGui::GetIO().FontGlobalScale = std::max(0.5f, ImGui::GetIO().FontGlobalScale - 0.1f);
+                }
+                ImGui::SameLine();
+                if (ImGui::Button("+")) {
+                    ImGui::GetIO().FontGlobalScale = std::min(2.0f, ImGui::GetIO().FontGlobalScale + 0.1f);
+                }
+                ImGui::SameLine();
+                ImGui::Text("%.1fx", ImGui::GetIO().FontGlobalScale);
+
+                ImGui::EndMenu();
             }
+
             ImGui::EndMenu();
         }
         ImGui::EndMainMenuBar();

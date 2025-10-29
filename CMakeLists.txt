@@ -41,6 +41,16 @@ include_directories(
     external/glfw/include
 )
 
+include(FetchContent)
+
+FetchContent_Declare(
+  jsoncons
+  GIT_REPOSITORY https://github.com/danielaparker/jsoncons.git
+  GIT_TAG master  # o un tag specifico, es. v0.172.0
+)
+
+FetchContent_MakeAvailable(jsoncons)
+
 include_directories(${CMAKE_SOURCE_DIR}/include)
 
 # Sorgenti
@@ -61,6 +71,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     # Vulkan::Vulkan
     glfw
     imgui
+    jsoncons
 )
 
 if(APPLE)
