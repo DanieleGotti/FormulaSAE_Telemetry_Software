@@ -11,6 +11,7 @@
 #include "UI/SerialDeviceSelection.hpp"
 #include "UI/LogTerminal.hpp"
 #include "UI/AccBrkWindow.hpp"
+#include "UI/StatusWindow.hpp"
 #include "Telemetry/Services/ServiceManager.hpp"
 
 UiManager::UiManager() {
@@ -66,6 +67,9 @@ UiManager::~UiManager() {
         if (m_accBrkWindow) { 
             ServiceManager::getAggregator()->unsubscribe(m_accBrkWindow.get());
         }
+        if (m_statusWindow) { 
+            ServiceManager::getAggregator()->unsubscribe(m_statusWindow.get());
+        }
     }
     
     ImGui_ImplOpenGL3_Shutdown();
@@ -87,6 +91,9 @@ void UiManager::setupInitialState() {
             this->m_accBrkWindow = std::make_shared<AccBrkWindow>(this); 
             ServiceManager::getAggregator()->subscribe(this->m_accBrkWindow.get());
             
+            this->m_statusWindow = std::make_shared<StatusWindow>(this);
+            ServiceManager::getAggregator()->subscribe(this->m_statusWindow.get());
+
             if (m_serialSelectionWindow) {
                 this->removeElement(m_serialSelectionWindow);
                 m_serialSelectionWindow = nullptr;
@@ -145,6 +152,9 @@ void UiManager::draw() {
     }
     if (m_accBrkWindow) { 
         m_accBrkWindow->draw();
+    }
+    if (m_statusWindow) {
+        m_statusWindow->draw();
     }
 }
 
