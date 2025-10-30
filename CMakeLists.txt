@@ -78,8 +78,11 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     glfw
     imgui
     jsoncons
-    opengl32
 )
+
+if(WIN32)
+    target_link_libraries(${PROJECT_NAME} PRIVATE opengl32)
+endif()
 
 if(APPLE)
     target_link_libraries(${PROJECT_NAME} PRIVATE "-framework OpenGL")
