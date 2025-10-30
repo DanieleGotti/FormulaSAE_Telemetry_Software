@@ -37,7 +37,6 @@ private:
     void processPendingRemovals();
 
     void* m_window;
-    bool m_isDarkTheme = true;
     AppState m_currentState = AppState::CONFIGURING;
     UIElement* m_serialSelectionWindow = nullptr;
     std::shared_ptr<Dashboard> m_dashboard;

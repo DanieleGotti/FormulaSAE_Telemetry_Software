@@ -6,6 +6,7 @@
 #include "Telemetry/Services/DataAggregatorService.hpp"
 
 AcquisitionMethod ServiceManager::m_method;
+std::shared_ptr<SettingsManager> ServiceManager::m_settingsManager;
 std::unique_ptr<SerialService> ServiceManager::m_serialService;
 std::unique_ptr<NetworkService> ServiceManager::m_networkService;
 std::unique_ptr<DataManager> ServiceManager::m_dataManager;
@@ -14,6 +15,7 @@ std::shared_ptr<TxtWriter> ServiceManager::m_txtWriter = nullptr;
 std::shared_ptr<CsvWriter> ServiceManager::m_csvWriter = nullptr;
 
 void ServiceManager::initialize() {
+    m_settingsManager = std::make_shared<SettingsManager>();
     m_dataManager = std::make_unique<DataManager>();
     m_serialService = std::make_unique<SerialService>(m_dataManager.get());
     m_networkService = std::make_unique<NetworkService>();
@@ -146,6 +148,10 @@ void ServiceManager::stopLogging() {
 
 bool ServiceManager::isLogging() {
     return m_txtWriter != nullptr || m_csvWriter != nullptr;
+}
+
+std::shared_ptr<SettingsManager> ServiceManager::getSettingsManager() {
+    return m_settingsManager;
 }
 
 std::string ServiceManager::getCurrentLogFileName() {

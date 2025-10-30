@@ -40,15 +40,15 @@ UiManager::UiManager() {
 
     std::cout << "INFO [UIManager]: Caricamento dei font." << std::endl;
     io.Fonts->Clear(); 
-    font_body = io.Fonts->AddFontFromFileTTF("../external/fonts/RobotoCondensed-Regular.ttf", 20.0f);
-    font_label = io.Fonts->AddFontFromFileTTF("../external/fonts/RobotoCondensed-Bold.ttf", 20.0f);
-    font_data = io.Fonts->AddFontFromFileTTF("../external/fonts/RobotoCondensed-Regular.ttf", 22.0f);
-    font_title = io.Fonts->AddFontFromFileTTF("../external/fonts/RobotoCondensed-Bold.ttf", 22.0f);
+    font_body = io.Fonts->AddFontFromFileTTF("../external/fonts/RobotoCondensed-Regular.ttf", ServiceManager::getSettingsManager()->getBodyFontSize());
+    font_label = io.Fonts->AddFontFromFileTTF("../external/fonts/RobotoCondensed-Bold.ttf", ServiceManager::getSettingsManager()->getLabelFontSize());
+    font_data = io.Fonts->AddFontFromFileTTF("../external/fonts/RobotoCondensed-Regular.ttf", ServiceManager::getSettingsManager()->getDataFontSize());
+    font_title = io.Fonts->AddFontFromFileTTF("../external/fonts/RobotoCondensed-Bold.ttf", ServiceManager::getSettingsManager()->getTitleFontSize());
+    ImGui::GetIO().FontGlobalScale = ServiceManager::getSettingsManager()->getGlobalFontScale();
     assert(font_body != nullptr && "ERRORE: Impossibile caricare i font. Controlla i percorsi."); 
     std::cout << "INFO [UIManager]: Font caricati." << std::endl;    
     
-    m_isDarkTheme = true;
-    ApplyTheme(ImGui::GetStyle(), m_isDarkTheme);
+    ApplyTheme(ImGui::GetStyle(), ServiceManager::getSettingsManager()->getDarkMode());
     
     ImGui_ImplGlfw_InitForOpenGL((GLFWwindow*)m_window, true);
     ImGui_ImplOpenGL3_Init(glsl_version);
@@ -202,11 +202,13 @@ void UiManager::showDockingSpace() {
 
     if (ImGui::BeginMainMenuBar()) {
         if (ImGui::BeginMenu("Opzioni")) {
-            if (ImGui::BeginMenu("Aspetto")) {
-                const char* themeLabel = m_isDarkTheme ? "Tema chiaro" : "Tema scuro";
+          if (ImGui::BeginMenu("Aspetto")) {
+                bool changed = false;
+                float darkMode = ServiceManager::getSettingsManager()->getDarkMode();
+                const char* themeLabel = darkMode ? "Tema chiaro" : "Tema scuro";
                 if (ImGui::MenuItem(themeLabel)) {
-                    m_isDarkTheme = !m_isDarkTheme;
-                    ApplyTheme(ImGui::GetStyle(), m_isDarkTheme);
+                    ServiceManager::getSettingsManager()->setDarkMode(!darkMode);
+                    ApplyTheme(ImGui::GetStyle(), ServiceManager::getSettingsManager()->getDarkMode());
                 }
 
                 ImGui::Separator();
@@ -214,16 +216,25 @@ void UiManager::showDockingSpace() {
                 // Controllo dimensione font
                 ImGui::Text("Dimensione testo");
                 ImGui::SameLine();
+                float fontGlobalScale = ServiceManager::getSettingsManager()->getGlobalFontScale();
 
                 if (ImGui::Button("-")) {
-                    ImGui::GetIO().FontGlobalScale = std::max(0.5f, ImGui::GetIO().FontGlobalScale - 0.1f);
+                    ServiceManager::getSettingsManager()->setGlobalFontScale(std::max(0.5f, fontGlobalScale - 0.1f));
+                    changed = true;
                 }
                 ImGui::SameLine();
                 if (ImGui::Button("+")) {
-                    ImGui::GetIO().FontGlobalScale = std::min(2.0f, ImGui::GetIO().FontGlobalScale + 0.1f);
+                    ServiceManager::getSettingsManager()->setGlobalFontScale(std::max(0.5f, fontGlobalScale + 0.1f));
+                    changed = true;
                 }
                 ImGui::SameLine();
-                ImGui::Text("%.1fx", ImGui::GetIO().FontGlobalScale);
+                ImGui::Text("%.1fx", fontGlobalScale);
+
+                if(changed) {
+                    ImGuiIO& io = ImGui::GetIO();
+                    io.FontGlobalScale = ServiceManager::getSettingsManager()->getGlobalFontScale();
+
+                }
 
                 ImGui::EndMenu();
             }
@@ -235,17 +246,17 @@ void UiManager::showDockingSpace() {
     ImGui::End();
 }
 
-void UiManager::toggleTheme() {
-    m_isDarkTheme = !m_isDarkTheme; 
-    if (m_isDarkTheme) {
-        ImGui::StyleColorsDark();
-    } else {
-        ImGui::StyleColorsLight();
-    }
+// void UiManager::toggleTheme() {
+//     m_isDarkTheme = !m_isDarkTheme; 
+//     if (m_isDarkTheme) {
+//         ImGui::StyleColorsDark();
+//     } else {
+//         ImGui::StyleColorsLight();
+//     }
 
-    ImGuiStyle& style = ImGui::GetStyle();
-    if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
-        style.WindowRounding = 0.0f;
-        style.Colors[ImGuiCol_WindowBg].w = 1.0f;
-    }
-}
+//     ImGuiStyle& style = ImGui::GetStyle();
+//     if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+//         style.WindowRounding = 0.0f;
+//         style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+//     }
+// }

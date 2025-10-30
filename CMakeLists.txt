@@ -42,14 +42,18 @@ include_directories(
 )
 
 include(FetchContent)
-
 FetchContent_Declare(
   jsoncons
   GIT_REPOSITORY https://github.com/danielaparker/jsoncons.git
-  GIT_TAG master  # o un tag specifico, es. v0.172.0
+  GIT_TAG master
 )
-
-FetchContent_MakeAvailable(jsoncons)
+FetchContent_GetProperties(jsoncons)
+if(NOT jsoncons_POPULATED)
+  FetchContent_Populate(jsoncons)
+  # jsoncons è header-only, quindi aggiungiamo solo l'include path
+  add_library(jsoncons INTERFACE)
+  target_include_directories(jsoncons INTERFACE ${jsoncons_SOURCE_DIR}/include)
+endif()
 
 include_directories(${CMAKE_SOURCE_DIR}/include)
 
@@ -62,6 +66,8 @@ file(GLOB SRC_FILES
     src/Telemetry/data_acquisition/*.cpp
     src/Telemetry/Services/*.cpp
     src/Telemetry/data_writing/*.cpp
+    src/application_services/*.cpp
+    src/utils/*.cpp
 )
 
 add_executable(${PROJECT_NAME} ${SRC_FILES})
