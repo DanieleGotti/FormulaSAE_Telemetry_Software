@@ -5,6 +5,7 @@
 #include "Dashboard.hpp"
 #include "AccBrkWindow.hpp"
 #include "StatusWindow.hpp"
+#include "SteerWindow.hpp"
 
 struct ImFont;
 
@@ -23,6 +24,7 @@ public:
     void addElement(std::unique_ptr<UIElement> uiElement);
     void removeElement(UIElement* uiElement);
 
+    bool m_isDarkTheme = true;
     ImFont* font_body;    // Testo standard, log, pulsanti
     ImFont* font_label;   // Etichette dei dati (es. "ACC1A")
     ImFont* font_data;    // Valori numerici importanti
@@ -42,6 +44,7 @@ private:
     std::shared_ptr<Dashboard> m_dashboard;
     std::shared_ptr<AccBrkWindow> m_accBrkWindow;
     std::shared_ptr<StatusWindow> m_statusWindow;
+    std::shared_ptr<SteerWindow> m_steerWindow;
     std::vector<std::unique_ptr<UIElement>> m_uiElements;
     std::vector<UIElement*> m_elementsToRemove;
 

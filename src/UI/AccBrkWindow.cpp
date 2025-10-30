@@ -92,7 +92,10 @@ void AccBrkWindow::draw() {
     ImGui::Begin("Acceleratori e freni", nullptr, ImGuiWindowFlags_NoScrollbar);
     
     float available_height = ImGui::GetContentRegionAvail().y;
-    float plot_height = (available_height - ImGui::GetStyle().ItemSpacing.y * 3 - ImGui::GetTextLineHeightWithSpacing()) / 2.0f;
+    float title_height = ImGui::GetTextLineHeightWithSpacing();
+    float spacing_height = ImGui::GetStyle().ItemSpacing.y;
+    float non_plot_height = (2 * title_height) + (3 * spacing_height);
+    float plot_height = (available_height - non_plot_height) / 2.0f;
     if (plot_height < 100) plot_height = 100;
     
     ImPlotAxisFlags x_flags = ImPlotAxisFlags_NoHighlight;
