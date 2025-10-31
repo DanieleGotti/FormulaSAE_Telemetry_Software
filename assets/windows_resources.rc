@@ -1,0 +1,4 @@
+IDI_ICON1 ICON "windows_icon.ico"
+
+FONT_ROBOTO_REGULAR FONT "assets/fonts/Roboto-Regular.ttf"
+FONT_ROBOTO_BOLD FONT "assets/fonts/Roboto-Bold.ttf"

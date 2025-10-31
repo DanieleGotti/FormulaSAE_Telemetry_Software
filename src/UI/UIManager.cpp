@@ -6,6 +6,8 @@
 #include <iostream>
 #include <cassert>
 #include <implot.h>
+#include <utils/resources.hpp>
+
 #include "UI/UIManager.hpp"
 #include "UI/Theme.hpp"
 #include "UI/SerialDeviceSelection.hpp"
@@ -40,10 +42,28 @@ UiManager::UiManager() {
 
     std::cout << "INFO [UIManager]: Caricamento dei font." << std::endl;
     io.Fonts->Clear(); 
-    font_body = io.Fonts->AddFontFromFileTTF("../external/fonts/RobotoCondensed-Regular.ttf", ServiceManager::getSettingsManager()->getBodyFontSize());
-    font_label = io.Fonts->AddFontFromFileTTF("../external/fonts/RobotoCondensed-Bold.ttf", ServiceManager::getSettingsManager()->getLabelFontSize());
-    font_data = io.Fonts->AddFontFromFileTTF("../external/fonts/RobotoCondensed-Regular.ttf", ServiceManager::getSettingsManager()->getDataFontSize());
-    font_title = io.Fonts->AddFontFromFileTTF("../external/fonts/RobotoCondensed-Bold.ttf", ServiceManager::getSettingsManager()->getTitleFontSize());
+
+#ifdef __APPLE__
+    // Su macOS, i font sono nel bundle, nella sottocartella 'fonts' di Resources
+    font_body = io.Fonts->AddFontFromFileTTF(resources::getResourcePath("fonts/RobotoCondensed-Regular.ttf").c_str(), ServiceManager::getSettingsManager()->getBodyFontSize());
+    font_label = io.Fonts->AddFontFromFileTTF(resources::getResourcePath("fonts/RobotoCondensed-Bold.ttf").c_str(), ServiceManager::getSettingsManager()->getLabelFontSize());
+    m_font_data = io.Fonts->AddFontFromFileTTF(resources::getResourcePath("fonts/RobotoCondensed-Regular.ttf").c_str(), ServiceManager::getSettingsManager()->getDataFontSize());
+    font_title = io.Fonts->AddFontFromFileTTF(resources::getResourcePath("fonts/RobotoCondensed-Bold.ttf").c_str(), ServiceManager::getSettingsManager()->getTitleFontSize());
+#else
+    auto [fontDataRegular, fontSizeRegular] = GetFontData(L"FONT_ROBOTO_REGULAR");
+    auto [fontDataBold, fontSizeBold] = GetFontData(L"FONT_ROBOTO_BOLD");
+
+    if (fontDataRegular && fontSizeRegular > 0) {
+        font_body = io.Fonts->AddFontFromMemoryTTF(fontDataRegular, fontSizeRegular, ServiceManager::getSettingsManager()->getBodyFontSize());
+        font_data = io.Fonts->AddFontFromMemoryTTF(fontDataRegular, fontSizeRegular, ServiceManager::getSettingsManager()->getDataFontSize());
+    }
+
+    if (fontDataBold && fontSizeBold > 0) {
+        font_label = io.Fonts->AddFontFromMemoryTTF(fontDataBold, fontSizeBold, ServiceManager::getSettingsManager()->getLabelFontSize());
+        font_title = io.Fonts->AddFontFromMemoryTTF(fontDataBold, fontSizeBold, ServiceManager::getSettingsManager()->getTitleFontSize());
+    }
+#endif
+
     ImGui::GetIO().FontGlobalScale = ServiceManager::getSettingsManager()->getGlobalFontScale();
     assert(font_body != nullptr && "ERRORE: Impossibile caricare i font. Controlla i percorsi."); 
     std::cout << "INFO [UIManager]: Font caricati." << std::endl;    
