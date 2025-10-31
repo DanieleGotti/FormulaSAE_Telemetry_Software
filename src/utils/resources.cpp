@@ -2,8 +2,6 @@
 
 namespace resources {
 
-
-// Funzione modificata per ottenere il percorso della directory Resources
 std::string getResourcesPath() {
 #ifdef __APPLE__
     std::cout << "DEBUG getResourcesPath: Tentativo di ottenere il main bundle." << std::endl;
@@ -26,7 +24,6 @@ std::string getResourcesPath() {
                     std::string bundlePath = buffer.data();
                     std::cout << "DEBUG getResourcesPath: Percorso base bundle: " << bundlePath << std::endl;
                     
-                    // Ora costruisci il percorso della directory Resources
                     std::string resourcePath = bundlePath + "/Contents/Resources";
                     std::cout << "DEBUG getResourcesPath: Percorso Resources costruito: " << resourcePath << std::endl;
                     
@@ -51,34 +48,23 @@ std::string getResourcesPath() {
     std::cerr << "ERRORE CRITICO: Impossibile trovare la directory Resources del bundle (getResourcesPath fallito)." << std::endl;
     return "";
 #else
-    // Per altri sistemi operativi, potresti voler aggiungere una logica per trovare le risorse
-    // o semplicemente restituire una stringa vuota se non applicabile
-    // Alternativa per non-Apple: restituire la directory di esecuzione + "Resources" o simile
-    // char cwd[1024];
-    // if (getcwd(cwd, sizeof(cwd)) != NULL) {
-    //    return std::string(cwd); // O un percorso relativo alle risorse
-    // }
     return ""; 
 #endif
 }
 
-// Funzione helper per combinare il percorso della risorsa (non ha bisogno di modifiche se getResourcesPath funziona)
+// Funzione helper per combinare il percorso della risorsa
 std::string getResourcePath(const std::string& relativePath) {
     std::string resourcesPath = getResourcesPath();
     if (!resourcesPath.empty()) {
-        // Aggiunge uno slash finale se manca
         if (resourcesPath.back() != '/') {
             resourcesPath += "/";
         }
         return resourcesPath + relativePath;
     }
-    // Questo fallback dovrebbe essere raggiunto solo su OS non-Apple o in caso di errore grave
+
 #ifdef __APPLE__
-    // Se getResourcesPath fallisce su Apple, restituisce una stringa vuota,
-    // e il chiamante dovrà gestire il fallimento. L'assertion di ImGui si attiverà.
     return ""; 
 #else
-    // Mantiene il tuo vecchio percorso per altri OS
     return "../external/" + relativePath; 
 #endif
 }
@@ -123,4 +109,4 @@ std::pair<void*, DWORD> GetFontData(const wchar_t* resourceName) {
 }
 #endif
 
-} // namespace Resources
+}
