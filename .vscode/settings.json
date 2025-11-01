@@ -113,6 +113,13 @@
   "xutility": "cpp",
   "ranges": "cpp",
   "fstream": "cpp",
-  "xtree": "cpp"
+  "xtree": "cpp",
+  "codecvt": "cpp",
+  "execution": "cpp",
+  "future": "cpp",
+  "scoped_allocator": "cpp",
+  "stack": "cpp",
+  "valarray": "cpp",
+  "cassert": "cpp"
 }
 }

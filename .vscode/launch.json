@@ -13,6 +13,17 @@
       "externalConsole": true,        // Se vuoi vedere l'output in una console esterna
       "stopAtEntry": false,           // Se vuoi fermarti all'inizio di main()
       "environment": []
+    },
+    {
+      "name": "Debug Vulkan App (Windows)",
+      "type": "cppvsdbg",                  // usa il debugger di Visual Studio
+      "request": "launch",
+      "program": "${workspaceFolder}/build/telemetry_vulkan.exe",
+      "args": [],
+      "cwd": "${workspaceFolder}/build/",  // directory di lavoro
+      "environment": [],
+      "console": "externalTerminal",       // o "integratedTerminal"
+      "stopAtEntry": false
     }
   ]
 }

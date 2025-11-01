@@ -27,7 +27,7 @@ public:
     bool m_isDarkTheme = true;
     ImFont* font_body;    // Testo standard, log, pulsanti
     ImFont* font_label;   // Etichette dei dati (es. "ACC1A")
-    ImFont* m_font_data;    // Valori numerici importanti
+    ImFont* font_data;    // Valori numerici importanti
     ImFont* font_title;   // Titoli delle finestre, sezioni
 
 private:    

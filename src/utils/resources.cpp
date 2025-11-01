@@ -1,5 +1,9 @@
 #include <utils/resources.hpp>
 
+#ifdef WIN32
+#include "resources.h"
+#endif
+
 namespace resources {
 
 std::string getResourcesPath() {
@@ -72,7 +76,7 @@ std::string getResourcePath(const std::string& relativePath) {
 #ifdef _WIN32
 void loadEmbeddedFont(const wchar_t* resourceName) {
     // Trova la risorsa
-    HRSRC hRes = FindResourceW(nullptr, resourceName, RT_RCDATA);
+    HRSRC hRes = FindResource(nullptr, MAKEINTRESOURCE(IDR_FONT_REGULAR), TEXT("RCDATA"));
     if (!hRes) {
         std::wcerr << L"Font resource not found: " << resourceName << std::endl;
         return;
@@ -100,11 +104,14 @@ void loadEmbeddedFont(const wchar_t* resourceName) {
 }
 
 std::pair<void*, DWORD> GetFontData(const wchar_t* resourceName) {
-    HRSRC hRes = FindResourceW(nullptr, resourceName, RT_RCDATA);
+    HRSRC hRes = FindResourceW(nullptr, resourceName, TEXT("RCDATA"));
     if (!hRes) return {nullptr, 0};
     HGLOBAL hMem = LoadResource(nullptr, hRes);
+    if (!hMem) return {nullptr, 0}; // Aggiungi controllo per LoadResource
     DWORD size = SizeofResource(nullptr, hRes);
     void* pData = LockResource(hMem);
+    // LockResource restituisce NULL se hMem non è valido o se la risorsa è vuota.
+    // Non c'è bisogno di sbloccare, il sistema operativo gestisce la memoria della risorsa.
     return {pData, size};
 }
 #endif

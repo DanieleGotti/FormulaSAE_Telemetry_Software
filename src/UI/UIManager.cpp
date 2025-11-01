@@ -16,6 +16,10 @@
 #include "UI/StatusWindow.hpp"
 #include "Telemetry/Services/ServiceManager.hpp"
 
+#ifdef _WIN32
+#include "../utils/resources.h" // Necessario per IDR_FONT_REGULAR/BOLD
+#endif
+
 UiManager::UiManager() {
     if (!glfwInit())
         return;
@@ -49,19 +53,53 @@ UiManager::UiManager() {
     font_label = io.Fonts->AddFontFromFileTTF(resources::getResourcePath("fonts/RobotoCondensed-Bold.ttf").c_str(), ServiceManager::getSettingsManager()->getLabelFontSize());
     m_font_data = io.Fonts->AddFontFromFileTTF(resources::getResourcePath("fonts/RobotoCondensed-Regular.ttf").c_str(), ServiceManager::getSettingsManager()->getDataFontSize());
     font_title = io.Fonts->AddFontFromFileTTF(resources::getResourcePath("fonts/RobotoCondensed-Bold.ttf").c_str(), ServiceManager::getSettingsManager()->getTitleFontSize());
-#else
-    auto [fontDataRegular, fontSizeRegular] = GetFontData(L"FONT_ROBOTO_REGULAR");
-    auto [fontDataBold, fontSizeBold] = GetFontData(L"FONT_ROBOTO_BOLD");
+#endif
+#ifdef _WIN32
+    // Assicurati che UIManager.cpp includa l'header dove è dichiarata GetFontData
+    // Se GetFontData è in resources.hpp, includi resources.hpp
+    // Se GetFontData è in UIManager.cpp stesso, va bene così.
+    
+    // #include "utils/resources.hpp" // Se GetFontData è definita lì
 
-    if (fontDataRegular && fontSizeRegular > 0) {
-        font_body = io.Fonts->AddFontFromMemoryTTF(fontDataRegular, fontSizeRegular, ServiceManager::getSettingsManager()->getBodyFontSize());
-        font_data = io.Fonts->AddFontFromMemoryTTF(fontDataRegular, fontSizeRegular, ServiceManager::getSettingsManager()->getDataFontSize());
+    // --- Carica FONT REGULAR ---
+    auto [pFontDataRegular, dFontSizeRegular] = resources::GetFontData(MAKEINTRESOURCE(IDR_FONT_REGULAR));
+    if (pFontDataRegular && dFontSizeRegular > 0) {
+        font_body = io.Fonts->AddFontFromMemoryTTF(
+            pFontDataRegular, 
+            dFontSizeRegular, 
+            ServiceManager::getSettingsManager()->getBodyFontSize()
+        );
+        font_data = io.Fonts->AddFontFromMemoryTTF(
+            pFontDataRegular, 
+            dFontSizeRegular, 
+            ServiceManager::getSettingsManager()->getDataFontSize()
+        );
+    } else {
+        // Gestisci errore, es. logga un messaggio o carica un font di fallback
+        // Questo è importante per il debug se la risorsa non viene trovata
+        // Potresti voler caricare un font di sistema o un font di default ImGui
+        io.Fonts->AddFontDefault(); 
     }
 
-    if (fontDataBold && fontSizeBold > 0) {
-        font_label = io.Fonts->AddFontFromMemoryTTF(fontDataBold, fontSizeBold, ServiceManager::getSettingsManager()->getLabelFontSize());
-        font_title = io.Fonts->AddFontFromMemoryTTF(fontDataBold, fontSizeBold, ServiceManager::getSettingsManager()->getTitleFontSize());
+
+    // --- Carica FONT BOLD ---
+    auto [pFontDataBold, dFontSizeBold] = resources::GetFontData(MAKEINTRESOURCE(IDR_FONT_BOLD));
+    if (pFontDataBold && dFontSizeBold > 0) {
+        font_label = io.Fonts->AddFontFromMemoryTTF(
+            pFontDataBold, 
+            dFontSizeBold, 
+            ServiceManager::getSettingsManager()->getLabelFontSize()
+        );
+        font_title = io.Fonts->AddFontFromMemoryTTF(
+            pFontDataBold, 
+            dFontSizeBold, 
+            ServiceManager::getSettingsManager()->getTitleFontSize()
+        );
+    } else {
+        // Gestisci errore
+        io.Fonts->AddFontDefault(); 
     }
+
 #endif
 
     ImGui::GetIO().FontGlobalScale = ServiceManager::getSettingsManager()->getGlobalFontScale();
@@ -248,12 +286,12 @@ void UiManager::showDockingSpace() {
                 float fontGlobalScale = ServiceManager::getSettingsManager()->getGlobalFontScale();
 
                 if (ImGui::Button("-")) {
-                    ServiceManager::getSettingsManager()->setGlobalFontScale(std::max(0.5f, fontGlobalScale - 0.1f));
+                    ServiceManager::getSettingsManager()->setGlobalFontScale((std::max)(0.5f, fontGlobalScale - 0.1f));
                     changed = true;
                 }
                 ImGui::SameLine();
                 if (ImGui::Button("+")) {
-                    ServiceManager::getSettingsManager()->setGlobalFontScale(std::max(0.5f, fontGlobalScale + 0.1f));
+                    ServiceManager::getSettingsManager()->setGlobalFontScale((std::max)(0.5f, fontGlobalScale - 0.1f));
                     changed = true;
                 }
                 ImGui::SameLine();
