@@ -6,6 +6,7 @@
 #include "AccBrkWindow.hpp"
 #include "StatusWindow.hpp"
 #include "SteerWindow.hpp"
+#include "SuspensionWindow.hpp"
 
 struct ImFont;
 
@@ -45,6 +46,7 @@ private:
     std::shared_ptr<AccBrkWindow> m_accBrkWindow;
     std::shared_ptr<StatusWindow> m_statusWindow;
     std::shared_ptr<SteerWindow> m_steerWindow;
+    std::shared_ptr<SuspensionWindow> m_suspensionWindow;
     std::vector<std::unique_ptr<UIElement>> m_uiElements;
     std::vector<UIElement*> m_elementsToRemove;
 

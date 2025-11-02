@@ -68,7 +68,7 @@ void SteerWindow::draw() {
     // Mostra il valore intero
     ImGui::PushFont(m_uiManager->font_data);
     char angle_text[16];
-    snprintf(angle_text, 16, "%d°", static_cast<int>(roundf(current_angle)));
+    snprintf(angle_text, 16, "%.1f°", current_angle);
     ImVec2 text_size = ImGui::CalcTextSize(angle_text);
     ImGui::SetCursorPosX((ImGui::GetWindowWidth() - text_size.x) * 0.5f);
     ImGui::TextUnformatted(angle_text);

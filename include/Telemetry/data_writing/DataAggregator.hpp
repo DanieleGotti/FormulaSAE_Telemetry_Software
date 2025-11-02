@@ -5,6 +5,13 @@
 #include <functional>
 #include "../data_acquisition/PacketParser.hpp"
 
+// Definisce il formato con cui il valore numerico deve essere convertito in stringa
+enum class OutputFormat {
+    INTEGER,
+    DOUBLE,
+    STRING
+};
+
 // Definisce come devono essere aggregati i valori per colonna
 enum class AggregationType {
     AVERAGE,    // Calcola la media dei valori numerici
@@ -16,6 +23,7 @@ enum class AggregationType {
 struct ColumnConfig {
     std::string name;
     AggregationType type;
+    OutputFormat format;
 };
 
 // Mappa per rappresentare una riga del database 

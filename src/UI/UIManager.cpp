@@ -12,6 +12,8 @@
 #include "UI/LogTerminal.hpp"
 #include "UI/AccBrkWindow.hpp"
 #include "UI/StatusWindow.hpp"
+#include "UI/SteerWindow.hpp"
+#include "UI/SuspensionWindow.hpp"
 #include "Telemetry/Services/ServiceManager.hpp"
 
 UiManager::UiManager() {
@@ -73,6 +75,9 @@ UiManager::~UiManager() {
         if (m_steerWindow) { 
             ServiceManager::getAggregator()->unsubscribe(m_steerWindow.get());
         }
+        if (m_suspensionWindow) {
+            ServiceManager::getAggregator()->unsubscribe(m_suspensionWindow.get());
+        }
     }
     
     ImGui_ImplOpenGL3_Shutdown();
@@ -99,6 +104,9 @@ void UiManager::setupInitialState() {
 
             this->m_steerWindow = std::make_shared<SteerWindow>(this); 
             ServiceManager::getAggregator()->subscribe(this->m_steerWindow.get());
+
+            this->m_suspensionWindow = std::make_shared<SuspensionWindow>(this);    
+            ServiceManager::getAggregator()->subscribe(this->m_suspensionWindow.get()); 
 
             if (m_serialSelectionWindow) {
                 this->removeElement(m_serialSelectionWindow);
@@ -164,6 +172,9 @@ void UiManager::draw() {
     }
     if (m_steerWindow) {
         m_steerWindow->draw();
+    }
+    if (m_suspensionWindow) {
+        m_suspensionWindow->draw();
     }
 }
 

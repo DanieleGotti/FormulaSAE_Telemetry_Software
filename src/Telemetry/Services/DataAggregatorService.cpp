@@ -1,18 +1,34 @@
 #include <algorithm>
 #include "Telemetry/Services/DataAggregatorService.hpp"
+#include "Telemetry/data_writing/DataAggregator.hpp"
 
 DataAggregatorService::DataAggregatorService() {
     // Per aggiungere/modificare una colonna al database
     m_config = {
-        {"ACC1A", AggregationType::AVERAGE}, {"ACC1B", AggregationType::AVERAGE},
-        {"ACC2A", AggregationType::AVERAGE}, {"ACC2B", AggregationType::AVERAGE},
-        {"BRK1", AggregationType::AVERAGE}, {"BRK2", AggregationType::AVERAGE},
-        {"STEER", AggregationType::AVERAGE},
-        {"LEFT_INVERTER_FSM", AggregationType::INVERTER},
-        {"RIGHT_INVERTER_FSM", AggregationType::INVERTER},
-        {"R2D_BUTTON", AggregationType::LAST}, {"RESET_BUTTON", AggregationType::LAST},
-        {"SDC_INPUT", AggregationType::LAST}, {"TS_ON_BUTTON", AggregationType::LAST}
+        // Sensori che vogliamo vedere come INTERI
+        {"ACC1A", AggregationType::AVERAGE, OutputFormat::INTEGER},
+        {"ACC2A", AggregationType::AVERAGE, OutputFormat::INTEGER},
+        {"ACC1B", AggregationType::AVERAGE, OutputFormat::DOUBLE},
+        {"ACC2B", AggregationType::AVERAGE, OutputFormat::DOUBLE},
+        {"BRK1",  AggregationType::AVERAGE, OutputFormat::DOUBLE},
+        {"BRK2",  AggregationType::AVERAGE, OutputFormat::DOUBLE},
+        {"R2D_BUTTON", AggregationType::LAST, OutputFormat::INTEGER},
+        {"RESET_BUTTON", AggregationType::LAST, OutputFormat::INTEGER},
+        {"SDC_INPUT", AggregationType::LAST, OutputFormat::INTEGER},
+        {"TS_ON_BUTTON", AggregationType::LAST, OutputFormat::INTEGER},
+
+        // Sensori che vogliamo vedere come DECIMALI (DOUBLE)
+        {"STEER", AggregationType::AVERAGE, OutputFormat::DOUBLE},
+        {"SOSPADX", AggregationType::AVERAGE, OutputFormat::DOUBLE}, 
+        {"SOSPASX", AggregationType::AVERAGE, OutputFormat::DOUBLE},
+        {"SOSPPDX", AggregationType::AVERAGE, OutputFormat::DOUBLE},
+        {"SOSPPSX", AggregationType::AVERAGE, OutputFormat::DOUBLE},
+
+        // Dati che sono intrinsecamente STRINGHE
+        {"LEFT_INVERTER_FSM",  AggregationType::INVERTER, OutputFormat::STRING},
+        {"RIGHT_INVERTER_FSM", AggregationType::INVERTER, OutputFormat::STRING}
     };
+
 
     m_aggregator = std::make_unique<DataAggregator>(m_config, 
         [this](const DbRow& row){ this->onRowReady(row); }

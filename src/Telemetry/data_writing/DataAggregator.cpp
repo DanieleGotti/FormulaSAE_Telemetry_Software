@@ -5,6 +5,13 @@
 #include <cmath> 
 #include "Telemetry/data_writing/DataAggregator.hpp"
 
+// Converte un double in stringa con un numero fisso di cifre decimali.
+static std::string formatDouble(double value, int precision) {
+    std::stringstream ss;
+    ss << std::fixed << std::setprecision(precision) << value;
+    return ss.str();
+}
+
 DataAggregator::DataAggregator(std::vector<ColumnConfig> config, std::function<void(const DbRow&)> onRowReady)
     : m_config(std::move(config)), m_onRowReadyCallback(std::move(onRowReady)) {
     for (const auto& col : m_config) {
@@ -67,30 +74,34 @@ void DataAggregator::finalizeAndEmitRow() {
                 case AggregationType::AVERAGE: {
                     double sum = std::accumulate(data.numericValues.begin(), data.numericValues.end(), 0.0);
                     double avg = data.numericValues.empty() ? 0.0 : sum / data.numericValues.size();
-                    // Arrotonda e casta a intero
-                    finalRow[col_name] = std::to_string(static_cast<int>(std::round(avg)));
+                    
+                    if (col_config.format == OutputFormat::INTEGER) {
+                        finalRow[col_name] = std::to_string(static_cast<int>(std::round(avg)));
+                    } else if (col_config.format == OutputFormat::DOUBLE) {
+                        finalRow[col_name] = formatDouble(avg, 1); // 1 cifra decimale
+                    }
                     break;
                 }
-                case AggregationType::LAST:
-                    // Casta a intero
-                    finalRow[col_name] = std::to_string(static_cast<int>(getNumericValue(data.lastValue)));
+                case AggregationType::LAST: {
+                    double last_val = getNumericValue(data.lastValue);
+
+                    if (col_config.format == OutputFormat::INTEGER) {
+                        finalRow[col_name] = std::to_string(static_cast<int>(last_val));
+                    } else if (col_config.format == OutputFormat::DOUBLE) {
+                        finalRow[col_name] = formatDouble(last_val, 1); 
+                    }
                     break;
+                }
                 case AggregationType::INVERTER: {
                     std::string combined_states;
-                    // Unisce tutti gli stati ricevuti in questo timestamp con " / "
                     for (size_t i = 0; i < data.stringValues.size(); ++i) {
                         combined_states += data.stringValues[i] + (i == data.stringValues.size() - 1 ? "" : " / ");
                     }
                     finalRow[col_name] = combined_states;
                     
-                    // Se ricevo almeno uno stato, aggiorno l'ultimo stato conosciuto usando solo l'ultimo valore della sequenza
                     if (!data.stringValues.empty()) {
-                        if (col_name == "LEFT_INVERTER_FSM") {
-                            m_lastLeftInverterState = data.stringValues.back();
-                        }
-                        if (col_name == "RIGHT_INVERTER_FSM") {
-                            m_lastRightInverterState = data.stringValues.back();
-                        }
+                        if (col_name == "LEFT_INVERTER_FSM") m_lastLeftInverterState = data.stringValues.back();
+                        if (col_name == "RIGHT_INVERTER_FSM") m_lastRightInverterState = data.stringValues.back();
                     }
                     break;
                 }
