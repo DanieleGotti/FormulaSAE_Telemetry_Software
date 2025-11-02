@@ -16,8 +16,8 @@
 #include "UI/StatusWindow.hpp"
 #include "Telemetry/Services/ServiceManager.hpp"
 
-#ifdef _WIN32
-#include "../utils/resources.h" // Necessario per IDR_FONT_REGULAR/BOLD
+#ifdef WIN32
+#include "../assets/resources.h" // Necessario per IDR_FONT_REGULAR/BOLD
 #endif
 
 UiManager::UiManager() {
@@ -51,7 +51,7 @@ UiManager::UiManager() {
     // Su macOS, i font sono nel bundle, nella sottocartella 'fonts' di Resources
     font_body = io.Fonts->AddFontFromFileTTF(resources::getResourcePath("fonts/RobotoCondensed-Regular.ttf").c_str(), ServiceManager::getSettingsManager()->getBodyFontSize());
     font_label = io.Fonts->AddFontFromFileTTF(resources::getResourcePath("fonts/RobotoCondensed-Bold.ttf").c_str(), ServiceManager::getSettingsManager()->getLabelFontSize());
-    m_font_data = io.Fonts->AddFontFromFileTTF(resources::getResourcePath("fonts/RobotoCondensed-Regular.ttf").c_str(), ServiceManager::getSettingsManager()->getDataFontSize());
+    font_data = io.Fonts->AddFontFromFileTTF(resources::getResourcePath("fonts/RobotoCondensed-Regular.ttf").c_str(), ServiceManager::getSettingsManager()->getDataFontSize());
     font_title = io.Fonts->AddFontFromFileTTF(resources::getResourcePath("fonts/RobotoCondensed-Bold.ttf").c_str(), ServiceManager::getSettingsManager()->getTitleFontSize());
 #endif
 #ifdef _WIN32

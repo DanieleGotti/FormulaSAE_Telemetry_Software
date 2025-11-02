@@ -17,6 +17,6 @@ namespace resources {
 
 #ifdef WIN32
     void loadEmbeddedFont(const wchar_t* resourceName);
-    std::pair<void*, DWORD> GetFontData(const wchar_t* resourceName);
+    std::pair<void*, DWORD> GetFontData(LPWSTR resourceName);
 #endif
 } // namespace Resources

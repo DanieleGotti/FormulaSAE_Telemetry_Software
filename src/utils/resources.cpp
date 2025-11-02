@@ -1,7 +1,7 @@
 #include <utils/resources.hpp>
 
 #ifdef WIN32
-#include "resources.h"
+#include "../assets/resources.h"
 #endif
 
 namespace resources {
@@ -73,7 +73,7 @@ std::string getResourcePath(const std::string& relativePath) {
 #endif
 }
 
-#ifdef _WIN32
+#ifdef WIN32
 void loadEmbeddedFont(const wchar_t* resourceName) {
     // Trova la risorsa
     HRSRC hRes = FindResource(nullptr, MAKEINTRESOURCE(IDR_FONT_REGULAR), TEXT("RCDATA"));
@@ -103,8 +103,8 @@ void loadEmbeddedFont(const wchar_t* resourceName) {
     }
 }
 
-std::pair<void*, DWORD> GetFontData(const wchar_t* resourceName) {
-    HRSRC hRes = FindResourceW(nullptr, resourceName, TEXT("RCDATA"));
+std::pair<void*, DWORD> GetFontData(LPWSTR resourceName) {
+    HRSRC hRes = FindResourceW(nullptr, resourceName, RT_RCDATA);
     if (!hRes) return {nullptr, 0};
     HGLOBAL hMem = LoadResource(nullptr, hRes);
     if (!hMem) return {nullptr, 0}; // Aggiungi controllo per LoadResource
