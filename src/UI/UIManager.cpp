@@ -291,7 +291,7 @@ void UiManager::showDockingSpace() {
                 }
                 ImGui::SameLine();
                 if (ImGui::Button("+")) {
-                    ServiceManager::getSettingsManager()->setGlobalFontScale((std::max)(0.5f, fontGlobalScale - 0.1f));
+                    ServiceManager::getSettingsManager()->setGlobalFontScale((std::max)(0.5f, fontGlobalScale + 0.1f));
                     changed = true;
                 }
                 ImGui::SameLine();
