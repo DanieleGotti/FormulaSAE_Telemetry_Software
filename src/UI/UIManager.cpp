@@ -55,52 +55,53 @@ UiManager::UiManager() {
     font_title = io.Fonts->AddFontFromFileTTF(resources::getResourcePath("fonts/RobotoCondensed-Bold.ttf").c_str(), ServiceManager::getSettingsManager()->getTitleFontSize());
 #endif
 #ifdef _WIN32
-    // Assicurati che UIManager.cpp includa l'header dove è dichiarata GetFontData
-    // Se GetFontData è in resources.hpp, includi resources.hpp
-    // Se GetFontData è in UIManager.cpp stesso, va bene così.
-    
-    // #include "utils/resources.hpp" // Se GetFontData è definita lì
-
     // --- Carica FONT REGULAR ---
     auto [pFontDataRegular, dFontSizeRegular] = resources::GetFontData(MAKEINTRESOURCE(IDR_FONT_REGULAR));
     if (pFontDataRegular && dFontSizeRegular > 0) {
+        ImFontConfig cfg;
+        cfg.FontDataOwnedByAtlas = false; // <--- evita il crash
+
         font_body = io.Fonts->AddFontFromMemoryTTF(
-            pFontDataRegular, 
-            dFontSizeRegular, 
-            ServiceManager::getSettingsManager()->getBodyFontSize()
+            pFontDataRegular,
+            dFontSizeRegular,
+            ServiceManager::getSettingsManager()->getBodyFontSize(),
+            &cfg
         );
+
         font_data = io.Fonts->AddFontFromMemoryTTF(
-            pFontDataRegular, 
-            dFontSizeRegular, 
-            ServiceManager::getSettingsManager()->getDataFontSize()
+            pFontDataRegular,
+            dFontSizeRegular,
+            ServiceManager::getSettingsManager()->getDataFontSize(),
+            &cfg
         );
     } else {
-        // Gestisci errore, es. logga un messaggio o carica un font di fallback
-        // Questo è importante per il debug se la risorsa non viene trovata
-        // Potresti voler caricare un font di sistema o un font di default ImGui
         io.Fonts->AddFontDefault(); 
     }
-
 
     // --- Carica FONT BOLD ---
     auto [pFontDataBold, dFontSizeBold] = resources::GetFontData(MAKEINTRESOURCE(IDR_FONT_BOLD));
     if (pFontDataBold && dFontSizeBold > 0) {
+        ImFontConfig cfg;
+        cfg.FontDataOwnedByAtlas = false; // <--- anche qui
+
         font_label = io.Fonts->AddFontFromMemoryTTF(
-            pFontDataBold, 
-            dFontSizeBold, 
-            ServiceManager::getSettingsManager()->getLabelFontSize()
+            pFontDataBold,
+            dFontSizeBold,
+            ServiceManager::getSettingsManager()->getLabelFontSize(),
+            &cfg
         );
+
         font_title = io.Fonts->AddFontFromMemoryTTF(
-            pFontDataBold, 
-            dFontSizeBold, 
-            ServiceManager::getSettingsManager()->getTitleFontSize()
+            pFontDataBold,
+            dFontSizeBold,
+            ServiceManager::getSettingsManager()->getTitleFontSize(),
+            &cfg
         );
     } else {
-        // Gestisci errore
         io.Fonts->AddFontDefault(); 
     }
-
 #endif
+
 
     ImGui::GetIO().FontGlobalScale = ServiceManager::getSettingsManager()->getGlobalFontScale();
     assert(font_body != nullptr && "ERRORE: Impossibile caricare i font. Controlla i percorsi."); 
