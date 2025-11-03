@@ -6,9 +6,9 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # # Trova Vulkan (dall'SDK installato sul sistema)
-# find_package(Vulkan REQUIRED)
+# find_package(Vulkan REQUIRED) # Assicurati di scommentare se lo usi
 
-# Aggiungi GLFW come subdir (verrà compilato insieme al progetto)
+# Aggiungi GLFW come subdir
 add_subdirectory(external/glfw)
 
 # ---- IMGUI ----
@@ -33,11 +33,11 @@ target_include_directories(imgui PUBLIC
     ${IMPLOT_DIR}
 )
 
-target_link_libraries(imgui PUBLIC glfw) # usa glfw che già hai
+target_link_libraries(imgui PUBLIC glfw)
 
 # Include directories
 include_directories(
-    ${Vulkan_INCLUDE_DIRS}
+    # ${Vulkan_INCLUDE_DIRS} # Assicurati di scommentare se lo usi
     external/glm
     external/glfw/include
 )
@@ -46,10 +46,9 @@ include(FetchContent)
 FetchContent_Declare(
   jsoncons
   GIT_REPOSITORY https://github.com/danielaparker/jsoncons.git
-  GIT_TAG v0.177.0  # o un tag specifico, es. v0.172.0
+  GIT_TAG v0.177.0
 )
 
-# Disabilita la compilazione dei test e degli esempi di jsoncons
 set(JSONCONS_BUILD_TESTS OFF CACHE BOOL "Disable jsoncons tests")
 set(JSONCONS_BUILD_EXAMPLES OFF CACHE BOOL "Disable jsoncons examples")
 
@@ -72,18 +71,85 @@ file(GLOB SRC_FILES
 
 add_executable(${PROJECT_NAME} ${SRC_FILES})
 
-# Link
+
 target_link_libraries(${PROJECT_NAME} PRIVATE
-    # Vulkan::Vulkan
     glfw
     imgui
     jsoncons
 )
 
+# Sezione di configurazione specifica per Windows
 if(WIN32)
     target_link_libraries(${PROJECT_NAME} PRIVATE opengl32)
+
+    # Icona per Windows
+    set(APP_ICON_RESOURCE "${CMAKE_CURRENT_SOURCE_DIR}/assets/windows_resources.rc")
+    target_sources(${PROJECT_NAME} PRIVATE ${APP_ICON_RESOURCE})
+    add_definitions(-DUNICODE -D_UNICODE)
 endif()
 
+if (MSVC)
+    add_compile_options(/nologo)
+    add_compile_options(/FC-) # Usa /FC per path completi, /FC- non è un flag valido
+    
+    # Rimuovi /showIncludes da tutti i tipi di build
+    string(REPLACE "/showIncludes" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+    string(REPLACE "/showIncludes" "" CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
+    string(REPLACE "/showIncludes" "" CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
+    string(REPLACE "/showIncludes" "" CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO}")
+    string(REPLACE "/showIncludes" "" CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL}")
+endif()
+
+# Sezione di configurazione specifica per macOS
+# (Questa parte deve essere dopo add_executable(${PROJECT_NAME} ${SRC_FILES}))
+
+# (Questa parte deve essere dopo add_executable(${PROJECT_NAME} ${SRC_FILES})
+# e dopo aver impostato MACOSX_BUNDLE TRUE tramite set_target_properties,
+# come suggerito nella mia revisione precedente del tuo CMakeLists.txt completo.)
+
 if(APPLE)
+    # Imposta che l'app è un bundle macOS (questo è fondamentale, deve essere presente e TRUE)
+    set_target_properties(${PROJECT_NAME} PROPERTIES
+        MACOSX_BUNDLE TRUE
+    )
+
+    # Specifica il framework OpenGL per macOS
     target_link_libraries(${PROJECT_NAME} PRIVATE "-framework OpenGL")
+
+    # --- Gestione Icona ---
+    # Il nome del file icona dentro il bundle
+    set(MACOSX_BUNDLE_ICON_FILE "macos_icon.icns")
+    set_target_properties(${PROJECT_NAME} PROPERTIES
+        MACOSX_BUNDLE_ICON_FILE ${MACOSX_BUNDLE_ICON_FILE}
+    )
+
+    # Il percorso del file icona sorgente
+    set(ICON_SOURCE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/assets/macos_icon.icns")
+    
+    # Imposta la destinazione nel bundle e aggiungilo come "sorgente" al target
+    set_source_files_properties(${ICON_SOURCE_PATH} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
+    target_sources(${PROJECT_NAME} PRIVATE ${ICON_SOURCE_PATH})
+
+
+    # --- Gestione Font ---
+    # Elenca i file dei font
+    set(FONT_SOURCES
+        "${CMAKE_CURRENT_SOURCE_DIR}/assets/fonts/RobotoCondensed-Regular.ttf"
+        "${CMAKE_CURRENT_SOURCE_DIR}/assets/fonts/RobotoCondensed-Bold.ttf"
+    )
+
+    # Itera su ogni font per impostare la proprietà e aggiungerlo singolarmente
+    foreach(FONT_FILE ${FONT_SOURCES})
+        # Se vuoi i font in una sottocartella "fonts" dentro Resources:
+        # Estrai solo il nome del file per creare il percorso relativo
+        get_filename_component(FONT_NAME ${FONT_FILE} NAME)
+        set_source_files_properties(${FONT_FILE} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources/fonts/")
+        
+        # Aggiungilo come sorgente individuale
+        target_sources(${PROJECT_NAME} PRIVATE ${FONT_FILE})
+    endforeach()
+
+    # Se avessi altre risorse (immagini, ecc.) potresti creare liste simili
+    # e usare un foreach per gestirle singolarmente.
+
 endif()

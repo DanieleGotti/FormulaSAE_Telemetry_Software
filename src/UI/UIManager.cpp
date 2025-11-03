@@ -6,6 +6,8 @@
 #include <iostream>
 #include <cassert>
 #include <implot.h>
+#include <utils/resources.hpp>
+
 #include "UI/UIManager.hpp"
 #include "UI/Theme.hpp"
 #include "UI/SerialDeviceSelection.hpp"
@@ -15,6 +17,10 @@
 #include "UI/SteerWindow.hpp"
 #include "UI/SuspensionWindow.hpp"
 #include "Telemetry/Services/ServiceManager.hpp"
+
+#ifdef WIN32
+#include "../assets/resources.h" // Necessario per IDR_FONT_REGULAR/BOLD
+#endif
 
 UiManager::UiManager() {
     if (!glfwInit())
@@ -42,10 +48,63 @@ UiManager::UiManager() {
 
     std::cout << "INFO [UIManager]: Caricamento dei font." << std::endl;
     io.Fonts->Clear(); 
-    font_body = io.Fonts->AddFontFromFileTTF("../external/fonts/RobotoCondensed-Regular.ttf", ServiceManager::getSettingsManager()->getBodyFontSize());
-    font_label = io.Fonts->AddFontFromFileTTF("../external/fonts/RobotoCondensed-Bold.ttf", ServiceManager::getSettingsManager()->getLabelFontSize());
-    font_data = io.Fonts->AddFontFromFileTTF("../external/fonts/RobotoCondensed-Regular.ttf", ServiceManager::getSettingsManager()->getDataFontSize());
-    font_title = io.Fonts->AddFontFromFileTTF("../external/fonts/RobotoCondensed-Bold.ttf", ServiceManager::getSettingsManager()->getTitleFontSize());
+
+#ifdef __APPLE__
+    // Su macOS, i font sono nel bundle, nella sottocartella 'fonts' di Resources
+    font_body = io.Fonts->AddFontFromFileTTF(resources::getResourcePath("fonts/RobotoCondensed-Regular.ttf").c_str(), ServiceManager::getSettingsManager()->getBodyFontSize());
+    font_label = io.Fonts->AddFontFromFileTTF(resources::getResourcePath("fonts/RobotoCondensed-Bold.ttf").c_str(), ServiceManager::getSettingsManager()->getLabelFontSize());
+    font_data = io.Fonts->AddFontFromFileTTF(resources::getResourcePath("fonts/RobotoCondensed-Regular.ttf").c_str(), ServiceManager::getSettingsManager()->getDataFontSize());
+    font_title = io.Fonts->AddFontFromFileTTF(resources::getResourcePath("fonts/RobotoCondensed-Bold.ttf").c_str(), ServiceManager::getSettingsManager()->getTitleFontSize());
+#endif
+#ifdef _WIN32
+    // --- Carica FONT REGULAR ---
+    auto [pFontDataRegular, dFontSizeRegular] = resources::GetFontData(MAKEINTRESOURCE(IDR_FONT_REGULAR));
+    if (pFontDataRegular && dFontSizeRegular > 0) {
+        ImFontConfig cfg;
+        cfg.FontDataOwnedByAtlas = false; // <--- evita il crash
+
+        font_body = io.Fonts->AddFontFromMemoryTTF(
+            pFontDataRegular,
+            dFontSizeRegular,
+            ServiceManager::getSettingsManager()->getBodyFontSize(),
+            &cfg
+        );
+
+        font_data = io.Fonts->AddFontFromMemoryTTF(
+            pFontDataRegular,
+            dFontSizeRegular,
+            ServiceManager::getSettingsManager()->getDataFontSize(),
+            &cfg
+        );
+    } else {
+        io.Fonts->AddFontDefault(); 
+    }
+
+    // --- Carica FONT BOLD ---
+    auto [pFontDataBold, dFontSizeBold] = resources::GetFontData(MAKEINTRESOURCE(IDR_FONT_BOLD));
+    if (pFontDataBold && dFontSizeBold > 0) {
+        ImFontConfig cfg;
+        cfg.FontDataOwnedByAtlas = false; // <--- anche qui
+
+        font_label = io.Fonts->AddFontFromMemoryTTF(
+            pFontDataBold,
+            dFontSizeBold,
+            ServiceManager::getSettingsManager()->getLabelFontSize(),
+            &cfg
+        );
+
+        font_title = io.Fonts->AddFontFromMemoryTTF(
+            pFontDataBold,
+            dFontSizeBold,
+            ServiceManager::getSettingsManager()->getTitleFontSize(),
+            &cfg
+        );
+    } else {
+        io.Fonts->AddFontDefault(); 
+    }
+#endif
+
+
     ImGui::GetIO().FontGlobalScale = ServiceManager::getSettingsManager()->getGlobalFontScale();
     assert(font_body != nullptr && "ERRORE: Impossibile caricare i font. Controlla i percorsi."); 
     std::cout << "INFO [UIManager]: Font caricati." << std::endl;    
@@ -239,12 +298,12 @@ void UiManager::showDockingSpace() {
                 float fontGlobalScale = ServiceManager::getSettingsManager()->getGlobalFontScale();
 
                 if (ImGui::Button("-")) {
-                    ServiceManager::getSettingsManager()->setGlobalFontScale(std::max(0.5f, fontGlobalScale - 0.1f));
+                    ServiceManager::getSettingsManager()->setGlobalFontScale((std::max)(0.5f, fontGlobalScale - 0.1f));
                     changed = true;
                 }
                 ImGui::SameLine();
                 if (ImGui::Button("+")) {
-                    ServiceManager::getSettingsManager()->setGlobalFontScale(std::max(0.5f, fontGlobalScale + 0.1f));
+                    ServiceManager::getSettingsManager()->setGlobalFontScale((std::max)(0.5f, fontGlobalScale + 0.1f));
                     changed = true;
                 }
                 ImGui::SameLine();

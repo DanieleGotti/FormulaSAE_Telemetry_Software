@@ -1,0 +1,5 @@
+#include "resources.h"
+IDI_ICON1 ICON "windows_icon.ico"
+
+IDR_FONT_REGULAR RCDATA "./fonts/RobotoCondensed-Regular.ttf"
+IDR_FONT_BOLD    RCDATA "./fonts/RobotoCondensed-Bold.ttf"

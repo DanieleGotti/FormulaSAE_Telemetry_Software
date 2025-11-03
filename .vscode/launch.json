@@ -3,18 +3,27 @@
   "configurations": [
     {
       "name": "Debug Vulkan App",
-      "type": "cppdbg",
+      "type": "lldb",
       "request": "launch",
-      "program": "${workspaceFolder}/build/telemetry_vulkan",
+      "program": "${workspaceFolder}/build/telemetry_vulkan.app/Contents/MacOS/telemetry_vulkan",
       "args": [],
-      "stopAtEntry": false,
-      "cwd": "${workspaceFolder}/build/",
+      // "stopAtEntry": false,
+      "cwd": "${workspaceFolder}/build/telemetry_vulkan.app/Contents/MacOS/",
+      // "preLaunchTask": "cmake-build", // Opzionale: un task per rebuildare prima del debug
+      "externalConsole": true,        // Se vuoi vedere l'output in una console esterna
+      "stopAtEntry": false,           // Se vuoi fermarti all'inizio di main()
+      "environment": []
+    },
+    {
+      "name": "Debug Vulkan App (Windows)",
+      "type": "cppvsdbg",                  // usa il debugger di Visual Studio
+      "request": "launch",
+      "program": "${workspaceFolder}/build/telemetry_vulkan.exe",
+      "args": [],
+      "cwd": "${workspaceFolder}/build/",  // directory di lavoro
       "environment": [],
-      "externalConsole": false,
-      "MIMode": "lldb",
-      // "setupCommands": [
-      //   { "description": "Enable pretty-printing", "text": "-enable-pretty-printing", "ignoreFailures": true }
-      // ]
+      "console": "externalTerminal",       // o "integratedTerminal"
+      "stopAtEntry": false
     }
   ]
 }
