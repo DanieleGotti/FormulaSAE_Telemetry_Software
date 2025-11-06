@@ -4,6 +4,7 @@
 #include <sstream>
 #include <ctime>
 #include <cmath>
+#include <algorithm>
 #include "UI/AccBrkWindow.hpp"
 #include "UI/UIManager.hpp"
 
@@ -236,14 +237,22 @@ void AccBrkWindow::draw() {
             }
 
             if (has_data) {
-                if (std::abs(max_y - min_y) < 1.0) {
-                     max_y += 5.0;
-                }
-                double padding = (max_y - min_y) * 0.10; // Margine del 10%
-                ImPlot::SetupAxisLimits(ImAxis_Y1, min_y - padding, max_y + padding, ImGuiCond_Always);
+                // Definiamo i limiti di base dell'asse Y
+                double final_min_y = 800.0;
+                double final_max_y = 1000.0;
+
+                // Estendiamo i limiti solo se i dati reali superano quelli di base
+                final_min_y = (std::min)(final_min_y, min_y);
+                final_max_y = (std::max)(final_max_y, max_y);
+                // Aggiungiamo un padding per non far toccare le linee ai bordi
+                double range = final_max_y - final_min_y;
+                double padding = std::max(range * 0.10, 5.0); // 10% di padding o un minimo di 5
+
+                ImPlot::SetupAxisLimits(ImAxis_Y1, final_min_y - padding, final_max_y + padding, ImGuiCond_Always);
             } else {
-                ImPlot::SetupAxisLimits(ImAxis_Y1, 0, 100, ImGuiCond_Always);
-            }
+                // Se non ci sono dati, usiamo il range di default senza padding
+                ImPlot::SetupAxisLimits(ImAxis_Y1, 800, 1000, ImGuiCond_Always);
+            }          
 
             ImPlot::PlotLine("BRK1", m_plotData["BRK1"].X.data(), m_plotData["BRK1"].Y.data(), m_plotData["BRK1"].X.size());
             ImPlot::PlotLine("BRK2", m_plotData["BRK2"].X.data(), m_plotData["BRK2"].Y.data(), m_plotData["BRK2"].X.size());

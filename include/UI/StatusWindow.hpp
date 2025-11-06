@@ -24,6 +24,8 @@ private:
     void drawLed(const char* label, bool state);
     // Disegna un singolo indicatore LED con un'etichetta
     void drawLedIndicator(const char* label, bool state);
+    // Larghezza iniziale pannello indicatori
+    float m_leftPaneWidth = 280.0f;
 
     UiManager* m_uiManager;
     std::mutex m_dataMutex;

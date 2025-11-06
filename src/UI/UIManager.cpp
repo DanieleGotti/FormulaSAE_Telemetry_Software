@@ -7,7 +7,6 @@
 #include <cassert>
 #include <implot.h>
 #include <utils/resources.hpp>
-
 #include "UI/UIManager.hpp"
 #include "UI/Theme.hpp"
 #include "UI/SerialDeviceSelection.hpp"
@@ -16,6 +15,7 @@
 #include "UI/StatusWindow.hpp"
 #include "UI/SteerWindow.hpp"
 #include "UI/SuspensionWindow.hpp"
+#include "UI/HallWindow.hpp"
 #include "Telemetry/Services/ServiceManager.hpp"
 
 #ifdef WIN32
@@ -142,6 +142,9 @@ UiManager::~UiManager() {
         if (m_suspensionWindow) {
             ServiceManager::getAggregator()->unsubscribe(m_suspensionWindow.get());
         }
+        if (m_hallWindow) {
+            ServiceManager::getAggregator()->unsubscribe(m_hallWindow.get());
+        }
     }
     
     ImGui_ImplOpenGL3_Shutdown();
@@ -171,6 +174,9 @@ void UiManager::setupInitialState() {
 
             this->m_suspensionWindow = std::make_shared<SuspensionWindow>(this);    
             ServiceManager::getAggregator()->subscribe(this->m_suspensionWindow.get()); 
+
+            this->m_hallWindow = std::make_shared<HallWindow>(this);
+            ServiceManager::getAggregator()->subscribe(this->m_hallWindow.get());
 
             if (m_serialSelectionWindow) {
                 this->removeElement(m_serialSelectionWindow);
@@ -239,6 +245,9 @@ void UiManager::draw() {
     }
     if (m_suspensionWindow) {
         m_suspensionWindow->draw();
+    }
+    if (m_hallWindow) {
+        m_hallWindow->draw();
     }
 }
 
