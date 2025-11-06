@@ -8,7 +8,7 @@
 #include "../Telemetry/data_writing/IAggregatedDataSubscriber.hpp"
 #include "../Telemetry/data_writing/DataAggregator.hpp"
 
-// Riusa la struttura PlotLineData da AccBrkWindow.hpp
+// Contiene i dati di una singola linea del grafico
 struct PlotLineData; 
 
 class UiManager;
@@ -18,9 +18,7 @@ public:
     explicit SuspensionWindow(UiManager* manager);
     ~SuspensionWindow() override = default;
 
-    // Metodo da UIElement
     void draw() override;
-    // Metodo da IAggregatedDataSubscriber
     void onAggregatedDataReceived(const DbRow& dataRow) override;
 
 private:

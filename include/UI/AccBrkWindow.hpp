@@ -20,9 +20,7 @@ public:
     explicit AccBrkWindow(UiManager* manager);
     ~AccBrkWindow() override = default;
 
-    // Metodo da UIElement
     void draw() override;
-    // Metodo da IAggregatedDataSubscriber
     void onAggregatedDataReceived(const DbRow& dataRow) override;
 
 private:

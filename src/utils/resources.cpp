@@ -13,10 +13,10 @@ std::string getResourcesPath() {
     if (mainBundle) {
         std::cout << "DEBUG getResourcesPath: Main bundle ottenuto." << std::endl;
         
-        CFURLRef bundleURL = CFBundleCopyBundleURL(mainBundle); // Ottieni l'URL del bundle
+        CFURLRef bundleURL = CFBundleCopyBundleURL(mainBundle); // Ottiene l'URL del bundle
         if (bundleURL) {
             std::cout << "DEBUG getResourcesPath: URL del bundle ottenuto." << std::endl;
-            CFStringRef bundlePathCFString = CFURLCopyFileSystemPath(bundleURL, kCFURLPOSIXPathStyle); // Ottieni il percorso assoluto del bundle
+            CFStringRef bundlePathCFString = CFURLCopyFileSystemPath(bundleURL, kCFURLPOSIXPathStyle); // Ottiene il percorso assoluto del bundle
             
             if (bundlePathCFString) {
                 std::cout << "DEBUG getResourcesPath: Percorso assoluto del bundle ottenuto." << std::endl;
@@ -107,7 +107,7 @@ std::pair<void*, DWORD> GetFontData(LPWSTR resourceName) {
     HRSRC hRes = FindResourceW(nullptr, resourceName, RT_RCDATA);
     if (!hRes) return {nullptr, 0};
     HGLOBAL hMem = LoadResource(nullptr, hRes);
-    if (!hMem) return {nullptr, 0}; // Aggiungi controllo per LoadResource
+    if (!hMem) return {nullptr, 0}; // Aggiunge controllo per LoadResource
     DWORD size = SizeofResource(nullptr, hRes);
     void* pData = LockResource(hMem);
     // LockResource restituisce NULL se hMem non è valido o se la risorsa è vuota.

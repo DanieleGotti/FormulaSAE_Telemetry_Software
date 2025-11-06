@@ -1,7 +1,6 @@
 #include <imgui.h>
 #include <string>
 #include <sstream>
-
 #include "UI/StatusWindow.hpp"
 #include "UI/UIManager.hpp"
 
@@ -60,7 +59,7 @@ void StatusWindow::draw() {
     ImGui::PopStyleVar();
 
     // Pannello di indicatori di stato
-    ImGui::BeginChild("LeftPane", ImVec2(m_leftPaneWidth, 0), false);
+    ImGui::BeginChild("LeftPane", ImVec2(m_leftPaneWidth, 0), false, ImGuiWindowFlags_NoBackground);
     
     ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 10);
     ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 10);
@@ -120,7 +119,7 @@ void StatusWindow::draw() {
     ImGui::SameLine();
 
     // Pannello di stati inverter
-    ImGui::BeginChild("RightPane", ImVec2(0, 0), false);
+    ImGui::BeginChild("RightPane", ImVec2(0, 0), false, ImGuiWindowFlags_NoBackground);
     ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 10);
     ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 10);
 
@@ -149,7 +148,7 @@ void StatusWindow::draw() {
 
         ImGui::SetCursorPosY(ImGui::GetCursorPosY() + ImGui::GetStyle().FramePadding.y);
         
-        // Inverter Sinistro
+        // Inverter sinistro
         ImGui::PushFont(m_uiManager->font_body);
         ImGui::Text("Left:");
         ImGui::PopFont();
@@ -166,7 +165,7 @@ void StatusWindow::draw() {
 
         ImGui::SameLine();
 
-        // Inverter Destro
+        // Inverter destro
         ImGui::PushFont(m_uiManager->font_body);
         ImGui::Text("Right:");
         ImGui::PopFont();
@@ -182,7 +181,6 @@ void StatusWindow::draw() {
         ImGui::EndChild();
     }
     ImGui::EndGroup();
-
     ImGui::EndChild(); 
     
     ImGui::End();

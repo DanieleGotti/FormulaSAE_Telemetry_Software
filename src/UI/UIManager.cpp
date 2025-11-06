@@ -20,7 +20,7 @@
 
 #ifdef WIN32
 #include "../assets/resources.h" // Necessario per IDR_FONT_REGULAR/BOLD
-#include <windows.h
+#include <windows.h>
 #endif
 
 UiManager::UiManager() {
@@ -62,11 +62,11 @@ UiManager::UiManager() {
     font_title = io.Fonts->AddFontFromFileTTF(resources::getResourcePath("fonts/RobotoCondensed-Bold.ttf").c_str(), ServiceManager::getSettingsManager()->getTitleFontSize());
 #endif
 #ifdef _WIN32
-    // --- Carica FONT REGULAR ---
+    // Carica FONT REGULAR 
     auto [pFontDataRegular, dFontSizeRegular] = resources::GetFontData(MAKEINTRESOURCE(IDR_FONT_REGULAR));
     if (pFontDataRegular && dFontSizeRegular > 0) {
         ImFontConfig cfg;
-        cfg.FontDataOwnedByAtlas = false; // <--- evita il crash
+        cfg.FontDataOwnedByAtlas = false; 
 
         font_body = io.Fonts->AddFontFromMemoryTTF(
             pFontDataRegular,
@@ -85,11 +85,11 @@ UiManager::UiManager() {
         io.Fonts->AddFontDefault(); 
     }
 
-    // --- Carica FONT BOLD ---
+    // Carica FONT BOLD 
     auto [pFontDataBold, dFontSizeBold] = resources::GetFontData(MAKEINTRESOURCE(IDR_FONT_BOLD));
     if (pFontDataBold && dFontSizeBold > 0) {
         ImFontConfig cfg;
-        cfg.FontDataOwnedByAtlas = false; // <--- anche qui
+        cfg.FontDataOwnedByAtlas = false; 
 
         font_label = io.Fonts->AddFontFromMemoryTTF(
             pFontDataBold,
@@ -346,7 +346,7 @@ void UiManager::showDockingSpace() {
 //     } else {
 //         ImGui::StyleColorsLight();
 //     }
-
+//
 //     ImGuiStyle& style = ImGui::GetStyle();
 //     if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
 //         style.WindowRounding = 0.0f;
@@ -355,18 +355,11 @@ void UiManager::showDockingSpace() {
 // }
 
 #if defined(WIN32)
-// Supponendo che tu voglia impostare l'icona della finestra GLFW
-void SetWindowIconFromResource()
+void UiManager::SetWindowIconFromResource()
 {
     HINSTANCE hInstance = GetModuleHandle(nullptr);
-
     // Carica l'icona dal file eseguibile (risorsa IDI_APP_ICON)
-    HICON hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_APP_ICON));
-
-    if (!hIcon) {
-        MessageBox(nullptr, "Impossibile caricare l'icona dalla risorsa", "Errore", MB_OK);
-        return;
-    }
+    HICON hIcon = LoadIcon(hInstance, MAKEINTRESOURCEW(IDI_ICON1));
 
     // Converte l'HICON in formato GLFWimage
     ICONINFO iconInfo;
@@ -385,7 +378,7 @@ void SetWindowIconFromResource()
     BITMAPINFO bmi = {};
     bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
     bmi.bmiHeader.biWidth = width;
-    bmi.bmiHeader.biHeight = -height;  // negativo = top-down
+    bmi.bmiHeader.biHeight = -height;  
     bmi.bmiHeader.biPlanes = 1;
     bmi.bmiHeader.biBitCount = 32;
     bmi.bmiHeader.biCompression = BI_RGB;
@@ -398,7 +391,7 @@ void SetWindowIconFromResource()
     img.width = width;
     img.height = height;
     img.pixels = pixels.data();
-    glfwSetWindowIcon(window, 1, &img);
+    glfwSetWindowIcon((GLFWwindow*)m_window, 1, &img);
 
     // Cleanup
     SelectObject(memDC, oldBmp);

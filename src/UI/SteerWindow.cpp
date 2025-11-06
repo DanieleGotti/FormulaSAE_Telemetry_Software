@@ -66,7 +66,7 @@ void SteerWindow::draw() {
     }
 
     // Mostra il valore intero
-    ImGui::PushFont(m_uiManager->font_data);
+    ImGui::PushFont(m_uiManager->font_label);
     char angle_text[16];
     snprintf(angle_text, 16, "%.1f°", current_angle);
     ImVec2 text_size = ImGui::CalcTextSize(angle_text);
@@ -103,7 +103,7 @@ void SteerWindow::draw() {
         ImVec2 fixed_line_start(image_center.x, window_pos.y);
         ImVec2 fixed_line_end(image_center.x, window_pos.y + fixed_line_length);
         ImU32 fixed_line_color = m_uiManager->m_isDarkTheme
-            ? IM_COL32(255, 255, 255, 255) // Tema scuro -> linea bianca
+            ? IM_COL32(200, 200, 200, 255) // Tema scuro -> linea chiara
             : IM_COL32(0, 0, 0, 255);       // Tema chiaro -> linea nera
         draw_list->AddLine(fixed_line_start, fixed_line_end, fixed_line_color, 2.0f);
 

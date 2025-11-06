@@ -4,10 +4,11 @@
 #include <sstream>
 #include <ctime>
 #include <cmath>
+#include <iostream>
 #include "UI/SuspensionWindow.hpp"
 #include "UI/UIManager.hpp"
 
-// Formattatore asse temporale (puoi metterlo in un file di utility se lo usi in più posti)
+// Formattatore asse temporale
 static int TimeAxisFormatter(double value, char* buff, int size, void* user_data) {
     time_t time = static_cast<time_t>(value);
 #ifdef _WIN32
@@ -21,7 +22,6 @@ static int TimeAxisFormatter(double value, char* buff, int size, void* user_data
 
 
 SuspensionWindow::SuspensionWindow(UiManager* manager) : m_uiManager(manager) {
-    // Sensori per le sospensioni
     const std::vector<std::string> keys_to_plot = {
         "SOSAD", "SOSAS", "SOSPD", "SOSPS"
     };
@@ -42,8 +42,8 @@ std::chrono::system_clock::time_point SuspensionWindow::parseTimestamp(const std
             int ms = std::stoi(ts_str.substr(20, 3));
             time_point += std::chrono::milliseconds(ms);
         }
-    } catch(...) {
-        // Ignora eccezioni di parsing
+    } catch (const std::exception& e) {
+        std::cerr << "ERRORE [SuspensionWindow]: Impossibile ricavare il timestamp per il plot." << std::endl;
     }
     
     return time_point;
@@ -72,7 +72,7 @@ void SuspensionWindow::onAggregatedDataReceived(const DbRow& dataRow) {
             }
         }
     } catch (const std::exception& e) {
-        // Ignora
+        std::cerr << "ERRORE [SuspensionWindow]: Errore durante l'elaborazione dei dati per il plot." << e.what() << std::endl;
     }
 }
 
@@ -88,7 +88,6 @@ void SuspensionWindow::draw() {
     double now_time = std::chrono::duration<double>(std::chrono::system_clock::now().time_since_epoch()).count();
     double window_start_time = now_time - 10;
 
-    // Logica per i tick dell'asse x (identica a AccBrkWindow)
     float plot_width_pixels = ImGui::GetContentRegionAvail().x;
     if (plot_width_pixels <= 0) plot_width_pixels = 1;
 
@@ -120,7 +119,7 @@ void SuspensionWindow::draw() {
         }
     }
 
-    // Grafico Sospensioni
+    // Grafico sospensioni
     ImGui::PushFont(m_uiManager->font_label);
     ImGui::Text("Potenziometri lineari");
     ImGui::PopFont();
@@ -131,7 +130,6 @@ void SuspensionWindow::draw() {
         ImPlot::SetupAxes(nullptr, nullptr, x_flags, y_flags);
         ImPlot::SetupAxisLimits(ImAxis_X1, window_start_time, now_time, ImGuiCond_Always);
         
-        // Imposta il range dell'asse Y fisso tra -4 e 4
         ImPlot::SetupAxisLimits(ImAxis_Y1, -4, 4, ImGuiCond_Always);
 
         if (!tick_positions.empty())

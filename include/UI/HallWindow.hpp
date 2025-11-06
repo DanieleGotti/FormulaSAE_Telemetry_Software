@@ -19,15 +19,12 @@ public:
     explicit HallWindow(UiManager* manager);
     ~HallWindow() override = default;
 
-    // Metodo ereditato da UIElement
     void draw() override;
-    // Metodo ereditato da IAggregatedDataSubscriber
     void onAggregatedDataReceived(const DbRow& dataRow) override;
 
 private:
     // Funzione di utilità per convertire la stringa timestamp in un time_point
     std::chrono::system_clock::time_point parseTimestamp(const std::string& ts_str);
-
     // Disegna il tachimetro a semicerchio
     void drawSpeedometer(float speed);
 
@@ -38,8 +35,7 @@ private:
     std::map<std::string, PlotLineData> m_plotData;
     const double MAX_HISTORY_SECONDS = 20.0;
     
-    // Valore corrente della velocità media
     float m_currentSpeed = 0.0f;
-    // Altezza del pannello del tachimetro
     float m_speedometerPaneHeight = 230.0f;
+    
 };

@@ -11,9 +11,8 @@ class UiManager;
 class Dashboard : public UIElement, public IAggregatedDataSubscriber {
 public:
     explicit Dashboard(UiManager* manager);
-    void draw() override;
     
-    // Metodo implementato dalla nuova interfaccia
+    void draw() override;
     void onAggregatedDataReceived(const DbRow& dataRow) override;
     
 private:

@@ -14,9 +14,7 @@ public:
     explicit StatusWindow(UiManager* manager);
     ~StatusWindow() override = default;
 
-    // Metodo da UIElement
     void draw() override;
-    // Metodo da IAggregatedDataSubscriber
     void onAggregatedDataReceived(const DbRow& dataRow) override;
 
 private:

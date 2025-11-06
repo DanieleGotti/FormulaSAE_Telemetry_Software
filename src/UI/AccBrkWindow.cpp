@@ -1,6 +1,7 @@
 #include <imgui.h>
 #include <implot.h> 
 #include <iomanip>
+#include <iostream>
 #include <sstream>
 #include <ctime>
 #include <cmath>
@@ -85,12 +86,12 @@ void AccBrkWindow::onAggregatedDataReceived(const DbRow& dataRow) {
             }
         }
     } catch (const std::exception& e) {
-        // Ignora
+        std::cerr << "ERRORE [AccBrkWindow]: Errore durante l'elaborazione dei dati per il plot. " << std::endl;
     }
 }
 
 void AccBrkWindow::draw() {
-    ImGui::Begin("Acceleratori e freni", nullptr, ImGuiWindowFlags_NoScrollbar);
+    ImGui::Begin("Acceleratore e freno", nullptr, ImGuiWindowFlags_NoScrollbar);
     
     float available_height = ImGui::GetContentRegionAvail().y;
     float title_height = ImGui::GetTextLineHeightWithSpacing();
@@ -142,7 +143,7 @@ void AccBrkWindow::draw() {
 
     // Grafico acceleratori
     ImGui::PushFont(m_uiManager->font_label);
-    ImGui::Text("Acceleratori");
+    ImGui::Text("Sensori acceleratori");
     ImGui::PopFont();
     
     if (ImPlot::BeginPlot("##Acceleratori", ImVec2(-1, plot_height), ImPlotFlags_NoTitle)) {
@@ -201,7 +202,7 @@ void AccBrkWindow::draw() {
 
     // Grafico freni
     ImGui::PushFont(m_uiManager->font_label);
-    ImGui::Text("Freni");
+    ImGui::Text("Sensori freni");
     ImGui::PopFont();
     
     if (ImPlot::BeginPlot("##Freni", ImVec2(-1, plot_height), ImPlotFlags_NoTitle)) {
@@ -237,20 +238,17 @@ void AccBrkWindow::draw() {
             }
 
             if (has_data) {
-                // Definiamo i limiti di base dell'asse Y
                 double final_min_y = 800.0;
                 double final_max_y = 1000.0;
 
-                // Estendiamo i limiti solo se i dati reali superano quelli di base
+                // Estende i limiti solo se i dati reali superano quelli di base
                 final_min_y = (std::min)(final_min_y, min_y);
                 final_max_y = (std::max)(final_max_y, max_y);
-                // Aggiungiamo un padding per non far toccare le linee ai bordi
                 double range = final_max_y - final_min_y;
-                double padding = std::max(range * 0.10, 5.0); // 10% di padding o un minimo di 5
+                double padding = std::max(range * 0.10, 5.0); 
 
                 ImPlot::SetupAxisLimits(ImAxis_Y1, final_min_y - padding, final_max_y + padding, ImGuiCond_Always);
             } else {
-                // Se non ci sono dati, usiamo il range di default senza padding
                 ImPlot::SetupAxisLimits(ImAxis_Y1, 800, 1000, ImGuiCond_Always);
             }          
 
