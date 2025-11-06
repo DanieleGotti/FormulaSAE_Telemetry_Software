@@ -11,7 +11,8 @@ namespace {
     };
     const std::unordered_set<std::string> doubleSensorLabels = {
         "ACC1B", "ACC2B", "BRK1", "BRK2", "STEER",
-        "SOSPASX", "SOSPADX", "SOSPPSX", "SOSPPDX"
+        "SOSPASX", "SOSPADX", "SOSPPSX", "SOSPPDX",
+        "VELASX", "VELADX", "VELPDX", "VELPSX"
     };
     const std::unordered_set<std::string> statusLedLabels = {
         "SDC_INPUT", "RESET_BUTTON", "TS_ON_BUTTON", "R2D_BUTTON"
