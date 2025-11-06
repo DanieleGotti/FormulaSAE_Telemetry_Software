@@ -10,7 +10,8 @@ import random
 # Dati principali (ACC, BRK, STEER)
 EXPECTED_LABELS = ['ACC1A', 'ACC2A', 'ACC1B', 'ACC2B', 
                     'BRK1', 'BRK2', 'STEER',
-                    'SOSPASX', 'SOSPADX', 'SOSPPSX', 'SOSPPDX'
+                    'SOSPASX', 'SOSPADX', 'SOSPPSX', 'SOSPPDX',
+                    "VELASX", "VELADX", "VELPDX", "VELPSX"
                    ]
 
 # Messaggi speciali/LED
@@ -45,13 +46,16 @@ def generate_packet():
                 value = round(random.uniform(0.0, 4000.0), 1)
         elif label.startswith('BRK'):
             # BRK1, BRK2 sono float
-            value = round(random.uniform(0.0, 100.0), 1)
+            value = round(random.uniform(800.0, 2000.0), 1)
         elif label == 'STEER':
             # STEER è float
             value = round(random.uniform(-180.0, 180.0), 1)
         elif label.startswith('SOS'):
             # Sospensioni sono float
             value = round(random.uniform(-4.0, 4.0), 2)
+        elif label.startswith('VEL'):
+            # Velocità sono float
+            value = round(random.uniform(-50.0, 200.0), 2)
 
         packet = f"{label} {value}\n"
 
