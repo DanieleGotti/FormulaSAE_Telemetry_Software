@@ -20,6 +20,7 @@
 
 #ifdef WIN32
 #include "../assets/resources.h" // Necessario per IDR_FONT_REGULAR/BOLD
+#include <windows.h
 #endif
 
 UiManager::UiManager() {
@@ -48,6 +49,10 @@ UiManager::UiManager() {
 
     std::cout << "INFO [UIManager]: Caricamento dei font." << std::endl;
     io.Fonts->Clear(); 
+
+#ifdef WIN32
+    SetWindowIconFromResource();
+#endif
 
 #ifdef __APPLE__
     // Su macOS, i font sono nel bundle, nella sottocartella 'fonts' di Resources
@@ -339,3 +344,59 @@ void UiManager::showDockingSpace() {
 //         style.Colors[ImGuiCol_WindowBg].w = 1.0f;
 //     }
 // }
+
+#if defined(WIN32)
+// Supponendo che tu voglia impostare l'icona della finestra GLFW
+void SetWindowIconFromResource()
+{
+    HINSTANCE hInstance = GetModuleHandle(nullptr);
+
+    // Carica l'icona dal file eseguibile (risorsa IDI_APP_ICON)
+    HICON hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_APP_ICON));
+
+    if (!hIcon) {
+        MessageBox(nullptr, "Impossibile caricare l'icona dalla risorsa", "Errore", MB_OK);
+        return;
+    }
+
+    // Converte l'HICON in formato GLFWimage
+    ICONINFO iconInfo;
+    BITMAP bmpColor;
+    GetIconInfo(hIcon, &iconInfo);
+    GetObject(iconInfo.hbmColor, sizeof(BITMAP), &bmpColor);
+
+    int width = bmpColor.bmWidth;
+    int height = bmpColor.bmHeight;
+
+    // Copia i pixel in memoria (BGRA)
+    HDC hdc = GetDC(nullptr);
+    HDC memDC = CreateCompatibleDC(hdc);
+    HBITMAP oldBmp = (HBITMAP)SelectObject(memDC, iconInfo.hbmColor);
+
+    BITMAPINFO bmi = {};
+    bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+    bmi.bmiHeader.biWidth = width;
+    bmi.bmiHeader.biHeight = -height;  // negativo = top-down
+    bmi.bmiHeader.biPlanes = 1;
+    bmi.bmiHeader.biBitCount = 32;
+    bmi.bmiHeader.biCompression = BI_RGB;
+
+    std::vector<unsigned char> pixels(width * height * 4);
+    GetDIBits(memDC, iconInfo.hbmColor, 0, height, pixels.data(), &bmi, DIB_RGB_COLORS);
+
+    // Crea l’immagine GLFW
+    GLFWimage img{};
+    img.width = width;
+    img.height = height;
+    img.pixels = pixels.data();
+    glfwSetWindowIcon(window, 1, &img);
+
+    // Cleanup
+    SelectObject(memDC, oldBmp);
+    DeleteDC(memDC);
+    ReleaseDC(nullptr, hdc);
+    DeleteObject(iconInfo.hbmColor);
+    DeleteObject(iconInfo.hbmMask);
+    DestroyIcon(hIcon);
+}
+#endif

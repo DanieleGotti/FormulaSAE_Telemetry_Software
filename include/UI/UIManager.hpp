@@ -39,6 +39,10 @@ private:
     void applyTheme();
     void processPendingRemovals();
 
+#if defined (WIN32)
+    void SetWindowIconFromResource();
+#endif
+
     void* m_window;
     AppState m_currentState = AppState::CONFIGURING;
     UIElement* m_serialSelectionWindow = nullptr;
