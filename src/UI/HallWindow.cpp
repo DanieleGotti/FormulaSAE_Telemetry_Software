@@ -113,8 +113,8 @@ void HallWindow::drawSpeedometer(float speed) {
     float limiting_dim = std::min(available_space.x, available_space.y);
     float radius = (limiting_dim / 2.0f); 
     if (radius < 20.0f) radius = 20.0f; 
-    ImVec2 center = ImVec2(window_pos.x + available_space.x * 0.5f, window_pos.y + available_space.y * 0.5f + 20);
-
+    ImVec2 center = ImVec2(window_pos.x + available_space.x * 0.5f, window_pos.y + available_space.y * 0.5f + radius * 0.5f);
+    
     // Disegno del tachimetro 
     float start_angle = (float)M_PI;        
     float end_angle = 2.0f * (float)M_PI;    
@@ -166,7 +166,6 @@ void HallWindow::draw() {
     ImGui::TextUnformatted(angle_text);
     ImGui::PopFont();
     ImGui::Separator();
-    ImGui::Spacing();
     
     drawSpeedometer(m_currentSpeed);
     ImGui::EndChild();
@@ -244,7 +243,6 @@ void HallWindow::draw() {
         ImPlot::SetupAxes(nullptr, nullptr, ImPlotAxisFlags_NoHighlight, ImPlotAxisFlags_NoHighlight);
         
         ImPlot::SetupAxisLimits(ImAxis_X1, window_start_time, now_time, ImGuiCond_Always);
-        ImPlot::SetupAxisLimits(ImAxis_Y1, -20, 100, ImGuiCond_Always); 
 
         if (!tick_positions.empty()) {
             ImPlot::SetupAxisTicks(ImAxis_X1, tick_positions.data(), tick_positions.size(), tick_labels.data(), false);
@@ -255,6 +253,39 @@ void HallWindow::draw() {
 
         {
             std::lock_guard<std::mutex> lock(m_dataMutex);
+
+            // Calcola limiti y in modo dinamico
+            double min_y = std::numeric_limits<double>::max();
+            double max_y = std::numeric_limits<double>::lowest();
+            bool has_data = false;
+
+            for (const auto& pair : m_plotData) {
+                const auto& line_data = pair.second;
+                 for (size_t i = 0; i < line_data.X.size(); ++i) {
+                    if (line_data.X[i] >= window_start_time) {
+                        if (line_data.Y[i] < min_y) min_y = line_data.Y[i];
+                        if (line_data.Y[i] > max_y) max_y = line_data.Y[i];
+                        has_data = true;
+                    }
+                }
+            }
+
+            if (has_data) {
+                // Mantiene un range di base ma espande se i dati escono
+                double final_min_y = 0.0;
+                double final_max_y = 120.0;
+
+                final_min_y = (std::min)(final_min_y, min_y);
+                final_max_y = (std::max)(final_max_y, max_y);
+                
+                double range = final_max_y - final_min_y;
+                double padding = std::max(range * 0.10, 5.0); 
+
+                ImPlot::SetupAxisLimits(ImAxis_Y1, final_min_y - padding, final_max_y + padding, ImGuiCond_Always);
+            } else {
+                ImPlot::SetupAxisLimits(ImAxis_Y1, 0.0, 120.0, ImGuiCond_Always);
+            }
+
             for (const auto& pair : m_plotData) {
                 ImPlot::PlotLine(pair.first.c_str(), pair.second.X.data(), pair.second.Y.data(), pair.second.X.size());
             }

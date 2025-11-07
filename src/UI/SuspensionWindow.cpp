@@ -88,6 +88,7 @@ void SuspensionWindow::draw() {
     double now_time = std::chrono::duration<double>(std::chrono::system_clock::now().time_since_epoch()).count();
     double window_start_time = now_time - 10;
 
+    // La logica per i tick dell'asse x 
     float plot_width_pixels = ImGui::GetContentRegionAvail().x;
     if (plot_width_pixels <= 0) plot_width_pixels = 1;
 
@@ -129,8 +130,6 @@ void SuspensionWindow::draw() {
         ImPlot::SetupLegend(ImPlotLocation_NorthWest, ImPlotLegendFlags_Horizontal);
         ImPlot::SetupAxes(nullptr, nullptr, x_flags, y_flags);
         ImPlot::SetupAxisLimits(ImAxis_X1, window_start_time, now_time, ImGuiCond_Always);
-        
-        ImPlot::SetupAxisLimits(ImAxis_Y1, -4, 4, ImGuiCond_Always);
 
         if (!tick_positions.empty())
             ImPlot::SetupAxisTicks(ImAxis_X1, tick_positions.data(), tick_positions.size(), tick_labels.data(), false);
@@ -140,6 +139,39 @@ void SuspensionWindow::draw() {
         
         {
             std::lock_guard<std::mutex> lock(m_dataMutex);
+
+            // Calcola limiti y in modo dinamico
+            double min_y = std::numeric_limits<double>::max();
+            double max_y = std::numeric_limits<double>::lowest();
+            bool has_data = false;
+
+            const std::vector<std::string> susp_keys = {"SOSPADX", "SOSPASX", "SOSPPDX", "SOSPPSX"};
+            for (const auto& key : susp_keys) {
+                const auto& line_data = m_plotData[key];
+                 for (size_t i = 0; i < line_data.X.size(); ++i) {
+                    if (line_data.X[i] >= window_start_time) {
+                        if (line_data.Y[i] < min_y) min_y = line_data.Y[i];
+                        if (line_data.Y[i] > max_y) max_y = line_data.Y[i];
+                        has_data = true;
+                    }
+                }
+            }
+
+            if (has_data) {
+                // Mantiene un range di base ma espande se i dati escono
+                double final_min_y = -3.5;
+                double final_max_y = 3.5;
+
+                final_min_y = (std::min)(final_min_y, min_y);
+                final_max_y = (std::max)(final_max_y, max_y);
+                
+                double range = final_max_y - final_min_y;
+                double padding = range * 0.10; 
+
+                ImPlot::SetupAxisLimits(ImAxis_Y1, final_min_y - padding, final_max_y + padding, ImGuiCond_Always);
+            } else {
+                ImPlot::SetupAxisLimits(ImAxis_Y1, -3.5, 3.5, ImGuiCond_Always);
+            }
 
             ImPlot::PlotLine("SOSAD", m_plotData["SOSPADX"].X.data(), m_plotData["SOSPADX"].Y.data(), m_plotData["SOSPADX"].X.size());
             ImPlot::PlotLine("SOSAS", m_plotData["SOSPASX"].X.data(), m_plotData["SOSPASX"].Y.data(), m_plotData["SOSPASX"].X.size());
