@@ -59,7 +59,7 @@ void SteerWindow::onAggregatedDataReceived(const DbRow& dataRow) {
 }
 
 void SteerWindow::draw() {
-    ImGui::Begin("Sensore sterzo");
+    ImGui::Begin("Sterzo");
 
     float current_angle;
     {
@@ -68,7 +68,7 @@ void SteerWindow::draw() {
     }
 
     // Mostra il valore intero
-    ImGui::PushFont(m_uiManager->font_data);
+    ImGui::PushFont(m_uiManager->font_label);
     char angle_text[16];
     snprintf(angle_text, 16, "%.1f°", current_angle);
     ImVec2 text_size = ImGui::CalcTextSize(angle_text);
@@ -78,17 +78,17 @@ void SteerWindow::draw() {
     ImGui::Separator();
     ImGui::Spacing();
 
-    // Disegna il volante 
+    // Disegna il volante
     if (m_wheelTextureID) {
         ImDrawList* draw_list = ImGui::GetWindowDrawList();
-        
+
         ImVec2 window_pos = ImGui::GetCursorScreenPos();
         ImVec2 available_space = ImGui::GetContentRegionAvail();
         float image_size = std::min(available_space.x, available_space.y) * 0.9f;
         ImVec2 image_center(window_pos.x + available_space.x * 0.5f, window_pos.y + available_space.y * 0.5f);
 
+        // Disegna l'immagine del volante ruotata
         auto vertices = GetRotatedQuadPoints(image_center, image_size, current_angle);
-        
         ImU32 tint_color = m_uiManager->m_isDarkTheme
             ? IM_COL32(200, 200, 200, 255)   // Tema scuro -> volante grigio chiaro
             : IM_COL32(80, 80, 80, 255);     // Tema chiaro -> volante grigio scuro
@@ -99,6 +99,31 @@ void SteerWindow::draw() {
             ImVec2(0, 0), ImVec2(1, 0), ImVec2(1, 1), ImVec2(0, 1),
             tint_color
         );
+
+        // Linea fissa in alto che indica il centro
+        float fixed_line_length = 15.0f;
+        ImVec2 fixed_line_start(image_center.x, window_pos.y);
+        ImVec2 fixed_line_end(image_center.x, window_pos.y + fixed_line_length);
+        ImU32 fixed_line_color = m_uiManager->m_isDarkTheme
+            ? IM_COL32(200, 200, 200, 255) // Tema scuro -> linea chiara
+            : IM_COL32(0, 0, 0, 255);       // Tema chiaro -> linea nera
+        draw_list->AddLine(fixed_line_start, fixed_line_end, fixed_line_color, 2.0f);
+
+        // Linea rossa che ruota insieme al volante
+        float angle_rad = current_angle * PI / 180.0f;
+        float start_radius = image_size * 0.35f; 
+        float end_radius = image_size * 0.45f;   
+
+        ImVec2 rotating_line_start(
+            image_center.x + sinf(angle_rad) * start_radius,
+            image_center.y - cosf(angle_rad) * start_radius
+        );
+
+        ImVec2 rotating_line_end(
+            image_center.x + sinf(angle_rad) * end_radius,
+            image_center.y - cosf(angle_rad) * end_radius
+        );
+        draw_list->AddLine(rotating_line_start, rotating_line_end, IM_COL32(255, 0, 0, 255), 3.0f);
     }
 
     ImGui::End();

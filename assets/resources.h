@@ -3,5 +3,6 @@
 
 #define IDR_FONT_REGULAR 101
 #define IDR_FONT_BOLD    102
+#define IDI_ICON1        201
 
 #endif

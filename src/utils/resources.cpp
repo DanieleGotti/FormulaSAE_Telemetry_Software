@@ -56,7 +56,7 @@ std::pair<void*, DWORD> GetFontData(LPWSTR resourceName) {
     HRSRC hRes = FindResourceW(nullptr, resourceName, RT_RCDATA);
     if (!hRes) return {nullptr, 0};
     HGLOBAL hMem = LoadResource(nullptr, hRes);
-    if (!hMem) return {nullptr, 0}; // Aggiungi controllo per LoadResource
+    if (!hMem) return {nullptr, 0}; // Aggiunge controllo per LoadResource
     DWORD size = SizeofResource(nullptr, hRes);
     void* pData = LockResource(hMem);
     // LockResource restituisce NULL se hMem non è valido o se la risorsa è vuota.

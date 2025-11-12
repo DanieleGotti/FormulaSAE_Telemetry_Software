@@ -18,10 +18,12 @@
 #include "UI/StatusWindow.hpp"
 #include "UI/SteerWindow.hpp"
 #include "UI/SuspensionWindow.hpp"
+#include "UI/HallWindow.hpp"
 #include "Telemetry/Services/ServiceManager.hpp"
 
 #ifdef WIN32
 #include "../assets/resources.h" // Necessario per IDR_FONT_REGULAR/BOLD
+#include <windows.h>
 #endif
 
 UiManager::UiManager() {
@@ -51,6 +53,10 @@ UiManager::UiManager() {
 
     std::cout << "INFO [UIManager]: Caricamento dei font." << std::endl;
     io.Fonts->Clear(); 
+
+#ifdef WIN32
+    SetWindowIconFromResource();
+#endif
 
 #ifdef __APPLE__
     // Su macOS, i font sono nel bundle, nella sottocartella 'fonts' di Resources
@@ -103,11 +109,11 @@ UiManager::UiManager() {
     // font_title = io.Fonts->AddFontFromFileTTF(ServiceManager::getAssetManager()->getFont("RobotoCondensed-Bold.ttf").c_str(), ServiceManager::getSettingsManager()->getTitleFontSize());
 #endif
 #ifdef _WIN32
-    // --- Carica FONT REGULAR ---
+    // Carica FONT REGULAR 
     auto [pFontDataRegular, dFontSizeRegular] = resources::GetFontData(MAKEINTRESOURCE(IDR_FONT_REGULAR));
     if (pFontDataRegular && dFontSizeRegular > 0) {
         ImFontConfig cfg;
-        cfg.FontDataOwnedByAtlas = false; // <--- evita il crash
+        cfg.FontDataOwnedByAtlas = false; 
 
         font_body = io.Fonts->AddFontFromMemoryTTF(
             pFontDataRegular,
@@ -126,11 +132,11 @@ UiManager::UiManager() {
         io.Fonts->AddFontDefault(); 
     }
 
-    // --- Carica FONT BOLD ---
+    // Carica FONT BOLD 
     auto [pFontDataBold, dFontSizeBold] = resources::GetFontData(MAKEINTRESOURCE(IDR_FONT_BOLD));
     if (pFontDataBold && dFontSizeBold > 0) {
         ImFontConfig cfg;
-        cfg.FontDataOwnedByAtlas = false; // <--- anche qui
+        cfg.FontDataOwnedByAtlas = false; 
 
         font_label = io.Fonts->AddFontFromMemoryTTF(
             pFontDataBold,
@@ -183,6 +189,9 @@ UiManager::~UiManager() {
         if (m_suspensionWindow) {
             ServiceManager::getAggregator()->unsubscribe(m_suspensionWindow.get());
         }
+        if (m_hallWindow) {
+            ServiceManager::getAggregator()->unsubscribe(m_hallWindow.get());
+        }
     }
     
     ImGui_ImplOpenGL3_Shutdown();
@@ -212,6 +221,9 @@ void UiManager::setupInitialState() {
 
             this->m_suspensionWindow = std::make_shared<SuspensionWindow>(this);    
             ServiceManager::getAggregator()->subscribe(this->m_suspensionWindow.get()); 
+
+            this->m_hallWindow = std::make_shared<HallWindow>(this);
+            ServiceManager::getAggregator()->subscribe(this->m_hallWindow.get());
 
             if (m_serialSelectionWindow) {
                 this->removeElement(m_serialSelectionWindow);
@@ -280,6 +292,9 @@ void UiManager::draw() {
     }
     if (m_suspensionWindow) {
         m_suspensionWindow->draw();
+    }
+    if (m_hallWindow) {
+        m_hallWindow->draw();
     }
 }
 
@@ -378,10 +393,59 @@ void UiManager::showDockingSpace() {
 //     } else {
 //         ImGui::StyleColorsLight();
 //     }
-
+//
 //     ImGuiStyle& style = ImGui::GetStyle();
 //     if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
 //         style.WindowRounding = 0.0f;
 //         style.Colors[ImGuiCol_WindowBg].w = 1.0f;
 //     }
 // }
+
+#if defined(WIN32)
+void UiManager::SetWindowIconFromResource()
+{
+    HINSTANCE hInstance = GetModuleHandle(nullptr);
+    // Carica l'icona dal file eseguibile (risorsa IDI_APP_ICON)
+    HICON hIcon = LoadIcon(hInstance, MAKEINTRESOURCEW(IDI_ICON1));
+
+    // Converte l'HICON in formato GLFWimage
+    ICONINFO iconInfo;
+    BITMAP bmpColor;
+    GetIconInfo(hIcon, &iconInfo);
+    GetObject(iconInfo.hbmColor, sizeof(BITMAP), &bmpColor);
+
+    int width = bmpColor.bmWidth;
+    int height = bmpColor.bmHeight;
+
+    // Copia i pixel in memoria (BGRA)
+    HDC hdc = GetDC(nullptr);
+    HDC memDC = CreateCompatibleDC(hdc);
+    HBITMAP oldBmp = (HBITMAP)SelectObject(memDC, iconInfo.hbmColor);
+
+    BITMAPINFO bmi = {};
+    bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+    bmi.bmiHeader.biWidth = width;
+    bmi.bmiHeader.biHeight = -height;  
+    bmi.bmiHeader.biPlanes = 1;
+    bmi.bmiHeader.biBitCount = 32;
+    bmi.bmiHeader.biCompression = BI_RGB;
+
+    std::vector<unsigned char> pixels(width * height * 4);
+    GetDIBits(memDC, iconInfo.hbmColor, 0, height, pixels.data(), &bmi, DIB_RGB_COLORS);
+
+    // Crea l’immagine GLFW
+    GLFWimage img{};
+    img.width = width;
+    img.height = height;
+    img.pixels = pixels.data();
+    glfwSetWindowIcon((GLFWwindow*)m_window, 1, &img);
+
+    // Cleanup
+    SelectObject(memDC, oldBmp);
+    DeleteDC(memDC);
+    ReleaseDC(nullptr, hdc);
+    DeleteObject(iconInfo.hbmColor);
+    DeleteObject(iconInfo.hbmMask);
+    DestroyIcon(hIcon);
+}
+#endif

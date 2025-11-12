@@ -5,7 +5,7 @@
 DataAggregatorService::DataAggregatorService() {
     // Per aggiungere/modificare una colonna al database
     m_config = {
-        // Sensori che vogliamo vedere come INTERI
+        // Sensori che vogliamo vedere come interi
         {"ACC1A", AggregationType::AVERAGE, OutputFormat::INTEGER},
         {"ACC2A", AggregationType::AVERAGE, OutputFormat::INTEGER},
         {"ACC1B", AggregationType::AVERAGE, OutputFormat::DOUBLE},
@@ -17,14 +17,18 @@ DataAggregatorService::DataAggregatorService() {
         {"SDC_INPUT", AggregationType::LAST, OutputFormat::INTEGER},
         {"TS_ON_BUTTON", AggregationType::LAST, OutputFormat::INTEGER},
 
-        // Sensori che vogliamo vedere come DECIMALI (DOUBLE)
+        // Sensori che vogliamo vedere come decimali
         {"STEER", AggregationType::AVERAGE, OutputFormat::DOUBLE},
         {"SOSPADX", AggregationType::AVERAGE, OutputFormat::DOUBLE}, 
         {"SOSPASX", AggregationType::AVERAGE, OutputFormat::DOUBLE},
         {"SOSPPDX", AggregationType::AVERAGE, OutputFormat::DOUBLE},
         {"SOSPPSX", AggregationType::AVERAGE, OutputFormat::DOUBLE},
+        {"VELADX", AggregationType::AVERAGE, OutputFormat::DOUBLE}, 
+        {"VELASX", AggregationType::AVERAGE, OutputFormat::DOUBLE},
+        {"VELPDX", AggregationType::AVERAGE, OutputFormat::DOUBLE},
+        {"VELPSX", AggregationType::AVERAGE, OutputFormat::DOUBLE},
 
-        // Dati che sono intrinsecamente STRINGHE
+        // Dati che sono stringhe
         {"LEFT_INVERTER_FSM",  AggregationType::INVERTER, OutputFormat::STRING},
         {"RIGHT_INVERTER_FSM", AggregationType::INVERTER, OutputFormat::STRING}
     };

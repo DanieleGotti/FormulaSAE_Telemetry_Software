@@ -14,9 +14,7 @@ public:
     explicit StatusWindow(UiManager* manager);
     ~StatusWindow() override = default;
 
-    // Metodo da UIElement
     void draw() override;
-    // Metodo da IAggregatedDataSubscriber
     void onAggregatedDataReceived(const DbRow& dataRow) override;
 
 private:
@@ -24,6 +22,8 @@ private:
     void drawLed(const char* label, bool state);
     // Disegna un singolo indicatore LED con un'etichetta
     void drawLedIndicator(const char* label, bool state);
+    // Larghezza iniziale pannello indicatori
+    float m_leftPaneWidth = 280.0f;
 
     UiManager* m_uiManager;
     std::mutex m_dataMutex;

@@ -1,7 +1,6 @@
 #include <filesystem>
 #include <jsoncons/json.hpp>
 
-
 class SettingsManager {
 public:
     SettingsManager();

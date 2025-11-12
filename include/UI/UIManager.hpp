@@ -7,6 +7,7 @@
 #include "StatusWindow.hpp"
 #include "SteerWindow.hpp"
 #include "SuspensionWindow.hpp"
+#include "HallWindow.hpp"
 
 struct ImFont;
 
@@ -39,6 +40,10 @@ private:
     void applyTheme();
     void processPendingRemovals();
 
+#if defined (WIN32)
+    void SetWindowIconFromResource();
+#endif
+
     void* m_window;
     AppState m_currentState = AppState::CONFIGURING;
     UIElement* m_serialSelectionWindow = nullptr;
@@ -47,6 +52,7 @@ private:
     std::shared_ptr<StatusWindow> m_statusWindow;
     std::shared_ptr<SteerWindow> m_steerWindow;
     std::shared_ptr<SuspensionWindow> m_suspensionWindow;
+    std::shared_ptr<HallWindow> m_hallWindow;
     std::vector<std::unique_ptr<UIElement>> m_uiElements;
     std::vector<UIElement*> m_elementsToRemove;
 

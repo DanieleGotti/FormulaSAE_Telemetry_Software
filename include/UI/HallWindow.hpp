@@ -1,4 +1,5 @@
 #pragma once
+
 #include <vector>
 #include <string>
 #include <mutex>
@@ -8,28 +9,33 @@
 #include "../Telemetry/data_writing/IAggregatedDataSubscriber.hpp"
 #include "../Telemetry/data_writing/DataAggregator.hpp"
 
-// Contiene dati di una singola linea di grafico
-struct PlotLineData {
-    std::vector<double> X, Y;
-};
+// Contiene i dati di una singola linea del grafico
+struct PlotLineData;
 
 class UiManager;
 
-class AccBrkWindow : public UIElement, public IAggregatedDataSubscriber {
+class HallWindow : public UIElement, public IAggregatedDataSubscriber {
 public:
-    explicit AccBrkWindow(UiManager* manager);
-    ~AccBrkWindow() override = default;
+    explicit HallWindow(UiManager* manager);
+    ~HallWindow() override = default;
 
     void draw() override;
     void onAggregatedDataReceived(const DbRow& dataRow) override;
 
 private:
-    // Helper per convertire il timestamp stringa in un time_point
+    // Funzione di utilità per convertire la stringa timestamp in un time_point
     std::chrono::system_clock::time_point parseTimestamp(const std::string& ts_str);
+    // Disegna il tachimetro a semicerchio
+    void drawSpeedometer(float speed);
 
     UiManager* m_uiManager;
     std::mutex m_dataMutex;
+    
     // Mappa per memorizzare i dati di ogni sensore da plottare
     std::map<std::string, PlotLineData> m_plotData;
     const double MAX_HISTORY_SECONDS = 20.0;
+    
+    float m_currentSpeed = 0.0f;
+    float m_speedometerPaneHeight = 230.0f;
+    
 };
