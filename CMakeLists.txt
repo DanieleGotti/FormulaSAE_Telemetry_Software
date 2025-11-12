@@ -67,7 +67,16 @@ file(GLOB SRC_FILES
     src/Telemetry/data_writing/*.cpp
     src/application_services/*.cpp
     src/utils/*.cpp
+    src/utils/AssetManager/AssetManagerFactory.cpp
 )
+
+if(WIN32)
+    list(APPEND SRC_FILES src/utils/AssetManager/AssetManager_Windows.cpp)
+elseif(APPLE)
+    list(APPEND SRC_FILES src/utils/AssetManager/AssetManager_MacOS.cpp)
+else()
+    list(APPEND SRC_FILES src/utils/AssetManager/AssetManager_Linux.cpp)
+endif()
 
 add_executable(${PROJECT_NAME} ${SRC_FILES})
 
@@ -129,6 +138,22 @@ if(APPLE)
     # Imposta la destinazione nel bundle e aggiungilo come "sorgente" al target
     set_source_files_properties(${ICON_SOURCE_PATH} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
     target_sources(${PROJECT_NAME} PRIVATE ${ICON_SOURCE_PATH})
+
+    # --- Gestione Immagini ---
+    set(IMAGES_SOURCES
+        "${CMAKE_CURRENT_SOURCE_DIR}/assets/images/steering_wheel.png"
+    )
+
+    # Itera su ogni font per impostare la proprietà e aggiungerlo singolarmente
+    foreach(IMAGE_FILE ${IMAGES_SOURCES})
+        # Se vuoi i font in una sottocartella "fonts" dentro Resources:
+        # Estrai solo il nome del file per creare il percorso relativo
+        get_filename_component(IMAGE_NAME ${IMAGE_FILE} NAME)
+        set_source_files_properties(${IMAGE_FILE} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources/images/")
+        
+        # Aggiungilo come sorgente individuale
+        target_sources(${PROJECT_NAME} PRIVATE ${IMAGE_FILE})
+    endforeach()
 
 
     # --- Gestione Font ---

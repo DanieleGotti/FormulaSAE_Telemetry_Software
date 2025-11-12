@@ -11,6 +11,7 @@
 #include "../data_writing/CsvWriter.hpp"
 #include "../Services/DataAggregatorService.hpp"
 #include "../../application_services/SettingsManager.hpp"
+#include "../../utils/IAssetManager.hpp"
 
 typedef enum {
     ACQUISITION_METHOD_SERIAL = 0,
@@ -33,10 +34,12 @@ public:
     static void stopLogging();
     static bool isLogging();
     static std::shared_ptr<SettingsManager> getSettingsManager();
+    static std::shared_ptr<IAssetManager> getAssetManager();
     static std::string getCurrentLogFileName();
 
 private:
     static AcquisitionMethod m_method;
+    static std::shared_ptr<IAssetManager> m_assetManager;
     static std::shared_ptr<SettingsManager> m_settingsManager;
     static std::unique_ptr<SerialService> m_serialService;
     static std::unique_ptr<NetworkService> m_networkService;

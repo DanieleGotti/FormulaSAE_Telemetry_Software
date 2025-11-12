@@ -1,12 +1,15 @@
+// IAssetManager.hpp
+#pragma once
 #include <string>
-#include <iostream>
-#include <vector>
-#include <fstream>
+#include <filesystem>
+#include <utility>
 
 class IAssetManager {
 public:
     virtual ~IAssetManager() = default;
+    virtual std::pair<void*, uint32_t> getFont(const std::string& name) = 0;
+    virtual std::pair<void*, uint32_t> getImage(const std::string& path) = 0;
 
-    virtual void* loadFont(const std::string& name);
-    virtual void* loadImage(const std::string& name);
+private:
+    std::unordered_map<std::string, std::pair<void*, uint32_t>> fontCache;
 };

@@ -6,8 +6,10 @@
 #include <iostream>
 #include <cassert>
 #include <implot.h>
-#include <utils/resources.hpp>
+#include <utility>
+// #include <utils/resources.hpp>
 
+#include <utils/fsUtils.hpp>
 #include "UI/UIManager.hpp"
 #include "UI/Theme.hpp"
 #include "UI/SerialDeviceSelection.hpp"
@@ -41,6 +43,7 @@ UiManager::UiManager() {
     ImGui::CreateContext();
     ImPlot::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
+    io.IniFilename = fsutils::getAppDocumentsFilePath("imgui.ini").string().c_str();
     (void)io;
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
     io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
@@ -51,10 +54,53 @@ UiManager::UiManager() {
 
 #ifdef __APPLE__
     // Su macOS, i font sono nel bundle, nella sottocartella 'fonts' di Resources
-    font_body = io.Fonts->AddFontFromFileTTF(resources::getResourcePath("fonts/RobotoCondensed-Regular.ttf").c_str(), ServiceManager::getSettingsManager()->getBodyFontSize());
-    font_label = io.Fonts->AddFontFromFileTTF(resources::getResourcePath("fonts/RobotoCondensed-Bold.ttf").c_str(), ServiceManager::getSettingsManager()->getLabelFontSize());
-    font_data = io.Fonts->AddFontFromFileTTF(resources::getResourcePath("fonts/RobotoCondensed-Regular.ttf").c_str(), ServiceManager::getSettingsManager()->getDataFontSize());
-    font_title = io.Fonts->AddFontFromFileTTF(resources::getResourcePath("fonts/RobotoCondensed-Bold.ttf").c_str(), ServiceManager::getSettingsManager()->getTitleFontSize());
+    // font_body = io.Fonts->AddFontFromFileTTF(ServiceManager::getAssetManager()->getFont("RobotoCondensed-Regular.ttf").c_str(), ServiceManager::getSettingsManager()->getBodyFontSize());
+    auto [pFontDataRegular, dFontSizeRegular] = ServiceManager::getAssetManager()->getFont("RobotoCondensed-Regular.ttf");
+    if (pFontDataRegular && dFontSizeRegular > 0) {
+        ImFontConfig cfg;
+        cfg.FontDataOwnedByAtlas = false;
+
+        font_body = io.Fonts->AddFontFromMemoryTTF(
+            pFontDataRegular,
+            dFontSizeRegular,
+            ServiceManager::getSettingsManager()->getBodyFontSize(),
+            &cfg
+        );
+
+        font_data = io.Fonts->AddFontFromMemoryTTF(
+            pFontDataRegular,
+            dFontSizeRegular,
+            ServiceManager::getSettingsManager()->getDataFontSize(),
+            &cfg
+        );
+    } else {
+        io.Fonts->AddFontDefault(); 
+    }
+    // font_label = io.Fonts->AddFontFromFileTTF(ServiceManager::getAssetManager()->getFont("RobotoCondensed-Bold.ttf").c_str(), ServiceManager::getSettingsManager()->getLabelFontSize());
+    // --- Carica FONT BOLD ---
+    auto [pFontDataBold, dFontSizeBold] = ServiceManager::getAssetManager()->getFont("RobotoCondensed-Bold.ttf");
+    if (pFontDataBold && dFontSizeBold > 0) {
+        ImFontConfig cfg;
+        cfg.FontDataOwnedByAtlas = false;
+
+        font_label = io.Fonts->AddFontFromMemoryTTF(
+            pFontDataBold,
+            dFontSizeBold,
+            ServiceManager::getSettingsManager()->getLabelFontSize(),
+            &cfg
+        );
+
+        font_title = io.Fonts->AddFontFromMemoryTTF(
+            pFontDataBold,
+            dFontSizeBold,
+            ServiceManager::getSettingsManager()->getTitleFontSize(),
+            &cfg
+        );
+    } else {
+        io.Fonts->AddFontDefault(); 
+    }
+    // font_data = io.Fonts->AddFontFromFileTTF(ServiceManager::getAssetManager()->getFont("RobotoCondensed-Regular.ttf").c_str(), ServiceManager::getSettingsManager()->getDataFontSize());
+    // font_title = io.Fonts->AddFontFromFileTTF(ServiceManager::getAssetManager()->getFont("RobotoCondensed-Bold.ttf").c_str(), ServiceManager::getSettingsManager()->getTitleFontSize());
 #endif
 #ifdef _WIN32
     // --- Carica FONT REGULAR ---

@@ -3,6 +3,10 @@
 #define APPFOLDER "telemetry_manager"
 
 namespace fsutils {
+  std::filesystem::path getAppDocumentsFilePath(std::string relativePath) {
+    return getAppDocumentsDirectory() / relativePath;
+  }
+  
   std::filesystem::path getAppDocumentsDirectory()  {
     static std::filesystem::path path;
 

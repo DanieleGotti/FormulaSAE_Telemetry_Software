@@ -120,6 +120,10 @@
   "scoped_allocator": "cpp",
   "stack": "cpp",
   "valarray": "cpp",
-  "cassert": "cpp"
+  "cassert": "cpp",
+  "__verbose_abort": "cpp",
+  "csignal": "cpp",
+  "print": "cpp",
+  "shared_mutex": "cpp"
 }
 }

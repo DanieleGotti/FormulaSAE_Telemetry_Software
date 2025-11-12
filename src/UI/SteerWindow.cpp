@@ -7,6 +7,8 @@
 #include <GLFW/glfw3.h>
 #include "UI/SteerWindow.hpp"
 #include "UI/UIManager.hpp"
+#include "utils/IAssetManager.hpp"
+#include "Telemetry/Services/ServiceManager.hpp"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "../external/stb_image/stb_image.h"
@@ -35,7 +37,7 @@ static std::array<ImVec2, 4> GetRotatedQuadPoints(const ImVec2& center, float si
 
 
 SteerWindow::SteerWindow(UiManager* manager) : m_uiManager(manager) {
-    bool ret = loadTextureFromFile("../external/assets/steering_wheel.png", &m_wheelTextureID, &m_wheelWidth, &m_wheelHeight);
+    bool ret = loadTextureFromMemory("steering_wheel.png", &m_wheelTextureID, &m_wheelWidth, &m_wheelHeight);
     if (!ret) {
         std::cerr << "ERRORE [SteerWindow]: Impossibile caricare l'immagine 'steering_wheel.png'" << std::endl;
     }
@@ -118,5 +120,48 @@ bool SteerWindow::loadTextureFromFile(const char* filename, GLuint* out_texture,
     *out_texture = image_texture;
     *out_width = image_width;
     *out_height = image_height;
+    return true;
+}
+
+bool SteerWindow::loadTextureFromMemory(const char* filename, GLuint* out_texture, int* out_width, int* out_height) {
+
+    auto [pData, dataSize] = ServiceManager::getAssetManager()->getImage(filename);
+    if (!pData || dataSize == 0) {
+        std::cerr << "Errore: impossibile caricare asset " << filename << std::endl;
+        return false;
+    }
+
+
+    int image_width = 0, image_height = 0;
+    unsigned char* image_data = stbi_load_from_memory(
+        reinterpret_cast<const unsigned char*>(pData),
+        dataSize,
+        &image_width,
+        &image_height,
+        nullptr,
+        4 // forza RGBA
+    );
+
+    if (!image_data) {
+        std::cerr << "Errore: stbi_load_from_memory fallita per " << filename << std::endl;
+        return false;
+    }
+
+    // 3️⃣ Crea la texture OpenGL come prima
+    GLuint image_texture;
+    glGenTextures(1, &image_texture);
+    glBindTexture(GL_TEXTURE_2D, image_texture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width, image_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
+
+    // 4️⃣ Libera i dati decodificati
+    stbi_image_free(image_data);
+
+    // 5️⃣ Ritorna le info
+    *out_texture = image_texture;
+    *out_width = image_width;
+    *out_height = image_height;
+
     return true;
 }

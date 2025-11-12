@@ -4,6 +4,8 @@
 #include "Telemetry/data_acquisition/SerialDataSource.hpp" 
 #include "Telemetry/data_writing/DataManager.hpp"
 #include "Telemetry/Services/DataAggregatorService.hpp"
+#include "utils/AssetManagerFactory.hpp"
+#include "utils/IAssetManager.hpp"
 
 AcquisitionMethod ServiceManager::m_method;
 std::shared_ptr<SettingsManager> ServiceManager::m_settingsManager;
@@ -13,8 +15,10 @@ std::unique_ptr<DataManager> ServiceManager::m_dataManager;
 std::unique_ptr<DataAggregatorService> ServiceManager::m_aggregatorService;
 std::shared_ptr<TxtWriter> ServiceManager::m_txtWriter = nullptr;
 std::shared_ptr<CsvWriter> ServiceManager::m_csvWriter = nullptr;
+std::shared_ptr<IAssetManager> ServiceManager::m_assetManager = nullptr;
 
 void ServiceManager::initialize() {
+    m_assetManager = CreateAssetManager();
     m_settingsManager = std::make_shared<SettingsManager>();
     m_dataManager = std::make_unique<DataManager>();
     m_serialService = std::make_unique<SerialService>(m_dataManager.get());
@@ -159,4 +163,11 @@ std::string ServiceManager::getCurrentLogFileName() {
         return m_txtWriter->getCurrentFileName();
     }
     return "";
+}
+
+std::shared_ptr<IAssetManager> ServiceManager::getAssetManager() {
+    if (!m_assetManager) {
+        m_assetManager = CreateAssetManager();
+    }
+    return m_assetManager;
 }
