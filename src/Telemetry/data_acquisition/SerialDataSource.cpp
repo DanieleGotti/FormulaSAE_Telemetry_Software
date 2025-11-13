@@ -15,6 +15,7 @@
     #include <stdio.h>
     #include <regex>
 #endif
+#include <thread>
 
 SerialDataSource::SerialDataSource()
 #if defined (_WIN32) || defined( _WIN64) 
@@ -158,6 +159,8 @@ bool SerialDataSource::open(const std::string &resource, int baudRate)
 #endif
 #if defined(__APPLE__)
     fd = ::open(resource.c_str(), O_RDWR | O_NOCTTY | O_SYNC);
+    int flags = fcntl(fd, F_GETFL, 0);
+    fcntl(fd, F_SETFL, flags | O_NONBLOCK);
     if(fd < 0) {
         std::cerr << "ERRORE [SerialDataSource]: Impossibile aprire la porta seriale: " << resource << "." << std::endl;
         return false;
@@ -243,6 +246,7 @@ std::vector<uint8_t> SerialDataSource::readPacket()
     if(bytesRead < 0) { 
         std::cerr << "ERRORE [SerialDataSource]: Impossibile leggere dalla porta seriale." << std::endl;
         return {};
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
     buffer.resize(bytesRead);
     return buffer;
