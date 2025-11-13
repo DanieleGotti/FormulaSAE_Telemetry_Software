@@ -43,8 +43,9 @@ UiManager::UiManager() {
     ImGui::CreateContext();
     ImPlot::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
-    io.IniFilename = fsutils::getAppDocumentsFilePath("imgui.ini").string().c_str();
     (void)io;
+    static const std::string path = fsutils::getAppDocumentsFilePath("imgui.ini").string();
+    io.IniFilename = path.c_str();
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
     io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
