@@ -1,4 +1,3 @@
-// AssetManagerFactory.hpp
 #pragma once
 #include <memory>
 #include "IAssetManager.hpp"

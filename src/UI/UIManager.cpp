@@ -7,8 +7,6 @@
 #include <cassert>
 #include <implot.h>
 #include <utility>
-// #include <utils/resources.hpp>
-
 #include <utils/fsUtils.hpp>
 #include "UI/UIManager.hpp"
 #include "UI/Theme.hpp"
@@ -22,7 +20,7 @@
 #include "Telemetry/Services/ServiceManager.hpp"
 
 #ifdef WIN32
-#include "../assets/resources.h" // Necessario per IDR_FONT_REGULAR/BOLD
+#include "../assets/resources.h" 
 #include <windows.h>
 #endif
 
@@ -51,16 +49,16 @@ UiManager::UiManager() {
     io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 
-    std::cout << "INFO [UIManager]: Caricamento dei font." << std::endl;
+    addElement(std::make_unique<LogTerminal>(this));    
+
+    std::cout << "INFO [UiManager]: UiManager inizializzato." << std::endl;
     io.Fonts->Clear(); 
 
 #ifdef WIN32
-    SetWindowIconFromResource();
+    //SetWindowIconFromResource();
 #endif
 
-#ifdef __APPLE__
-    // Su macOS, i font sono nel bundle, nella sottocartella 'fonts' di Resources
-    // font_body = io.Fonts->AddFontFromFileTTF(ServiceManager::getAssetManager()->getFont("RobotoCondensed-Regular.ttf").c_str(), ServiceManager::getSettingsManager()->getBodyFontSize());
+    // Carica FONT REGULAR 
     auto [pFontDataRegular, dFontSizeRegular] = ServiceManager::getAssetManager()->getFont("RobotoCondensed-Regular.ttf");
     if (pFontDataRegular && dFontSizeRegular > 0) {
         ImFontConfig cfg;
@@ -82,8 +80,8 @@ UiManager::UiManager() {
     } else {
         io.Fonts->AddFontDefault(); 
     }
-    // font_label = io.Fonts->AddFontFromFileTTF(ServiceManager::getAssetManager()->getFont("RobotoCondensed-Bold.ttf").c_str(), ServiceManager::getSettingsManager()->getLabelFontSize());
-    // --- Carica FONT BOLD ---
+
+    // Carica FONT BOLD 
     auto [pFontDataBold, dFontSizeBold] = ServiceManager::getAssetManager()->getFont("RobotoCondensed-Bold.ttf");
     if (pFontDataBold && dFontSizeBold > 0) {
         ImFontConfig cfg;
@@ -105,61 +103,10 @@ UiManager::UiManager() {
     } else {
         io.Fonts->AddFontDefault(); 
     }
-    // font_data = io.Fonts->AddFontFromFileTTF(ServiceManager::getAssetManager()->getFont("RobotoCondensed-Regular.ttf").c_str(), ServiceManager::getSettingsManager()->getDataFontSize());
-    // font_title = io.Fonts->AddFontFromFileTTF(ServiceManager::getAssetManager()->getFont("RobotoCondensed-Bold.ttf").c_str(), ServiceManager::getSettingsManager()->getTitleFontSize());
-#endif
-#ifdef _WIN32
-    // Carica FONT REGULAR 
-    auto [pFontDataRegular, dFontSizeRegular] = resources::GetFontData(MAKEINTRESOURCE(IDR_FONT_REGULAR));
-    if (pFontDataRegular && dFontSizeRegular > 0) {
-        ImFontConfig cfg;
-        cfg.FontDataOwnedByAtlas = false; 
-
-        font_body = io.Fonts->AddFontFromMemoryTTF(
-            pFontDataRegular,
-            dFontSizeRegular,
-            ServiceManager::getSettingsManager()->getBodyFontSize(),
-            &cfg
-        );
-
-        font_data = io.Fonts->AddFontFromMemoryTTF(
-            pFontDataRegular,
-            dFontSizeRegular,
-            ServiceManager::getSettingsManager()->getDataFontSize(),
-            &cfg
-        );
-    } else {
-        io.Fonts->AddFontDefault(); 
-    }
-
-    // Carica FONT BOLD 
-    auto [pFontDataBold, dFontSizeBold] = resources::GetFontData(MAKEINTRESOURCE(IDR_FONT_BOLD));
-    if (pFontDataBold && dFontSizeBold > 0) {
-        ImFontConfig cfg;
-        cfg.FontDataOwnedByAtlas = false; 
-
-        font_label = io.Fonts->AddFontFromMemoryTTF(
-            pFontDataBold,
-            dFontSizeBold,
-            ServiceManager::getSettingsManager()->getLabelFontSize(),
-            &cfg
-        );
-
-        font_title = io.Fonts->AddFontFromMemoryTTF(
-            pFontDataBold,
-            dFontSizeBold,
-            ServiceManager::getSettingsManager()->getTitleFontSize(),
-            &cfg
-        );
-    } else {
-        io.Fonts->AddFontDefault(); 
-    }
-#endif
-
 
     ImGui::GetIO().FontGlobalScale = ServiceManager::getSettingsManager()->getGlobalFontScale();
-    assert(font_body != nullptr && "ERRORE: Impossibile caricare i font. Controlla i percorsi."); 
-    std::cout << "INFO [UIManager]: Font caricati." << std::endl;    
+    assert(font_body != nullptr && "ERRORE [UiManager]: Impossibile caricare i font. Controllare i percorsi."); 
+    std::cout << "INFO [UiManager]: Font caricati." << std::endl;    
     
     ApplyTheme(ImGui::GetStyle(), ServiceManager::getSettingsManager()->getDarkMode());
     
@@ -167,7 +114,7 @@ UiManager::UiManager() {
     ImGui_ImplOpenGL3_Init(glsl_version);
     glfwWindowHint(GLFW_REFRESH_RATE, 60);
 
-    addElement(std::make_unique<LogTerminal>(this));    
+    
     setupInitialState();
 }
 
@@ -231,7 +178,7 @@ void UiManager::setupInitialState() {
             }
             this->m_currentState = AppState::CONNECTED;
         } else {
-            std::cerr << "ERRORE [UIManager]: Connessione fallita." << std::endl;
+            std::cerr << "ERRORE [UiManager]: Connessione fallita." << std::endl;
         }
     };
     
@@ -385,21 +332,6 @@ void UiManager::showDockingSpace() {
     }
     ImGui::End();
 }
-
-// void UiManager::toggleTheme() {
-//     m_isDarkTheme = !m_isDarkTheme; 
-//     if (m_isDarkTheme) {
-//         ImGui::StyleColorsDark();
-//     } else {
-//         ImGui::StyleColorsLight();
-//     }
-//
-//     ImGuiStyle& style = ImGui::GetStyle();
-//     if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
-//         style.WindowRounding = 0.0f;
-//         style.Colors[ImGuiCol_WindowBg].w = 1.0f;
-//     }
-// }
 
 #if defined(WIN32)
 void UiManager::SetWindowIconFromResource()

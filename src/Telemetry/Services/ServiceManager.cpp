@@ -100,6 +100,8 @@ void ServiceManager::cleanup() {
     m_networkService.reset();
     m_aggregatorService.reset();
     m_dataManager.reset(); 
+    m_settingsManager.reset();
+    m_assetManager.reset();
     std::cout << "INFO [ServiceManager]: ServiceManager pulito." << std::endl;
 }
 

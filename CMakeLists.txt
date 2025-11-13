@@ -90,8 +90,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 # Sezione di configurazione specifica per Windows
 if(WIN32)
     target_link_libraries(${PROJECT_NAME} PRIVATE opengl32)
-
-    # Icona per Windows
+    target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/assets")
     set(APP_ICON_RESOURCE "${CMAKE_CURRENT_SOURCE_DIR}/assets/windows_resources.rc")
     target_sources(${PROJECT_NAME} PRIVATE ${APP_ICON_RESOURCE})
     add_definitions(-DUNICODE -D_UNICODE)

@@ -19,4 +19,4 @@ namespace resources {
     void loadEmbeddedFont(const wchar_t* resourceName);
     std::pair<void*, DWORD> GetFontData(LPWSTR resourceName);
 #endif
-} // namespace Resources
+} 

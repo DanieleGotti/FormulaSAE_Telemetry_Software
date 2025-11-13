@@ -1,8 +1,9 @@
-// IAssetManager.hpp
 #pragma once
 #include <string>
 #include <filesystem>
 #include <utility>
+#include <cstdint>
+#include <unordered_map>
 
 class IAssetManager {
 public:

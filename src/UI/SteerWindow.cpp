@@ -39,7 +39,7 @@ static std::array<ImVec2, 4> GetRotatedQuadPoints(const ImVec2& center, float si
 SteerWindow::SteerWindow(UiManager* manager) : m_uiManager(manager) {
     bool ret = loadTextureFromMemory("steering_wheel.png", &m_wheelTextureID, &m_wheelWidth, &m_wheelHeight);
     if (!ret) {
-        std::cerr << "ERRORE [SteerWindow]: Impossibile caricare l'immagine 'steering_wheel.png'" << std::endl;
+        std::cerr << "ERRORE [SteerWindow]: Impossibile caricare l'immagine 'steering_wheel.png'." << std::endl;
     }
 }
 
@@ -152,7 +152,7 @@ bool SteerWindow::loadTextureFromMemory(const char* filename, GLuint* out_textur
 
     auto [pData, dataSize] = ServiceManager::getAssetManager()->getImage(filename);
     if (!pData || dataSize == 0) {
-        std::cerr << "Errore: impossibile caricare asset " << filename << std::endl;
+        std::cerr << "ERRORE [SteerWindow]: Impossibile caricare asset '" << filename << "'." << std::endl;
         return false;
     }
 
@@ -168,11 +168,9 @@ bool SteerWindow::loadTextureFromMemory(const char* filename, GLuint* out_textur
     );
 
     if (!image_data) {
-        std::cerr << "Errore: stbi_load_from_memory fallita per " << filename << std::endl;
         return false;
     }
 
-    // 3️⃣ Crea la texture OpenGL come prima
     GLuint image_texture;
     glGenTextures(1, &image_texture);
     glBindTexture(GL_TEXTURE_2D, image_texture);
@@ -180,13 +178,13 @@ bool SteerWindow::loadTextureFromMemory(const char* filename, GLuint* out_textur
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width, image_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
 
-    // 4️⃣ Libera i dati decodificati
     stbi_image_free(image_data);
 
-    // 5️⃣ Ritorna le info
     *out_texture = image_texture;
     *out_width = image_width;
     *out_height = image_height;
+
+    std::cout << "INFO [SteerWindow]: Immagine '" << filename << "' caricata." << std::endl;
 
     return true;
 }
