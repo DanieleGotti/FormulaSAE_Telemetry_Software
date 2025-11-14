@@ -46,48 +46,48 @@ private:
     }
 
     std::string getResourcesPath() {
-        std::cout << "DEBUG getResourcesPath: Tentativo di ottenere il main bundle." << std::endl;
+        std::cout << "DEBUG [AssetManager_MacOS]: Tentativo di ottenere il main bundle." << std::endl;
         CFBundleRef mainBundle = CFBundleGetMainBundle();
         if (mainBundle) {
-            std::cout << "DEBUG getResourcesPath: Main bundle ottenuto." << std::endl;
+            std::cout << "DEBUG [AssetManager_MacOS]: Main bundle ottenuto." << std::endl;
             
             CFURLRef bundleURL = CFBundleCopyBundleURL(mainBundle); // Ottieni l'URL del bundle
             if (bundleURL) {
-                std::cout << "DEBUG getResourcesPath: URL del bundle ottenuto." << std::endl;
+                std::cout << "DEBUG [AssetManager_MacOS]: URL del bundle ottenuto." << std::endl;
                 CFStringRef bundlePathCFString = CFURLCopyFileSystemPath(bundleURL, kCFURLPOSIXPathStyle); // Ottieni il percorso assoluto del bundle
                 
                 if (bundlePathCFString) {
-                    std::cout << "DEBUG getResourcesPath: Percorso assoluto del bundle ottenuto." << std::endl;
+                    std::cout << "DEBUG [AssetManager_MacOS]: Percorso assoluto del bundle ottenuto." << std::endl;
                     CFIndex length = CFStringGetLength(bundlePathCFString);
                     CFIndex maxSize = CFStringGetMaximumSizeForEncoding(length, kCFStringEncodingUTF8);
                     
                     std::vector<char> buffer(maxSize + 1);
                     if (CFStringGetCString(bundlePathCFString, buffer.data(), buffer.size(), kCFStringEncodingUTF8)) {
                         std::string bundlePath = buffer.data();
-                        std::cout << "DEBUG getResourcesPath: Percorso base bundle: " << bundlePath << std::endl;
+                        std::cout << "DEBUG [AssetManager_MacOS]: Percorso base bundle: " << bundlePath << "." << std::endl;
                         
                         std::string resourcePath = bundlePath + "/Contents/Resources";
-                        std::cout << "DEBUG getResourcesPath: Percorso Resources costruito: " << resourcePath << std::endl;
+                        std::cout << "DEBUG [AssetManager_MacOS]: Percorso Resources costruito: " << resourcePath << "." << std::endl;
                         
                         CFRelease(bundlePathCFString);
                         CFRelease(bundleURL);
                         return resourcePath;
 
                     } else {
-                        std::cerr << "ERRORE getResourcesPath: CFStringGetCString (bundle path) fallito." << std::endl;
+                        std::cerr << "ERRORE [AssetManager_MacOS]: CFStringGetCString (bundle path) fallito." << std::endl;
                     }
                     CFRelease(bundlePathCFString);
                 } else {
-                    std::cerr << "ERRORE getResourcesPath: CFURLCopyFileSystemPath (bundle URL) ha restituito NULL." << std::endl;
+                    std::cerr << "ERRORE [AssetManager_MacOS]: CFURLCopyFileSystemPath (bundle URL) ha restituito NULL." << std::endl;
                 }
                 CFRelease(bundleURL);
             } else {
-                std::cerr << "ERRORE getResourcesPath: CFBundleCopyBundleURL ha restituito NULL." << std::endl;
+                std::cerr << "ERRORE [AssetManager_MacOS]: CFBundleCopyBundleURL ha restituito NULL." << std::endl;
             }
         } else {
-            std::cerr << "ERRORE getResourcesPath: CFBundleGetMainBundle ha restituito NULL." << std::endl;
+            std::cerr << "ERRORE [AssetManager_MacOS]: CFBundleGetMainBundle ha restituito NULL." << std::endl;
         }
-        std::cerr << "ERRORE CRITICO: Impossibile trovare la directory Resources del bundle (getResourcesPath fallito)." << std::endl;
+        std::cerr << "ERRORE [AssetManager_MacOS]: Impossibile trovare la directory Resources del bundle (getResourcesPath fallito)." << std::endl;
         return "";
     }
 
