@@ -18,7 +18,6 @@ public:
 private:
     UiManager* m_uiManager;    
     const std::string OUTPUT_DIRECTORY = "../output_data"; 
-    // La mappa ora conterrà direttamente le stringhe formattate
     std::map<std::string, std::string> m_latestData;
     std::mutex m_dataMutex;
 };

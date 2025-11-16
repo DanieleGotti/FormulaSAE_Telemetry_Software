@@ -65,6 +65,7 @@ file(GLOB SRC_FILES
     src/Telemetry/data_acquisition/*.cpp
     src/Telemetry/Services/*.cpp
     src/Telemetry/data_writing/*.cpp
+    src/Telemetry/file_reading/*.cpp
     src/application_services/*.cpp
     src/utils/*.cpp
     src/utils/AssetManager/AssetManagerFactory.cpp

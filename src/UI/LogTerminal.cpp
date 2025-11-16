@@ -12,7 +12,6 @@ LogTerminal::LogTerminal(UiManager* manager) : m_uiManager(manager) {
             : m_callback(std::move(callback)) {}
 
     protected:
-        // Aggiunge i caratteri a un buffer interno
         std::streamsize xsputn(const char* s, std::streamsize n) override {
             m_buffer.append(s, n);
             return n;
@@ -25,7 +24,7 @@ LogTerminal::LogTerminal(UiManager* manager) : m_uiManager(manager) {
             return c;
         }
         
-        // Quando lo stream viene flushato (con std::endl o automaticamente) invia l'intero buffer accumulato
+        // Quando lo stream viene flushato invia l'intero buffer accumulato
         int sync() override {
             if (!m_buffer.empty()) {
                 m_callback(m_buffer);

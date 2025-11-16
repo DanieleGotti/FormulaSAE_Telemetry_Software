@@ -1,3 +1,4 @@
 build/
 build_windows/
 output_data/
+telemetry_tester/__pycache__/

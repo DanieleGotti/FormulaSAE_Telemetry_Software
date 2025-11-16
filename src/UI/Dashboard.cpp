@@ -13,45 +13,55 @@ void Dashboard::onAggregatedDataReceived(const DbRow& dataRow) {
 }
 
 void Dashboard::draw() {
-    ImGui::Begin("Gestione dati in arrivo");
+    ImGui::Begin("Gestione dati");
 
-    // Pannello di controllo per avviare/fermare la registrazione
-    ImGui::BeginChild("ControlPanel", ImVec2(0, 100), true);
+    if (m_uiManager->getCurrentState() == AppState::CONNECTED_LIVE) {
+        ImGui::BeginChild("ControlPanel", ImVec2(0, 100), true);
+        ImGui::PushFont(m_uiManager->font_label);
+        ImGui::Text("Controllo registrazione");
+        ImGui::PopFont();
+        ImGui::Separator();
+        
+        bool isLogging = ServiceManager::isLogging();
+        if (!isLogging) {
+            if (ImGui::Button("Avvia registrazione")) {
+                ServiceManager::startLogging(OUTPUT_DIRECTORY);
+            }
+        } else {
+            ImGui::Text("Registrazione in corso. Salvataggio in: %s.", OUTPUT_DIRECTORY.c_str());
+            if (ImGui::Button("Ferma registrazione")) {
+                ServiceManager::stopLogging();
+            }
+        }
+        ImGui::EndChild();
+    }
+
     ImGui::PushFont(m_uiManager->font_label);
-    ImGui::Text("Controllo registrazione");
+    ImGui::Text("Dati correnti");
     ImGui::PopFont();
     ImGui::Separator();
-    
-    bool isLogging = ServiceManager::isLogging();
-    if (!isLogging) {
-        if (ImGui::Button("Avvia registrazione")) {
-            ServiceManager::startLogging(OUTPUT_DIRECTORY);
-        }
-    } else {
-        ImGui::Text("Registrazione in corso. Salvataggio in: %s.", OUTPUT_DIRECTORY.c_str());
-        
-        if (ImGui::Button("Ferma registrazione")) {
-            ServiceManager::stopLogging();
-        }
-    }
-    ImGui::EndChild();
-
-    ImGui::PushFont(m_uiManager->font_label);
-    ImGui::Text("Dati in arrivo");
-    ImGui::PopFont();
 
     if (ImGui::BeginTable("DataTable", 2, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY)) {
-        ImGui::TableSetupColumn("Tipo");
+        ImGui::TableSetupColumn("Tipo"); 
         ImGui::TableSetupColumn("Valore");
-        ImGui::TableHeadersRow();
 
-        std::map<std::string, std::string> dataCopy;
-        {
+        ImGui::TableNextRow(ImGuiTableRowFlags_Headers);
+        ImGui::TableSetColumnIndex(0);
+        ImGui::TextUnformatted("Tipo"); 
+        ImGui::TableSetColumnIndex(1);
+        ImGui::TextUnformatted("Valore");
+        DbRow dataToDisplay;
+        if (m_uiManager->getCurrentState() == AppState::CONNECTED_PLAYBACK) {
+            auto playbackManager = ServiceManager::getPlaybackManager();
+            if (auto row = playbackManager->getCurrentRow()) {
+                dataToDisplay = *row;
+            }
+        } else {
             std::lock_guard<std::mutex> lock(m_dataMutex);
-            dataCopy = m_latestData;
+            dataToDisplay = m_latestData;
         }
 
-        for (const auto& [label, value] : dataCopy) {
+        for (const auto& [label, value] : dataToDisplay) {
             if (label == "timestamp") continue;
 
             ImGui::TableNextRow();

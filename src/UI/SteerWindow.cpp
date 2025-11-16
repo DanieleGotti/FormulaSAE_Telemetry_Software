@@ -9,6 +9,7 @@
 #include "UI/UIManager.hpp"
 #include "utils/IAssetManager.hpp"
 #include "Telemetry/Services/ServiceManager.hpp"
+#include "Telemetry/file_reading/PlaybackManager.hpp" 
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "../external/stb_image/stb_image.h"
@@ -17,7 +18,6 @@
 #define PI 3.1415926535f
 #endif
 
-// Funzione per ruotare l'immagine dello sterzo
 static std::array<ImVec2, 4> GetRotatedQuadPoints(const ImVec2& center, float size, float angle_degrees) {
     float angle_rad = angle_degrees * PI / 180.0f;
     float s = sinf(angle_rad);
@@ -34,7 +34,6 @@ static std::array<ImVec2, 4> GetRotatedQuadPoints(const ImVec2& center, float si
     }
     return points;
 }
-
 
 SteerWindow::SteerWindow(UiManager* manager) : m_uiManager(manager) {
     bool ret = loadTextureFromMemory("steering_wheel.png", &m_wheelTextureID, &m_wheelWidth, &m_wheelHeight);
@@ -61,13 +60,25 @@ void SteerWindow::onAggregatedDataReceived(const DbRow& dataRow) {
 void SteerWindow::draw() {
     ImGui::Begin("Sterzo");
 
-    float current_angle;
-    {
+    float current_angle = 0.0f;
+
+    if (m_uiManager->getCurrentState() == AppState::CONNECTED_PLAYBACK) {
+        // Modalità lettura da file 
+        auto playbackManager = ServiceManager::getPlaybackManager();
+        if (auto rowOpt = playbackManager->getCurrentRow()) {
+            try {
+                current_angle = std::stof(rowOpt->at("STEER"));
+            } catch (const std::exception& e) {
+                // In caso di errore l'angolo rimane 0.
+            }
+        }
+    } else {
+        // Modalità live
         std::lock_guard<std::mutex> lock(m_dataMutex);
         current_angle = m_steeringAngle;
     }
 
-    // Mostra il valore intero
+    // Mostra gradi
     ImGui::PushFont(m_uiManager->font_label);
     char angle_text[16];
     snprintf(angle_text, 16, "%.1f°", current_angle);
@@ -81,7 +92,6 @@ void SteerWindow::draw() {
     // Disegna il volante
     if (m_wheelTextureID) {
         ImDrawList* draw_list = ImGui::GetWindowDrawList();
-
         ImVec2 window_pos = ImGui::GetCursorScreenPos();
         ImVec2 available_space = ImGui::GetContentRegionAvail();
         float image_size = std::min(available_space.x, available_space.y) * 0.9f;
@@ -89,10 +99,7 @@ void SteerWindow::draw() {
 
         // Disegna l'immagine del volante ruotata
         auto vertices = GetRotatedQuadPoints(image_center, image_size, current_angle);
-        ImU32 tint_color = m_uiManager->m_isDarkTheme
-            ? IM_COL32(200, 200, 200, 255)   // Tema scuro -> volante grigio chiaro
-            : IM_COL32(80, 80, 80, 255);     // Tema chiaro -> volante grigio scuro
-
+        ImU32 tint_color = m_uiManager->m_isDarkTheme ? IM_COL32(200, 200, 200, 255) : IM_COL32(80, 80, 80, 255);
         draw_list->AddImageQuad(
             (void*)(intptr_t)m_wheelTextureID,
             vertices[0], vertices[1], vertices[2], vertices[3],
@@ -104,21 +111,17 @@ void SteerWindow::draw() {
         float fixed_line_length = 15.0f;
         ImVec2 fixed_line_start(image_center.x, window_pos.y);
         ImVec2 fixed_line_end(image_center.x, window_pos.y + fixed_line_length);
-        ImU32 fixed_line_color = m_uiManager->m_isDarkTheme
-            ? IM_COL32(200, 200, 200, 255) // Tema scuro -> linea chiara
-            : IM_COL32(0, 0, 0, 255);       // Tema chiaro -> linea nera
+        ImU32 fixed_line_color = m_uiManager->m_isDarkTheme ? IM_COL32(200, 200, 200, 255) : IM_COL32(0, 0, 0, 255);
         draw_list->AddLine(fixed_line_start, fixed_line_end, fixed_line_color, 2.0f);
 
         // Linea rossa che ruota insieme al volante
         float angle_rad = current_angle * PI / 180.0f;
         float start_radius = image_size * 0.35f; 
         float end_radius = image_size * 0.45f;   
-
         ImVec2 rotating_line_start(
             image_center.x + sinf(angle_rad) * start_radius,
             image_center.y - cosf(angle_rad) * start_radius
         );
-
         ImVec2 rotating_line_end(
             image_center.x + sinf(angle_rad) * end_radius,
             image_center.y - cosf(angle_rad) * end_radius
@@ -142,34 +145,22 @@ bool SteerWindow::loadTextureFromFile(const char* filename, GLuint* out_texture,
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width, image_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
     stbi_image_free(image_data);
 
-    *out_texture = image_texture;
-    *out_width = image_width;
-    *out_height = image_height;
+    *out_texture = image_texture; *out_width = image_width; *out_height = image_height;
     return true;
 }
 
 bool SteerWindow::loadTextureFromMemory(const char* filename, GLuint* out_texture, int* out_width, int* out_height) {
-
     auto [pData, dataSize] = ServiceManager::getAssetManager()->getImage(filename);
     if (!pData || dataSize == 0) {
         std::cerr << "ERRORE [SteerWindow]: Impossibile caricare asset '" << filename << "'." << std::endl;
         return false;
     }
 
-
     int image_width = 0, image_height = 0;
     unsigned char* image_data = stbi_load_from_memory(
-        reinterpret_cast<const unsigned char*>(pData),
-        dataSize,
-        &image_width,
-        &image_height,
-        nullptr,
-        4 // forza RGBA
+        reinterpret_cast<const unsigned char*>(pData), dataSize, &image_width, &image_height, nullptr, 4
     );
-
-    if (!image_data) {
-        return false;
-    }
+    if (!image_data) return false;
 
     GLuint image_texture;
     glGenTextures(1, &image_texture);
@@ -177,14 +168,9 @@ bool SteerWindow::loadTextureFromMemory(const char* filename, GLuint* out_textur
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width, image_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
-
     stbi_image_free(image_data);
 
-    *out_texture = image_texture;
-    *out_width = image_width;
-    *out_height = image_height;
-
+    *out_texture = image_texture; *out_width = image_width; *out_height = image_height;
     std::cout << "INFO [SteerWindow]: Immagine '" << filename << "' caricata." << std::endl;
-
     return true;
 }

@@ -5,7 +5,7 @@
 
 using PacketData = std::variant<int, double, std::string>;
 
-// Ordino i tipi di pacchetto in categorie
+// Ordina i tipi di pacchetto in categorie
 enum class PacketType {
     SENSOR_DATA,
     STATUS_LED,
@@ -16,7 +16,8 @@ enum class PacketType {
 class PacketParser {
 public:
     // Converte riga dato grezza in oggetto PacketParser
-    static PacketParser parse(const std::string& line, const std::chrono::system_clock::time_point& reception_time);
+    static PacketParser parse(const std::string& line, const std::chrono::system_clock::time_point& reception_time, bool isFromFile = false);
+    static std::chrono::system_clock::time_point parseTimestampString(const std::string& ts_str);
 
     std::chrono::system_clock::time_point timestamp;
     PacketType packetType = PacketType::UNKNOWN;

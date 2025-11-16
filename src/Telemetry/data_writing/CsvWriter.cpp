@@ -22,6 +22,7 @@ CsvWriter::~CsvWriter() {
 bool CsvWriter::createFile(const std::string& directoryPath, const std::vector<std::string>& columnOrder) {
     closeFile();
     m_columnOrder = columnOrder;
+    m_isFirstRow = true;
 
     std::string fileName = generate_csv_filename();
     std::filesystem::path fullPath = std::filesystem::path(directoryPath) / fileName;
@@ -42,6 +43,12 @@ bool CsvWriter::createFile(const std::string& directoryPath, const std::vector<s
 void CsvWriter::onAggregatedDataReceived(const DbRow& dataRow) {
     if (!m_outputFile.is_open()) return;
 
+    // Ignora la prima riga
+    if (m_isFirstRow) {
+        m_isFirstRow = false;
+        return; 
+    }
+
     std::stringstream ss;
     for (size_t i = 0; i < m_columnOrder.size(); ++i) {
         const std::string& col_name = m_columnOrder[i];
@@ -56,4 +63,33 @@ void CsvWriter::stop() {
 
 void CsvWriter::closeFile() { 
     if (m_outputFile.is_open()) m_outputFile.close(); 
+}
+
+bool CsvWriter::WriteToFile(const std::string& filePath, const std::vector<std::string>& columnOrder, const std::vector<DbRow>& data) {
+    std::ofstream outputFile(filePath, std::ios::out | std::ios::trunc);
+    if (!outputFile.is_open()) {
+        std::cerr << "ERRORE [CsvWriter]: Impossibile creare il file CSV: " << filePath << "." << std::endl;
+        return false;
+    }
+
+    // Scrive l'header
+    for (size_t i = 0; i < columnOrder.size(); ++i) {
+        outputFile << columnOrder[i] << (i == columnOrder.size() - 1 ? "" : ";");
+    }
+    outputFile << std::endl;
+
+    // Scrive tutte le righe di dati
+    for (const auto& dataRow : data) {
+        for (size_t i = 0; i < columnOrder.size(); ++i) {
+            const std::string& col_name = columnOrder[i];
+            if (dataRow.count(col_name)) {
+                outputFile << dataRow.at(col_name);
+            }
+            outputFile << (i == columnOrder.size() - 1 ? "" : ";");
+        }
+        outputFile << std::endl;
+    }
+
+    std::cout << "INFO [CsvWriter]: File " << filePath << " generato con successo (" << data.size() << " righe)." << std::endl;
+    return true;
 }
