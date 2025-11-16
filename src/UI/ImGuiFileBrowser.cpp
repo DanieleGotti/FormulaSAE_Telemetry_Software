@@ -2,10 +2,14 @@
 #include <algorithm>
 #include <iostream>
 #include <cctype>
+#include <filesystem>
 #include "UI/ImGuiFileBrowser.hpp"
 
 #ifdef _WIN32
 #include <windows.h> 
+#elif __APPLE__
+#include <mach-o/dyld.h>
+#include <limits.h> 
 #endif
 
 static std::filesystem::path GetDefaultPath() {
@@ -13,6 +17,12 @@ static std::filesystem::path GetDefaultPath() {
         char buffer[MAX_PATH];
         // Ottiene il percorso completo dell'eseguibile 
         if (GetModuleFileNameA(NULL, buffer, MAX_PATH) != 0) {
+            return std::filesystem::path(buffer).parent_path().parent_path() / "output_data";
+        }
+    #elif __APPLE__
+        char buffer[PATH_MAX];
+        uint32_t size = sizeof(buffer);
+        if (_NSGetExecutablePath(buffer, &size) == 0) {
             return std::filesystem::path(buffer).parent_path().parent_path() / "output_data";
         }
     #endif

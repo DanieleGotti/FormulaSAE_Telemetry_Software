@@ -124,6 +124,7 @@
   "__verbose_abort": "cpp",
   "csignal": "cpp",
   "print": "cpp",
-  "shared_mutex": "cpp"
+  "shared_mutex": "cpp",
+  "expected": "cpp"
 }
 }

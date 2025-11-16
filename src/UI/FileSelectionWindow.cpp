@@ -28,7 +28,7 @@ void FileSelectionWindow::draw() {
         auto selected_path = m_fileBrowser.draw("Scegli File", m_showFileBrowser);
         if (selected_path.has_value()) {
             // Se l'utente ha scelto un file, aggiorna il buffer
-            strncpy_s(m_filePathBuffer, sizeof(m_filePathBuffer), selected_path.value().c_str(), _TRUNCATE);
+            snprintf(m_filePathBuffer, sizeof(m_filePathBuffer), "%s", selected_path.value().c_str());
         }
     }
     
