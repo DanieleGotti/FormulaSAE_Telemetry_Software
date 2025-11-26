@@ -20,6 +20,7 @@
 #include "UI/SuspensionWindow.hpp"
 #include "UI/HallWindow.hpp"
 #include "UI/PlaybackControlsWindow.hpp"
+#include "UI/TemperatureWindow.hpp"
 #include "Telemetry/Services/ServiceManager.hpp"
 #include "Telemetry/Services/FileService.hpp"
 #include "Telemetry/file_reading/PlaybackManager.hpp"
@@ -104,6 +105,7 @@ UiManager::~UiManager() {
         if (m_steerWindow) ServiceManager::getAggregator()->unsubscribe(m_steerWindow.get());
         if (m_suspensionWindow) ServiceManager::getAggregator()->unsubscribe(m_suspensionWindow.get());
         if (m_hallWindow) ServiceManager::getAggregator()->unsubscribe(m_hallWindow.get());
+        if (m_temperatureWindow) ServiceManager::getAggregator()->unsubscribe(m_temperatureWindow.get());
         if (m_tempDataSubscriber) ServiceManager::getAggregator()->unsubscribe(m_tempDataSubscriber.get());
     }
     
@@ -173,6 +175,7 @@ void UiManager::transitionToConnectedState(AppState connectedState) {
     m_steerWindow = std::make_shared<SteerWindow>(this);
     m_suspensionWindow = std::make_shared<SuspensionWindow>(this);
     m_hallWindow = std::make_shared<HallWindow>(this);
+    m_temperatureWindow = std::make_shared<TemperatureWindow>(this);
 
     if (connectedState == AppState::CONNECTED_LIVE) {
         // In modalità live, tutte le finestre si iscrivono all'aggregator
@@ -183,6 +186,7 @@ void UiManager::transitionToConnectedState(AppState connectedState) {
         aggregator->subscribe(m_steerWindow.get());
         aggregator->subscribe(m_suspensionWindow.get());
         aggregator->subscribe(m_hallWindow.get());
+        aggregator->subscribe(m_temperatureWindow.get());
     } else if (connectedState == AppState::CONNECTED_PLAYBACK) {
         // In modalità lettura file, viene creata la finestra dei controlli
         m_playbackControls = std::make_shared<PlaybackControlsWindow>(this);
@@ -269,6 +273,7 @@ void UiManager::draw() {
         if (m_steerWindow) m_steerWindow->draw();
         if (m_suspensionWindow) m_suspensionWindow->draw();
         if (m_hallWindow) m_hallWindow->draw();
+        if (m_temperatureWindow) m_temperatureWindow->draw();
     }
 
     if (m_currentState == AppState::CONNECTED_PLAYBACK) {
@@ -368,6 +373,7 @@ void UiManager::resetToHome() {
     m_steerWindow.reset();
     m_suspensionWindow.reset();
     m_hallWindow.reset();
+    m_temperatureWindow.reset();
     m_playbackControls.reset();
 
     m_uiElements.clear();

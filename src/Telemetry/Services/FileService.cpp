@@ -19,6 +19,7 @@ static std::vector<ColumnConfig> getFileAggregatorConfig() {
         {"SOSPPDX", AggregationType::AVERAGE, OutputFormat::DOUBLE}, {"SOSPPSX", AggregationType::AVERAGE, OutputFormat::DOUBLE},
         {"VELADX", AggregationType::AVERAGE, OutputFormat::DOUBLE}, {"VELASX", AggregationType::AVERAGE, OutputFormat::DOUBLE},
         {"VELPDX", AggregationType::AVERAGE, OutputFormat::DOUBLE}, {"VELPSX", AggregationType::AVERAGE, OutputFormat::DOUBLE},
+        {"TMPDX", AggregationType::AVERAGE, OutputFormat::DOUBLE}, {"TMPSX", AggregationType::AVERAGE, OutputFormat::DOUBLE},
         {"LEFT_INVERTER_FSM",  AggregationType::INVERTER, OutputFormat::STRING},
         {"RIGHT_INVERTER_FSM", AggregationType::INVERTER, OutputFormat::STRING}
     };

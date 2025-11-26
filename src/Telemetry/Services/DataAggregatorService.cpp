@@ -27,6 +27,8 @@ DataAggregatorService::DataAggregatorService() {
         {"VELASX", AggregationType::AVERAGE, OutputFormat::DOUBLE},
         {"VELPDX", AggregationType::AVERAGE, OutputFormat::DOUBLE},
         {"VELPSX", AggregationType::AVERAGE, OutputFormat::DOUBLE},
+        {"TMPDX", AggregationType::AVERAGE, OutputFormat::DOUBLE},
+        {"TMPSX", AggregationType::AVERAGE, OutputFormat::DOUBLE},
 
         // Dati che sono stringhe
         {"LEFT_INVERTER_FSM",  AggregationType::INVERTER, OutputFormat::STRING},

@@ -11,7 +11,8 @@ import random
 EXPECTED_LABELS = ['ACC1A', 'ACC2A', 'ACC1B', 'ACC2B', 
                     'BRK1', 'BRK2', 'STEER',
                     'SOSPASX', 'SOSPADX', 'SOSPPSX', 'SOSPPDX',
-                    "VELASX", "VELADX", "VELPDX", "VELPSX"
+                    "VELASX", "VELADX", "VELPDX", "VELPSX",
+                    "TMPDX", "TMPSX"
                    ]
 
 # Messaggi speciali/LED
@@ -56,6 +57,9 @@ def generate_packet():
         elif label.startswith('VEL'):
             # Velocità sono float
             value = round(random.uniform(-50.0, 200.0), 2)
+        elif label.startswith('TMP'):
+            # Temperature sono float
+            value = round(random.uniform(0.0, 150.0), 2)
 
         packet = f"{label} {value}\n"
 

@@ -217,17 +217,15 @@ void ServiceManager::stopLogging() {
     }
 
     if (m_csvWriter) {
-
         if (m_aggregatorService) {
             m_aggregatorService->flush();
         }
         getAggregator()->unsubscribe(m_csvWriter.get());
         m_csvWriter->stop();
         m_csvWriter.reset();
-    }
-    
-    std::cout << "REGISTRAZIONE [ServiceManager]: Registrazione fermata." << std::endl;
 
+        std::cout << "REGISTRAZIONE [ServiceManager]: Registrazione fermata." << std::endl;
+    }
 }
 
 bool ServiceManager::isLogging() {
