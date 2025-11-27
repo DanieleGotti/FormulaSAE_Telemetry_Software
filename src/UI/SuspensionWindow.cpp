@@ -88,13 +88,16 @@ void SuspensionWindow::draw() {
     ImPlotAxisFlags x_flags = ImPlotAxisFlags_NoHighlight;
     ImPlotAxisFlags y_flags = ImPlotAxisFlags_NoHighlight; 
 
-    // Calcolo dell'asse X
+    // Calcolo dell'asse X e del Cursore
     double window_start_time, now_time;
+    double cursor_time = 0.0; // Variabile per la linea verticale
+
     if (m_uiManager->getCurrentState() == AppState::CONNECTED_PLAYBACK) {
         auto currentRowOpt = ServiceManager::getPlaybackManager()->getCurrentRow();
         if (currentRowOpt) {
             auto center_ts = PacketParser::parseTimestampString(currentRowOpt->at("timestamp"));
             double centerTime = std::chrono::duration<double>(center_ts.time_since_epoch()).count();
+            cursor_time = centerTime; // In playback il cursore è al centro
             window_start_time = centerTime - (MAX_HISTORY_SECONDS / 2.0);
             now_time = centerTime + (MAX_HISTORY_SECONDS / 2.0);
         } else {
@@ -103,10 +106,11 @@ void SuspensionWindow::draw() {
     } else {
         // Modalità live
         now_time = std::chrono::duration<double>(std::chrono::system_clock::now().time_since_epoch()).count();
+        cursor_time = now_time; // In live il cursore è il tempo attuale
         window_start_time = now_time - 10.0;
     }
 
-    // Calcolo dell'asse X
+    // Calcolo dei tick per l'asse X
     float plot_width_pixels = ImGui::GetContentRegionAvail().x;
     if (plot_width_pixels <= 0) plot_width_pixels = 1;
     const double nice_steps[] = {1.0, 2.0, 5.0, 10.0};
@@ -179,6 +183,11 @@ void SuspensionWindow::draw() {
             ImPlot::PlotLine("SOSPASX", m_plotData.at("SOSPASX").X.data(), m_plotData.at("SOSPASX").Y.data(), m_plotData.at("SOSPASX").X.size());
             ImPlot::PlotLine("SOSPPDX", m_plotData.at("SOSPPDX").X.data(), m_plotData.at("SOSPPDX").Y.data(), m_plotData.at("SOSPPDX").X.size());
             ImPlot::PlotLine("SOSPPSX", m_plotData.at("SOSPPSX").X.data(), m_plotData.at("SOSPPSX").Y.data(), m_plotData.at("SOSPPSX").X.size());
+            
+            // Disegna la linea rossa verticale al cursore temporale
+            ImPlot::PushStyleColor(ImPlotCol_Line, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+            ImPlot::PlotInfLines("##Cursor", &cursor_time, 1);
+            ImPlot::PopStyleColor();
         }
 
         ImPlot::PopStyleVar();

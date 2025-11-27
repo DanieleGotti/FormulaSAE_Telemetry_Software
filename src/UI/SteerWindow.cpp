@@ -78,13 +78,8 @@ void SteerWindow::draw() {
         current_angle = m_steeringAngle;
     }
 
-    // Mostra gradi
     ImGui::PushFont(m_uiManager->font_label);
-    char angle_text[16];
-    snprintf(angle_text, 16, "%.1f°", current_angle);
-    ImVec2 text_size = ImGui::CalcTextSize(angle_text);
-    ImGui::SetCursorPosX((ImGui::GetWindowWidth() - text_size.x) * 0.5f);
-    ImGui::TextUnformatted(angle_text);
+    ImGui::Text("Sensore angolo sterzo");
     ImGui::PopFont();
     ImGui::Separator();
     ImGui::Spacing();
@@ -94,8 +89,12 @@ void SteerWindow::draw() {
         ImDrawList* draw_list = ImGui::GetWindowDrawList();
         ImVec2 window_pos = ImGui::GetCursorScreenPos();
         ImVec2 available_space = ImGui::GetContentRegionAvail();
-        float image_size = std::min(available_space.x, available_space.y) * 0.9f;
-        ImVec2 image_center(window_pos.x + available_space.x * 0.5f, window_pos.y + available_space.y * 0.5f);
+        
+        float bottom_padding = 30.0f;
+        float image_size = std::min(available_space.x, available_space.y - bottom_padding) * 0.9f;
+        
+        // Centro l'immagine considerando lo spazio disponibile
+        ImVec2 image_center(window_pos.x + available_space.x * 0.5f, window_pos.y + (available_space.y - bottom_padding) * 0.5f);
 
         // Disegna l'immagine del volante ruotata
         auto vertices = GetRotatedQuadPoints(image_center, image_size, current_angle);
@@ -127,6 +126,15 @@ void SteerWindow::draw() {
             image_center.y - cosf(angle_rad) * end_radius
         );
         draw_list->AddLine(rotating_line_start, rotating_line_end, IM_COL32(255, 0, 0, 255), 3.0f);
+
+        // Valore dell'angolo sotto il volante
+        char angle_text[16];
+        ImGui::PushFont(m_uiManager->font_label);
+        snprintf(angle_text, 16, "%.1f°", current_angle);
+        ImVec2 angle_text_size = ImGui::CalcTextSize(angle_text);
+        ImVec2 text_pos(image_center.x - angle_text_size.x * 0.5f, image_center.y + image_size * 0.5f + 10.0f);
+        draw_list->AddText(text_pos, ImGui::GetColorU32(ImGuiCol_Text), angle_text);
+        ImGui::PopFont();
     }
 
     ImGui::End();

@@ -86,7 +86,7 @@ void HallWindow::drawSpeedometer(float speed) {
     float radius = (limiting_dim / 2.0f); 
     if (radius < 20.0f) radius = 20.0f; 
 
-    ImVec2 center = ImVec2(window_pos.x + available_space.x * 0.5f, window_pos.y + available_space.y * 0.5f + radius * 0.5f);
+    ImVec2 center = ImVec2(window_pos.x + available_space.x * 0.5f, window_pos.y + available_space.y * 0.5f + radius * 0.25f);
     float start_angle = (float)M_PI;
     float speed_normalized = std::fmax(0.0f, std::fmin(300.0f, speed)) / 300.0f;
     float speed_angle = start_angle + speed_normalized * (float)M_PI;
@@ -109,6 +109,14 @@ void HallWindow::drawSpeedometer(float speed) {
     }
     draw_list->AddLine(center, ImVec2(center.x + cos(speed_angle) * (radius - 10), center.y + sin(speed_angle) * (radius - 10)), ImColor(255, 0, 0), 3.0f);
     draw_list->AddCircleFilled(center, 5.0f, ImColor(255, 0, 0));
+
+    // Visualizzazione velocità sotto il tachimetro
+    ImGui::PushFont(m_uiManager->font_label);
+    char speed_text[16];
+    snprintf(speed_text, 16, "%.1f km/h", speed);
+    ImVec2 speed_text_size = ImGui::CalcTextSize(speed_text);
+    draw_list->AddText(ImVec2(center.x - speed_text_size.x * 0.5f, center.y + 20.0f), ImGui::GetColorU32(ImGuiCol_Text), speed_text);
+    ImGui::PopFont();
     ImGui::Dummy(available_space);
 }
 
@@ -156,7 +164,7 @@ void HallWindow::draw() {
                 sum += std::stod(currentRowOpt->at("VELPDX"));
                 currentSpeed = static_cast<float>(sum / 4.0);
             } catch (const std::exception&) {
-                // In caso di dato mancante, la velocità rimane 0
+                std::cerr << "ERRORE [HallWindow]: Errore durante il calcolo della velocità." << std::endl;
             }
         }
     } else {
@@ -168,12 +176,9 @@ void HallWindow::draw() {
     // Pannello tachimetro 
     ImGui::BeginChild("TachimetroChild", ImVec2(0, m_speedometerPaneHeight), false, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoBackground);
     ImGui::PushFont(m_uiManager->font_label);
-    char angle_text[16];
-    snprintf(angle_text, 16, "%.1f km/h", currentSpeed);
-    ImVec2 text_size = ImGui::CalcTextSize(angle_text);
-    ImGui::SetCursorPosX((ImGui::GetWindowWidth() - text_size.x) * 0.5f);
-    ImGui::TextUnformatted(angle_text);
+    ImGui::Text("Tachimetro");
     ImGui::PopFont();
+    
     ImGui::Separator();
     drawSpeedometer(currentSpeed);
     ImGui::EndChild();
@@ -199,13 +204,16 @@ void HallWindow::draw() {
     // Pannello sensori hall
     ImGui::BeginChild("GraficoChild", ImVec2(0, 0), false, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoBackground);
     
-    // Calcolo dell'asse X
+    // Calcolo dell'asse X e del Cursore
     double window_start_time, now_time;
+    double cursor_time = 0.0; // Variabile per la linea verticale
+
     if (m_uiManager->getCurrentState() == AppState::CONNECTED_PLAYBACK) {
         auto currentRowOpt = ServiceManager::getPlaybackManager()->getCurrentRow();
         if (currentRowOpt) {
             auto center_ts = PacketParser::parseTimestampString(currentRowOpt->at("timestamp"));
             double centerTime = std::chrono::duration<double>(center_ts.time_since_epoch()).count();
+            cursor_time = centerTime; // In playback il cursore è al centro
             window_start_time = centerTime - (MAX_HISTORY_SECONDS / 2.0);
             now_time = centerTime + (MAX_HISTORY_SECONDS / 2.0);
         } else {
@@ -214,6 +222,7 @@ void HallWindow::draw() {
     } else {
         // Modalità live
         now_time = std::chrono::duration<double>(std::chrono::system_clock::now().time_since_epoch()).count();
+        cursor_time = now_time; // In live il cursore è il tempo attuale
         window_start_time = now_time - 10;
     }
     
@@ -287,6 +296,11 @@ void HallWindow::draw() {
             for (const auto& pair : m_plotData) {
                 ImPlot::PlotLine(pair.first.c_str(), pair.second.X.data(), pair.second.Y.data(), pair.second.X.size());
             }
+            
+            // Disegna la linea rossa verticale al cursore temporale
+            ImPlot::PushStyleColor(ImPlotCol_Line, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+            ImPlot::PlotInfLines("##Cursor", &cursor_time, 1);
+            ImPlot::PopStyleColor();
         }
         ImPlot::PopStyleVar();
         ImPlot::EndPlot();

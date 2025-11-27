@@ -111,13 +111,17 @@ void AccBrkWindow::draw() {
     ImPlotAxisFlags x_flags = ImPlotAxisFlags_NoHighlight;
     ImPlotAxisFlags y_flags = ImPlotAxisFlags_NoHighlight; 
 
+    // Calcolo dell'asse X e del Cursore
     double window_start_time, now_time;
+    double cursor_time = 0.0; // Variabile per la linea verticale
+
     if (m_uiManager->getCurrentState() == AppState::CONNECTED_PLAYBACK) {
         auto currentRowOpt = ServiceManager::getPlaybackManager()->getCurrentRow();
         if (currentRowOpt) {
             auto center_ts = PacketParser::parseTimestampString(currentRowOpt->at("timestamp"));
             double centerTime = std::chrono::duration<double>(center_ts.time_since_epoch()).count();
             
+            cursor_time = centerTime; // Cursore al centro in playback
             window_start_time = centerTime - (MAX_HISTORY_SECONDS / 2.0);
             now_time = centerTime + (MAX_HISTORY_SECONDS / 2.0);
         } else {
@@ -125,6 +129,7 @@ void AccBrkWindow::draw() {
         }
     } else {
         now_time = std::chrono::duration<double>(std::chrono::system_clock::now().time_since_epoch()).count();
+        cursor_time = now_time; // Cursore al tempo attuale in live
         window_start_time = now_time - 10.0; 
     }
 
@@ -199,6 +204,11 @@ void AccBrkWindow::draw() {
             ImPlot::PlotLine("ACC1B", m_plotData.at("ACC1B").X.data(), m_plotData.at("ACC1B").Y.data(), m_plotData.at("ACC1B").X.size());
             ImPlot::PlotLine("ACC2A", m_plotData.at("ACC2A").X.data(), m_plotData.at("ACC2A").Y.data(), m_plotData.at("ACC2A").X.size());
             ImPlot::PlotLine("ACC2B", m_plotData.at("ACC2B").X.data(), m_plotData.at("ACC2B").Y.data(), m_plotData.at("ACC2B").X.size());
+
+            // Disegna la linea rossa verticale al cursore temporale
+            ImPlot::PushStyleColor(ImPlotCol_Line, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+            ImPlot::PlotInfLines("##CursorAcc", &cursor_time, 1);
+            ImPlot::PopStyleColor();
         }
 
         ImPlot::PopStyleVar();
@@ -250,6 +260,11 @@ void AccBrkWindow::draw() {
 
             ImPlot::PlotLine("BRK1", m_plotData.at("BRK1").X.data(), m_plotData.at("BRK1").Y.data(), m_plotData.at("BRK1").X.size());
             ImPlot::PlotLine("BRK2", m_plotData.at("BRK2").X.data(), m_plotData.at("BRK2").Y.data(), m_plotData.at("BRK2").X.size());
+
+            // Disegna la linea rossa verticale al cursore temporale
+            ImPlot::PushStyleColor(ImPlotCol_Line, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+            ImPlot::PlotInfLines("##CursorBrk", &cursor_time, 1);
+            ImPlot::PopStyleColor();
         }
 
         ImPlot::PopStyleVar();

@@ -33,9 +33,9 @@ void TemperatureWindow::printColoredValue(const std::string& label, const std::s
             ImVec4 color = getColorForThreshold(val, limitGreen, limitRed);
             ImGui::PushFont(m_uiManager->font_label);
             ImGui::TextColored(color, "%s", strVal.c_str());
-            ImGui::PopFont();
             ImGui::SameLine();
             ImGui::Text("°C");
+            ImGui::PopFont();
             
             if (val >= limitRed && ImGui::IsItemHovered()) {
                 ImGui::SetTooltip("ATTENZIONE: Valore critico");
@@ -77,8 +77,8 @@ void TemperatureWindow::draw() {
         ImGui::Spacing();
 
         ImGui::PushFont(m_uiManager->font_body);
-        printColoredValue("Pompa DX", "TMPDX", dataToDisplay, 50.0f, 100.0f);
-        printColoredValue("Pompa SX", "TMPSX", dataToDisplay, 50.0f, 100.0f);
+        printColoredValue("Pompa DX", "TMPDX", dataToDisplay, 60.0f, 80.0f);
+        printColoredValue("Pompa SX", "TMPSX", dataToDisplay, 60.0f, 80.0f);
         ImGui::PopFont();
 
     } else {
