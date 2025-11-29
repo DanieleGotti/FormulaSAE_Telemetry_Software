@@ -18,6 +18,8 @@ public:
     void subscribe(IAggregatedDataSubscriber* subscriber);
     void unsubscribe(IAggregatedDataSubscriber* subscriber);
     std::vector<std::string> getColumnOrder() const;
+    // Configurazione di default delle colonne
+    static std::vector<ColumnConfig> getDefaultConfig();
 
 private:
     void onRowReady(const DbRow& row);

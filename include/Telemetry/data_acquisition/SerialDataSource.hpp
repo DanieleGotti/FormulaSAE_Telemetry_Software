@@ -1,7 +1,7 @@
 #pragma once
-#include "IDataSource.hpp"
 #include <string>
 #include <vector>
+#include "IDataSource.hpp"
 #include "BaudRateQueryable.hpp"
 
 class SerialDataSource: public IDataSource, public BaudRateQueryable {

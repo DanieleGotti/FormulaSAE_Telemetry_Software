@@ -5,25 +5,7 @@
 #include "Telemetry/Services/FileService.hpp"
 #include "Telemetry/data_acquisition/PacketParser.hpp"
 #include "Telemetry/data_writing/DataAggregator.hpp"
-
-// Le configurazioni per l'aggregatore sono definite qui
-static std::vector<ColumnConfig> getFileAggregatorConfig() {
-    return {
-        {"ACC1A", AggregationType::AVERAGE, OutputFormat::INTEGER}, {"ACC2A", AggregationType::AVERAGE, OutputFormat::INTEGER},
-        {"ACC1B", AggregationType::AVERAGE, OutputFormat::DOUBLE}, {"ACC2B", AggregationType::AVERAGE, OutputFormat::DOUBLE},
-        {"BRK1",  AggregationType::AVERAGE, OutputFormat::DOUBLE}, {"BRK2",  AggregationType::AVERAGE, OutputFormat::DOUBLE},
-        {"R2D_BUTTON", AggregationType::LAST, OutputFormat::INTEGER}, {"RESET_BUTTON", AggregationType::LAST, OutputFormat::INTEGER},
-        {"SDC_INPUT", AggregationType::LAST, OutputFormat::INTEGER}, {"TS_ON_BUTTON", AggregationType::LAST, OutputFormat::INTEGER},
-        {"STEER", AggregationType::AVERAGE, OutputFormat::DOUBLE},
-        {"SOSPADX", AggregationType::AVERAGE, OutputFormat::DOUBLE}, {"SOSPASX", AggregationType::AVERAGE, OutputFormat::DOUBLE},
-        {"SOSPPDX", AggregationType::AVERAGE, OutputFormat::DOUBLE}, {"SOSPPSX", AggregationType::AVERAGE, OutputFormat::DOUBLE},
-        {"VELADX", AggregationType::AVERAGE, OutputFormat::DOUBLE}, {"VELASX", AggregationType::AVERAGE, OutputFormat::DOUBLE},
-        {"VELPDX", AggregationType::AVERAGE, OutputFormat::DOUBLE}, {"VELPSX", AggregationType::AVERAGE, OutputFormat::DOUBLE},
-        {"TMPDX", AggregationType::AVERAGE, OutputFormat::DOUBLE}, {"TMPSX", AggregationType::AVERAGE, OutputFormat::DOUBLE},
-        {"LEFT_INVERTER_FSM",  AggregationType::INVERTER, OutputFormat::STRING},
-        {"RIGHT_INVERTER_FSM", AggregationType::INVERTER, OutputFormat::STRING}
-    };
-}
+#include "Telemetry/Services/DataAggregatorService.hpp"
 
 FileService::FileService() = default;
 
@@ -70,7 +52,9 @@ void FileService::loadingLoop() {
 
     std::cout << "INFO [FileService]: File aperto con successo. Inizio caricamento." << std::endl;
 
-    DataAggregator aggregator(getFileAggregatorConfig(), [this](const DbRow& row){
+    auto aggregatorConfig = DataAggregatorService::getDefaultConfig();
+
+    DataAggregator aggregator(aggregatorConfig, [this](const DbRow& row){
         std::lock_guard<std::mutex> lock(m_dataMutex);
         m_loadedData.push_back(row);
     });

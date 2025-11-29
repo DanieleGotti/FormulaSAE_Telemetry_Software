@@ -56,7 +56,6 @@ private:
     std::map<std::string, AggregationType> m_configMap;
     std::function<void(const DbRow&)> m_onRowReadyCallback;
 
-    // Stato per la propagazione dei valori Inverter 
-    std::string m_lastLeftInverterState = "null";
-    std::string m_lastRightInverterState = "null";
+    // Memorizza l'ultimo valore noto per ogni colonna 
+    std::map<std::string, std::string> m_lastKnownValues; 
 };

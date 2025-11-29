@@ -2,9 +2,8 @@
 #include "Telemetry/Services/DataAggregatorService.hpp"
 #include "Telemetry/data_writing/DataAggregator.hpp"
 
-DataAggregatorService::DataAggregatorService() {
-    // Per aggiungere/modificare una colonna al database
-    m_config = {
+std::vector<ColumnConfig> DataAggregatorService::getDefaultConfig() {
+    std::vector<ColumnConfig> config = {
         // Sensori che vogliamo vedere come interi
         {"ACC1A", AggregationType::AVERAGE, OutputFormat::INTEGER},
         {"ACC2A", AggregationType::AVERAGE, OutputFormat::INTEGER},
@@ -29,12 +28,28 @@ DataAggregatorService::DataAggregatorService() {
         {"VELPSX", AggregationType::AVERAGE, OutputFormat::DOUBLE},
         {"TMPDX", AggregationType::AVERAGE, OutputFormat::DOUBLE},
         {"TMPSX", AggregationType::AVERAGE, OutputFormat::DOUBLE},
+        {"TMPMOTORDX", AggregationType::AVERAGE, OutputFormat::DOUBLE},
+        {"TMPMOTORSX", AggregationType::AVERAGE, OutputFormat::DOUBLE},
 
         // Dati che sono stringhe
         {"LEFT_INVERTER_FSM",  AggregationType::INVERTER, OutputFormat::STRING},
         {"RIGHT_INVERTER_FSM", AggregationType::INVERTER, OutputFormat::STRING}
     };
 
+    // Dati dei 14 moduli della batteria
+    for (int i = 1; i <= 14; ++i) {
+        std::string suffix = std::to_string(i);
+        config.push_back({ "TMP1M" + suffix, AggregationType::AVERAGE, OutputFormat::DOUBLE });
+        config.push_back({ "TMP2M" + suffix, AggregationType::AVERAGE, OutputFormat::DOUBLE });
+        config.push_back({ "TENSM" + suffix, AggregationType::AVERAGE, OutputFormat::DOUBLE });
+        config.push_back({ "ERRORM" + suffix, AggregationType::LAST, OutputFormat::INTEGER });
+    }
+    return config;
+}
+
+
+DataAggregatorService::DataAggregatorService() {
+    m_config = getDefaultConfig();
 
     m_aggregator = std::make_unique<DataAggregator>(m_config, 
         [this](const DbRow& row){ this->onRowReady(row); }

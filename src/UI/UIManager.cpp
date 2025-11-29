@@ -21,6 +21,7 @@
 #include "UI/HallWindow.hpp"
 #include "UI/PlaybackControlsWindow.hpp"
 #include "UI/TemperatureWindow.hpp"
+#include "UI/ModulesBatteryWindow.hpp"
 #include "Telemetry/Services/ServiceManager.hpp"
 #include "Telemetry/Services/FileService.hpp"
 #include "Telemetry/file_reading/PlaybackManager.hpp"
@@ -106,6 +107,7 @@ UiManager::~UiManager() {
         if (m_suspensionWindow) ServiceManager::getAggregator()->unsubscribe(m_suspensionWindow.get());
         if (m_hallWindow) ServiceManager::getAggregator()->unsubscribe(m_hallWindow.get());
         if (m_temperatureWindow) ServiceManager::getAggregator()->unsubscribe(m_temperatureWindow.get());
+        if (m_modulesBatteryWindow) ServiceManager::getAggregator()->unsubscribe(m_modulesBatteryWindow.get());
         if (m_tempDataSubscriber) ServiceManager::getAggregator()->unsubscribe(m_tempDataSubscriber.get());
     }
     
@@ -176,6 +178,7 @@ void UiManager::transitionToConnectedState(AppState connectedState) {
     m_suspensionWindow = std::make_shared<SuspensionWindow>(this);
     m_hallWindow = std::make_shared<HallWindow>(this);
     m_temperatureWindow = std::make_shared<TemperatureWindow>(this);
+    m_modulesBatteryWindow = std::make_shared<ModulesBatteryWindow>(this);
 
     if (connectedState == AppState::CONNECTED_LIVE) {
         // In modalità live, tutte le finestre si iscrivono all'aggregator
@@ -187,6 +190,7 @@ void UiManager::transitionToConnectedState(AppState connectedState) {
         aggregator->subscribe(m_suspensionWindow.get());
         aggregator->subscribe(m_hallWindow.get());
         aggregator->subscribe(m_temperatureWindow.get());
+        aggregator->subscribe(m_modulesBatteryWindow.get());
     } else if (connectedState == AppState::CONNECTED_PLAYBACK) {
         // In modalità lettura file, viene creata la finestra dei controlli
         m_playbackControls = std::make_shared<PlaybackControlsWindow>(this);
@@ -274,6 +278,7 @@ void UiManager::draw() {
         if (m_suspensionWindow) m_suspensionWindow->draw();
         if (m_hallWindow) m_hallWindow->draw();
         if (m_temperatureWindow) m_temperatureWindow->draw();
+        if (m_modulesBatteryWindow) m_modulesBatteryWindow->draw();
     }
 
     if (m_currentState == AppState::CONNECTED_PLAYBACK) {
@@ -374,6 +379,7 @@ void UiManager::resetToHome() {
     m_suspensionWindow.reset();
     m_hallWindow.reset();
     m_temperatureWindow.reset();
+    m_modulesBatteryWindow.reset();
     m_playbackControls.reset();
 
     m_uiElements.clear();
@@ -386,7 +392,6 @@ void UiManager::resetToHome() {
 
 #if defined(WIN32)
 void UiManager::SetWindowIconFromResource() {
-    // ---- Funzione invariata ----
     HINSTANCE hInstance = GetModuleHandle(nullptr);
     HICON hIcon = LoadIcon(hInstance, MAKEINTRESOURCEW(IDI_ICON1));
     if (!hIcon) return;

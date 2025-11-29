@@ -13,7 +13,7 @@ namespace {
         "ACC1B", "ACC2B", "BRK1", "BRK2", "STEER",
         "SOSPASX", "SOSPADX", "SOSPPSX", "SOSPPDX",
         "VELASX", "VELADX", "VELPDX", "VELPSX",
-        "TMPDX", "TMPSX"
+        "TMPDX", "TMPSX", "TMPMOTORDX", "TMPMOTORSX"
     };
     const std::unordered_set<std::string> statusLedLabels = { "SDC_INPUT", "RESET_BUTTON", "TS_ON_BUTTON", "R2D_BUTTON" };
     const std::unordered_set<std::string> inverterFsmLabels = { "LEFT_INVERTER_FSM", "RIGHT_INVERTER_FSM" };
@@ -22,6 +22,12 @@ namespace {
         {4, "ENABLE_INVERTER"}, {5, "ENABLED"}, {6, "ON"}, {7, "OK"}, {8, "ERROR"}
     };
     const std::string inverterStateKeyword = "STATE";
+    bool isBatteryModuleLabel(const std::string& label) {
+        return (label.rfind("TMP1M", 0) == 0) || 
+               (label.rfind("TMP2M", 0) == 0) || 
+               (label.rfind("TENSM", 0) == 0) || 
+               (label.rfind("ERRORM", 0) == 0);
+    }
 }
 
 std::chrono::system_clock::time_point PacketParser::parseTimestampString(const std::string& ts_str) {
@@ -87,6 +93,11 @@ PacketParser PacketParser::parse(const std::string& line, const std::chrono::sys
         if (statusLedLabels.count(label)) {
             packet.packetType = PacketType::STATUS_LED;
             packet.data = std::stoi(value_str);
+            return packet;
+        }
+        if (isBatteryModuleLabel(label)) {
+            packet.packetType = PacketType::SENSOR_DATA;
+            packet.data = std::stod(value_str);
             return packet;
         }
         if (inverterFsmLabels.count(label)) {

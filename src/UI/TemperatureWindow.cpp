@@ -81,6 +81,21 @@ void TemperatureWindow::draw() {
         printColoredValue("Pompa SX", "TMPSX", dataToDisplay, 60.0f, 80.0f);
         ImGui::PopFont();
 
+        ImGui::Spacing();
+        ImGui::Separator();
+
+        ImGui::PushFont(m_uiManager->font_label);
+        ImGui::Text("Motori");
+        ImGui::PopFont();
+        
+        ImGui::Separator();
+        ImGui::Spacing();
+
+        ImGui::PushFont(m_uiManager->font_body);
+        printColoredValue(" Motore DX", "TMPMOTORDX", dataToDisplay, 100.0f,120.0f);
+        printColoredValue(" Motore SX", "TMPMOTORSX", dataToDisplay, 100.0f, 120.0f);
+        ImGui::PopFont();
+
     } else {
         ImGui::Text("In attesa di dati.");
     }

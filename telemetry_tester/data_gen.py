@@ -12,7 +12,7 @@ EXPECTED_LABELS = ['ACC1A', 'ACC2A', 'ACC1B', 'ACC2B',
                     'BRK1', 'BRK2', 'STEER',
                     'SOSPASX', 'SOSPADX', 'SOSPPSX', 'SOSPPDX',
                     "VELASX", "VELADX", "VELPDX", "VELPSX",
-                    "TMPDX", "TMPSX"
+                    "TMPDX", "TMPSX", "TMPMOTORDX", "TMPMOTORSX"
                    ]
 
 # Messaggi speciali/LED
@@ -28,8 +28,8 @@ def generate_packet():
     Senza timestamp e con lo spazio come separatore.
     """
     message_type = random.choices(
-        population=['main_data', 'status', 'state', 'malformed'], 
-        weights=[80, 15, 5, 0.5], 
+        population=['main_data', 'battery_full', 'status', 'state', 'malformed'], 
+        weights=[80, 60, 15, 5, 0.5], 
         k=1
     )[0]
 
@@ -60,6 +60,32 @@ def generate_packet():
         elif label.startswith('TMP'):
             # Temperature sono float
             value = round(random.uniform(0.0, 150.0), 2)
+
+        packet = f"{label} {value}\n"
+
+    # Generazione dati per i moduli batteria
+    elif message_type == 'battery_full':
+        mod_idx = random.randint(1, 14)
+        data_type = random.choice(['TMP1', 'TMP2', 'TENS', 'ERROR'])
+        
+        label = ""
+        value = 0
+
+        if data_type == 'TMP1':
+            label = f"TMP1M{mod_idx}"
+            # Temperature sono float
+            value = round(random.uniform(30.0, 75.0), 1) 
+        elif data_type == 'TMP2':
+            # Temperature sono float
+            label = f"TMP2M{mod_idx}"
+            value = round(random.uniform(30.0, 75.0), 1)
+        elif data_type == 'TENS':
+            label = f"TENSM{mod_idx}"
+            # Voltaggi sono float
+            value = round(random.uniform(3.0, 4.3), 2)
+        elif data_type == 'ERROR':
+            label = f"ERRORM{mod_idx}"
+            value = 1 if random.random() > 0.95 else 0
 
         packet = f"{label} {value}\n"
 
