@@ -160,9 +160,9 @@ void HallWindow::draw() {
                 double sum = 0.0;
                 sum += std::stod(currentRowOpt->at("VELADX"));
                 sum += std::stod(currentRowOpt->at("VELASX"));
-                sum += std::stod(currentRowOpt->at("VELPSX"));
-                sum += std::stod(currentRowOpt->at("VELPDX"));
-                currentSpeed = static_cast<float>(sum / 4.0);
+                // sum += std::stod(currentRowOpt->at("VELPSX"));
+                // sum += std::stod(currentRowOpt->at("VELPDX"));
+                currentSpeed = static_cast<float>(sum / 2.0);
             } catch (const std::exception&) {
                 std::cerr << "ERRORE [HallWindow]: Errore durante il calcolo della velocità." << std::endl;
             }
