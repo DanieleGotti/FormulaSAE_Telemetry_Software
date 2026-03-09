@@ -1,8 +1,3 @@
-#include "UI/AccBrkWindow.hpp"
-#include "UI/UIManager.hpp"
-#include "Telemetry/Services/ServiceManager.hpp"
-#include "Telemetry/file_reading/PlaybackManager.hpp"
-#include "Telemetry/data_acquisition/PacketParser.hpp"
 #include <imgui.h>
 #include <implot.h> 
 #include <iomanip>
@@ -12,6 +7,11 @@
 #include <cmath>
 #include <algorithm>
 #include <limits>
+#include "UI/AccBrkWindow.hpp"
+#include "UI/UIManager.hpp"
+#include "Telemetry/Services/ServiceManager.hpp"
+#include "Telemetry/file_reading/PlaybackManager.hpp"
+#include "Telemetry/data_acquisition/PacketParser.hpp"
 
 struct TimeFormatterData { 
     double AxisSpan; 

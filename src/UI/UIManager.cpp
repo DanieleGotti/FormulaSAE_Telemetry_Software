@@ -19,6 +19,7 @@
 #include "UI/SteerWindow.hpp"
 #include "UI/SuspensionWindow.hpp"
 #include "UI/HallWindow.hpp"
+#include "UI/VarianceWindow.hpp"
 #include "UI/PlaybackControlsWindow.hpp"
 #include "UI/TemperatureWindow.hpp"
 #include "UI/ModulesBatteryWindow.hpp"
@@ -109,6 +110,9 @@ UiManager::~UiManager() {
         if (m_temperatureWindow) ServiceManager::getAggregator()->unsubscribe(m_temperatureWindow.get());
         if (m_modulesBatteryWindow) ServiceManager::getAggregator()->unsubscribe(m_modulesBatteryWindow.get());
         if (m_tempDataSubscriber) ServiceManager::getAggregator()->unsubscribe(m_tempDataSubscriber.get());
+        if (ServiceManager::getDataManager() && m_varianceWindow) {
+        ServiceManager::getDataManager()->removeSubscriber(m_varianceWindow.get());
+        }
     }
     
     ImGui_ImplOpenGL3_Shutdown();
@@ -179,6 +183,7 @@ void UiManager::transitionToConnectedState(AppState connectedState) {
     m_hallWindow = std::make_shared<HallWindow>(this);
     m_temperatureWindow = std::make_shared<TemperatureWindow>(this);
     m_modulesBatteryWindow = std::make_shared<ModulesBatteryWindow>(this);
+    m_varianceWindow = std::make_shared<VarianceWindow>(this);
 
     if (connectedState == AppState::CONNECTED_LIVE) {
         // In modalità live, tutte le finestre si iscrivono all'aggregator
@@ -191,6 +196,7 @@ void UiManager::transitionToConnectedState(AppState connectedState) {
         aggregator->subscribe(m_hallWindow.get());
         aggregator->subscribe(m_temperatureWindow.get());
         aggregator->subscribe(m_modulesBatteryWindow.get());
+        ServiceManager::getDataManager()->addSubscriber(m_varianceWindow.get());
     } else if (connectedState == AppState::CONNECTED_PLAYBACK) {
         // In modalità lettura file, viene creata la finestra dei controlli
         m_playbackControls = std::make_shared<PlaybackControlsWindow>(this);
@@ -279,6 +285,7 @@ void UiManager::draw() {
         if (m_hallWindow) m_hallWindow->draw();
         if (m_temperatureWindow) m_temperatureWindow->draw();
         if (m_modulesBatteryWindow) m_modulesBatteryWindow->draw();
+        if (m_varianceWindow) m_varianceWindow->draw();
     }
 
     if (m_currentState == AppState::CONNECTED_PLAYBACK) {
@@ -370,6 +377,10 @@ void UiManager::showDockingSpace() {
 void UiManager::resetToHome() {
     std::cout << "INFO [UiManager]: Reset dell'interfaccia verso la schermata Home." << std::endl;
 
+    if (m_varianceWindow && ServiceManager::getDataManager()) {
+        ServiceManager::getDataManager()->removeSubscriber(m_varianceWindow.get());
+    }
+
     ServiceManager::resetForNewSession();
 
     m_dashboard.reset();
@@ -381,6 +392,7 @@ void UiManager::resetToHome() {
     m_temperatureWindow.reset();
     m_modulesBatteryWindow.reset();
     m_playbackControls.reset();
+    m_varianceWindow.reset();
 
     m_uiElements.clear();
     m_serialSelectionWindow = nullptr;

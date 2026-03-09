@@ -31,22 +31,55 @@ namespace {
 }
 
 std::chrono::system_clock::time_point PacketParser::parseTimestampString(const std::string& ts_str) {
-    try {
-        if (ts_str.length() < 23) return std::chrono::system_clock::time_point();
-        std::tm tm = {};
-        tm.tm_year = std::stoi(ts_str.substr(0, 4)) - 1900;
-        tm.tm_mon = std::stoi(ts_str.substr(5, 2)) - 1;
-        tm.tm_mday = std::stoi(ts_str.substr(8, 2));
-        tm.tm_hour = std::stoi(ts_str.substr(11, 2));
-        tm.tm_min = std::stoi(ts_str.substr(14, 2));
-        tm.tm_sec = std::stoi(ts_str.substr(17, 2));
-        time_t time = std::mktime(&tm);
-        auto time_point = std::chrono::system_clock::from_time_t(time);
-        int ms = std::stoi(ts_str.substr(20, 3));
-        return time_point + std::chrono::milliseconds(ms);
-    } catch (const std::exception&) {
-        return std::chrono::system_clock::time_point();
+    if (ts_str.length() < 23) return std::chrono::system_clock::time_point();
+
+    const char* s = ts_str.data();
+
+    auto parse_len =[](const char* p, int len) {
+        int val = 0;
+        for (int i = 0; i < len; ++i) {
+            if (p[i] >= '0' && p[i] <= '9') {
+                val = val * 10 + (p[i] - '0');
+            }
+        }
+        return val;
+    };
+
+    // La cache salva in memoria i primi 19 caratteri (fino ai secondi)
+    thread_local char cached_str[20] = {0}; 
+    thread_local std::chrono::system_clock::time_point cached_tp;
+
+    bool cache_hit = true;
+    for (int i = 0; i < 19; ++i) {
+        if (s[i] != cached_str[i]) {
+            cache_hit = false;
+            break;
+        }
     }
+
+    // Se il secondo è cambiato, usiamo mktime 
+    if (!cache_hit) {
+        for (int i = 0; i < 19; ++i) {
+            cached_str[i] = s[i];
+        }
+
+        std::tm tm = {}; 
+        tm.tm_year = parse_len(s, 4) - 1900;
+        tm.tm_mon  = parse_len(s + 5, 2) - 1;
+        tm.tm_mday = parse_len(s + 8, 2);
+        tm.tm_hour = parse_len(s + 11, 2);
+        tm.tm_min  = parse_len(s + 14, 2);
+        tm.tm_sec  = parse_len(s + 17, 2);
+
+        time_t time = std::mktime(&tm);
+        if (time == -1) return std::chrono::system_clock::time_point(); 
+        
+        cached_tp = std::chrono::system_clock::from_time_t(time);
+    }
+
+    // Aggiunge i millisecondi 
+    int ms = parse_len(s + 20, 3);
+    return cached_tp + std::chrono::milliseconds(ms);
 }
 
 PacketParser PacketParser::parse(const std::string& line, const std::chrono::system_clock::time_point& reception_time, bool isFromFile) {
