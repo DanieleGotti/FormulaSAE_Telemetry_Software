@@ -36,7 +36,6 @@ std::vector<ColumnConfig> DataAggregatorService::getDefaultConfig() {
         {"RIGHT_INVERTER_FSM", AggregationType::INVERTER, OutputFormat::STRING}
     };
 
-    // Dati dei 14 moduli della batteria
     for (int i = 1; i <= 14; ++i) {
         std::string suffix = std::to_string(i);
         config.push_back({ "TMP1M" + suffix, AggregationType::AVERAGE, OutputFormat::DOUBLE });
@@ -47,16 +46,13 @@ std::vector<ColumnConfig> DataAggregatorService::getDefaultConfig() {
     return config;
 }
 
-
 DataAggregatorService::DataAggregatorService() {
     m_config = getDefaultConfig();
-
     m_aggregator = std::make_unique<DataAggregator>(m_config, 
         [this](const DbRow& row){ this->onRowReady(row); }
     );
 }
 
-// Non è usato 
 bool DataAggregatorService::createFile(const std::string& directoryPath) { 
     return true; 
 }
@@ -99,5 +95,15 @@ std::vector<std::string> DataAggregatorService::getColumnOrder() const {
     for(const auto& col : m_config) {
         order.push_back(col.name);
     }
+    
+    const std::vector<std::string> targetSensors = {
+        "ACC1A", "ACC2A", "ACC1B", "ACC2B", "BRK1", "BRK2", "STEER"
+    };
+    for (const auto& sensor : targetSensors) {
+        order.push_back(sensor + "_MEAN");
+        order.push_back(sensor + "_VAR");
+        order.push_back(sensor + "_STD");
+    }
+    
     return order;
 }

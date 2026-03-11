@@ -110,9 +110,7 @@ UiManager::~UiManager() {
         if (m_temperatureWindow) ServiceManager::getAggregator()->unsubscribe(m_temperatureWindow.get());
         if (m_modulesBatteryWindow) ServiceManager::getAggregator()->unsubscribe(m_modulesBatteryWindow.get());
         if (m_tempDataSubscriber) ServiceManager::getAggregator()->unsubscribe(m_tempDataSubscriber.get());
-        if (ServiceManager::getDataManager() && m_varianceWindow) {
-        ServiceManager::getDataManager()->removeSubscriber(m_varianceWindow.get());
-        }
+        if (m_varianceWindow) ServiceManager::getAggregator()->unsubscribe(m_varianceWindow.get());
     }
     
     ImGui_ImplOpenGL3_Shutdown();
@@ -196,7 +194,7 @@ void UiManager::transitionToConnectedState(AppState connectedState) {
         aggregator->subscribe(m_hallWindow.get());
         aggregator->subscribe(m_temperatureWindow.get());
         aggregator->subscribe(m_modulesBatteryWindow.get());
-        ServiceManager::getDataManager()->addSubscriber(m_varianceWindow.get());
+        aggregator->subscribe(m_varianceWindow.get());
     } else if (connectedState == AppState::CONNECTED_PLAYBACK) {
         // In modalità lettura file, viene creata la finestra dei controlli
         m_playbackControls = std::make_shared<PlaybackControlsWindow>(this);
@@ -376,10 +374,6 @@ void UiManager::showDockingSpace() {
 
 void UiManager::resetToHome() {
     std::cout << "INFO [UiManager]: Reset dell'interfaccia verso la schermata Home." << std::endl;
-
-    if (m_varianceWindow && ServiceManager::getDataManager()) {
-        ServiceManager::getDataManager()->removeSubscriber(m_varianceWindow.get());
-    }
 
     ServiceManager::resetForNewSession();
 
