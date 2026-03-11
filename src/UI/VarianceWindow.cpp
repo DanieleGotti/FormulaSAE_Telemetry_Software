@@ -120,11 +120,7 @@ void VarianceWindow::draw() {
         ImGui::TableHeadersRow();
 
         auto formatValue =[](double val) {
-            if (val > 0.0001 || val == 0.0) {
-                ImGui::Text("%.3f", val); // 3 decimali per facilità di lettura
-            } else {
-                ImGui::Text("%e", val);
-            }
+            ImGui::Text("%.3f", val); // 3 decimali per facilità di lettura
         };
 
         std::lock_guard<std::mutex> lock(m_dataMutex);
