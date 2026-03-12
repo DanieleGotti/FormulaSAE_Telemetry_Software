@@ -174,6 +174,17 @@ if(APPLE)
         target_sources(${PROJECT_NAME} PRIVATE ${FONT_FILE})
     endforeach()
 
+    # --- Gestione Configurazione ImGui Default ---
+    set(IMGUI_CONFIG_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/assets/resources/imgui.ini")
+    
+    # Imposta la destinazione direttamente nella cartella Resources (senza sottocartelle)
+    set_source_files_properties(${IMGUI_CONFIG_SOURCE} PROPERTIES 
+        MACOSX_PACKAGE_LOCATION "Resources"
+    )
+    
+    # Aggiungi il file alle sorgenti del target
+    target_sources(${PROJECT_NAME} PRIVATE ${IMGUI_CONFIG_SOURCE})
+
     # Se avessi altre risorse (immagini, ecc.) potresti creare liste simili
     # e usare un foreach per gestirle singolarmente.
 

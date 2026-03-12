@@ -59,8 +59,14 @@ UiManager::UiManager() {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImPlot::CreateContext();
-    ImGuiIO& io = ImGui::GetIO();
-    (void)io;
+    [[maybe_unused]] ImGuiIO& io = ImGui::GetIO();
+
+    if (ServiceManager::getSettingsManager()->getFirstAccess()) {
+      auto [pFileData, pFileLength] = ServiceManager::getAssetManager()->getDefaultImGuiIniFile();
+      ImGui::LoadIniSettingsFromMemory((const char*)pFileData, pFileLength);
+      ServiceManager::getSettingsManager()->setFirstAccess(false);
+    }
+
     static const std::string path = fsutils::getAppDocumentsFilePath("imgui.ini").string();
     io.IniFilename = path.c_str();
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;

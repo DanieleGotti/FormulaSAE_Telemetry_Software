@@ -11,6 +11,7 @@
 #define TITLE_FONT_SIZE_KEY "titleFontSize"
 #define GLOBAL_FONT_SCALE_KEY "globalFontScale"
 #define DARK_MODE_KEY "darkMode"
+#define FIRST_ACCESS_KEY "firstAccess"
 
 #define DEFAULT_VERSION 1.0f
 #define DEFAULT_BODYFONTSIZE 20.0f
@@ -19,6 +20,7 @@
 #define DEFAULT_TITLEFONTSIZE 22.0f
 #define DEFAULT_GLOBALFONTSCALE 1.0f
 #define DEFAULT_DARKMODE true
+#define DEFAULT_FIRST_ACCESS true
 
 SettingsManager::SettingsManager() {
     // Create settings directory if not present
@@ -44,6 +46,7 @@ bool SettingsManager::parseJsonSettingsFile() {
         defaultConfig[TITLE_FONT_SIZE_KEY] = DEFAULT_TITLEFONTSIZE;
         defaultConfig[GLOBAL_FONT_SCALE_KEY] = DEFAULT_GLOBALFONTSCALE;
         defaultConfig[DARK_MODE_KEY] = DEFAULT_DARKMODE;
+        defaultConfig[FIRST_ACCESS_KEY] = DEFAULT_FIRST_ACCESS;
 
         m_settings = defaultConfig;
 
@@ -123,6 +126,13 @@ bool SettingsManager::getDarkMode() const {
     return false; // Default to light mode
 }
 
+bool SettingsManager::getFirstAccess() const {
+    if(m_settings.contains(FIRST_ACCESS_KEY)) {
+        return m_settings[FIRST_ACCESS_KEY].as<bool>();
+    }
+    return false; // Default not first access
+}
+
 void SettingsManager::setBodyFontSize(float size) {
     m_settings[BODY_FONT_SIZE_KEY] = size;
     saveSettingsToFile();
@@ -155,5 +165,10 @@ void SettingsManager::setVersion(float version) {
 
 void SettingsManager::setDarkMode(bool isDarkMode) {
     m_settings[DARK_MODE_KEY] = isDarkMode;
+    saveSettingsToFile();
+}
+
+void SettingsManager::setFirstAccess(bool isFirstAccess) {
+    m_settings[FIRST_ACCESS_KEY] = isFirstAccess;
     saveSettingsToFile();
 }

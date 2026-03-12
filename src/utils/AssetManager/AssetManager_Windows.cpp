@@ -73,6 +73,30 @@ public:
         return {safeBuffer, static_cast<uint32_t>(resourceSize)};
     }
 
+    std::pair<void*, uint32_t> getDefaultImGuiIniFile() {
+        int resourceId = IDR_IMGUI_CONFIG;
+
+        std::cout << "INFO [AssetManager]: Loading ImGui config resource" << std::endl;
+
+        HINSTANCE hInstance = GetModuleHandle(nullptr);
+        HRSRC hRes = FindResource(hInstance, MAKEINTRESOURCE(resourceId), RT_RCDATA);
+        if (!hRes) return {nullptr, 0};
+
+        HGLOBAL hResLoad = LoadResource(hInstance, hRes);
+        void* pResourceData = LockResource(hResLoad);
+        DWORD resourceSize = SizeofResource(hInstance, hRes);
+        
+        if (!pResourceData || resourceSize == 0) return {nullptr, 0};
+
+        // Allocate resourceSize + 1 to ensure null-termination for safety
+        char* safeBuffer = new char[resourceSize + 1];
+        std::memcpy(safeBuffer, pResourceData, resourceSize);
+        safeBuffer[resourceSize] = '\0';
+
+        m_assetDataBuffers.push_back(safeBuffer); 
+        return {safeBuffer, static_cast<uint32_t>(resourceSize)};
+    }
+
 private:
     std::list<void*> m_assetDataBuffers;
 };

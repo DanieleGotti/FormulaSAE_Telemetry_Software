@@ -13,6 +13,7 @@ public:
     float getGlobalFontScale() const;
     float getVersion() const;
     bool getDarkMode() const;
+    bool getFirstAccess() const;
 
     // Setters
     void setBodyFontSize(float size);
@@ -22,6 +23,7 @@ public:
     void setGlobalFontScale(float scale);
     void setVersion(float version);
     void setDarkMode(bool isDarkMode);
+    void setFirstAccess(bool isFirstAccess);
 
 private:
     bool parseJsonSettingsFile();

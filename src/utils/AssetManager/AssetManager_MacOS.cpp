@@ -103,6 +103,14 @@ private:
         return "";
     }
 
+    std::pair<void*, uint32_t> getDefaultImGuiIniFile() override {
+        std::string filename = "imgui.ini"; 
+
+        std::cout << "INFO [AssetManager_MacOS]: Loading default ImGui config from bundle." << std::endl;
+
+        return loadAsset(filename);
+    }
+
 private:
     std::unordered_map<std::string, std::pair<void*, uint32_t>> m_assetCache;
 };
