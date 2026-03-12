@@ -154,9 +154,9 @@ void DataAggregator::finalizeAndEmitRow() {
 
     // Aggiunta delle statistiche alla riga
     for (const auto& sensor : m_targetSensors) {
-        finalRow[sensor + "_MEAN"] = formatDouble(m_currentStats[sensor].mean, 3);
-        finalRow[sensor + "_VAR"]  = formatDouble(m_currentStats[sensor].variance, 3);
-        finalRow[sensor + "_STD"]  = formatDouble(m_currentStats[sensor].stdDev, 3);
+        finalRow[sensor + "_MEAN"] = formatDouble(m_currentStats[sensor].mean, 2);
+        finalRow[sensor + "_VAR"]  = formatDouble(m_currentStats[sensor].variance, 2);
+        finalRow[sensor + "_STD"]  = formatDouble(m_currentStats[sensor].stdDev, 2);
     }
 
     if (m_onRowReadyCallback) {

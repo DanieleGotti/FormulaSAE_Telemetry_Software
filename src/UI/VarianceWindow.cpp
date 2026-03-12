@@ -1,6 +1,4 @@
 #include <imgui.h>
-#include <iostream>
-#include <algorithm>
 #include "UI/VarianceWindow.hpp"
 #include "UI/UIManager.hpp"
 #include "Telemetry/Services/ServiceManager.hpp"
@@ -12,38 +10,17 @@ VarianceWindow::VarianceWindow(UiManager* manager) : m_uiManager(manager) {
     }
 }
 
-// Lettura per evitare problemi di formattazione dei numeri con Excel
-static double safeRead(const DbRow& row, const std::string& key) {
-    std::string val = "";
-    
-    // Cerca la colonna esatta
-    if (row.count(key)) {
-        val = row.at(key);
-    } 
-    // Bugfix Windows: Cerca la colonna con il carriage return attaccato
-    else if (row.count(key + "\r")) {
-        val = row.at(key + "\r");
-    } 
-    else {
-        return 0.0;
-    }
-
-    // Trasforma le eventuali virgole in punti prima di convertire in double
-    std::replace(val.begin(), val.end(), ',', '.');
-
-    try {
-        return std::stod(val);
-    } catch (...) {
-        return 0.0;
-    }
-}
-
-// Estrae i 3 valori per tutti i sensori
 void VarianceWindow::extractStatsFromRow(const DbRow& row) {
     for (const auto& sensor : m_targetSensors) {
-        m_displayStats[sensor].mean     = safeRead(row, sensor + "_MEAN");
-        m_displayStats[sensor].variance = safeRead(row, sensor + "_VAR");
-        m_displayStats[sensor].stdDev   = safeRead(row, sensor + "_STD");
+        if (row.count(sensor + "_MEAN")) {
+            try { m_displayStats[sensor].mean = std::stod(row.at(sensor + "_MEAN")); } catch (...) {}
+        }
+        if (row.count(sensor + "_VAR")) {
+            try { m_displayStats[sensor].variance = std::stod(row.at(sensor + "_VAR")); } catch (...) {}
+        }
+        if (row.count(sensor + "_STD")) {
+            try { m_displayStats[sensor].stdDev = std::stod(row.at(sensor + "_STD")); } catch (...) {}
+        }
     }
 }
 
@@ -53,7 +30,6 @@ void VarianceWindow::onAggregatedDataReceived(const DbRow& row) {
 }
 
 void VarianceWindow::draw() {
-    // Modalità PLAYBACK: legge direttamente la riga dove si trova il cursore
     if (m_uiManager->getCurrentState() == AppState::CONNECTED_PLAYBACK) {
         auto playbackManager = ServiceManager::getPlaybackManager();
         if (playbackManager) {
@@ -65,7 +41,6 @@ void VarianceWindow::draw() {
         }
     }
 
-    // Disegna la tabella con i dati correnti
     ImGui::Begin("Statistiche sensori", nullptr);
 
     ImGui::PushFont(m_uiManager->font_label);
@@ -82,7 +57,7 @@ void VarianceWindow::draw() {
         ImGui::TableHeadersRow();
 
         auto formatValue =[](double val) {
-            ImGui::Text("%.3f", val); // Formatta sempre con 3 decimali puliti
+            ImGui::Text("%.3f", val); 
         };
 
         std::lock_guard<std::mutex> lock(m_dataMutex);
