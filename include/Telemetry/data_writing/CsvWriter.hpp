@@ -27,4 +27,5 @@ private:
     std::ofstream m_outputFile;
     std::vector<std::string> m_columnOrder;
     bool m_isFirstRow{true};
+    double m_recordingStartTime{-1.0};
 };

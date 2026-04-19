@@ -96,8 +96,8 @@ void ImGuiFileBrowser::refreshFiles() {
             } else if (entry.is_regular_file()) {
                 std::string extension = entry.path().extension().string();
                 std::transform(extension.begin(), extension.end(), extension.begin(),[](unsigned char c){ return std::tolower(c); });
-                // Mostriamo solo .txt 
-                if (extension == ".txt") {
+                // Mostriamo solo .csv 
+                if (extension == ".csv") {
                     m_currentFiles.push_back({entry.path().filename().string(), false});
                 }
             }

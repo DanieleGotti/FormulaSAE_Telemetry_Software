@@ -1,17 +1,10 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Sat Oct 11 22:29:50 2025
-
-@author: Daniele Gotti
-"""
-
 import serial
 import serial.tools.list_ports
 import threading
 import time
-import random
-import sys 
-from data_gen import generate_packet
+import sys
+from data_gen import generate_packet_A, generate_packet_B
 
 class SerialSender:
     def __init__(self):
@@ -23,15 +16,8 @@ class SerialSender:
 
     @staticmethod
     def list_ports():
-        """
-        Scansiona e restituisce una lista di porte seriali disponibili.
-        Su Windows, utilizza un metodo di "brute-force" per trovare anche
-        le porte virtuali che list_ports.comports() potrebbe non vedere.
-        """
         ports = []
-        # Metodo standard per Windows
         if sys.platform.startswith('win'):
-            print("Scanning for COM ports on Windows...")
             for i in range(1, 257):
                 port_name = f'COM{i}'
                 try:
@@ -41,15 +27,11 @@ class SerialSender:
                 except (OSError, serial.SerialException):
                     pass
         else:
-            # Metodo standard per Linux, macOS, etc.
-            print("Scanning for ports on non-Windows OS...")
             available_ports = serial.tools.list_ports.comports()
             ports = [port.device for port in available_ports]
-
         return ports
 
-    def start(self, port_name, baudrate=115200):
-        """Apre la porta e avvia il thread di invio."""
+    def start(self, port_name, baudrate=256000):
         if self._is_running:
             return
 
@@ -66,7 +48,6 @@ class SerialSender:
             return False
 
     def stop(self):
-        """Segnala al thread di fermarsi e chiude la porta."""
         if not self._is_running:
             return
             
@@ -83,27 +64,44 @@ class SerialSender:
         if self.on_stop:
             self.on_stop()
 
-    def _sending_loop(self):
-        """Il ciclo che gira nel thread secondario."""
-        print("Thread invio avviato.")
+    def _sending_loop(self):        
+        interval = 0.005  # 5 millisecondi esatti
+        next_time = time.perf_counter() + interval
+        tick_counter = 0  # ogni tick = 5ms
+
         while self._is_running:
             try:
-                data = generate_packet()
-                self.serial_port.write(data)
-                time.sleep(random.uniform(0.001, 0.01)) 
+                # Pacchetto A — sempre, ogni 5ms
+                data_A = generate_packet_A(tick_counter)
+                self.serial_port.write(data_A)
+
+                # Pacchetto B — sempre, ogni 40 tick (200ms)
+                if tick_counter % 40 == 0:
+                    data_B = generate_packet_B(tick_counter)
+                    self.serial_port.write(data_B)
+
+                # Sincronizzazione precisa a 5ms
+                now = time.perf_counter()
+                sleep_time = next_time - now
+                if sleep_time > 0.002:
+                    time.sleep(sleep_time - 0.001)
+                while time.perf_counter() < next_time:
+                    pass
+
+                next_time += interval
+                tick_counter += 1
 
             except serial.SerialException as e:
                 print(f"Errore durante l'invio: {e}")
-                self._is_running = False 
+                self._is_running = False
                 if self.on_error:
-                    self.root.after(0, self.on_error, f"Connessione persa: {str(e)}")
-                break 
+                    self.on_error(f"Connessione persa: {str(e)}")
+                break
             except Exception as e:
                 print(f"Errore imprevisto: {e}")
                 self._is_running = False
                 if self.on_error:
-                     self.root.after(0, self.on_error, f"Errore: {str(e)}")
+                    self.on_error(f"Errore: {str(e)}")
                 break
 
         self.stop()
-        print("Thread invio terminato.")

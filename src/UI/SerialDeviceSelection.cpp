@@ -64,7 +64,7 @@ void SerialDeviceSelection::refreshPorts() {
 
     m_selectedBaudrateIndex = -1;
     for (int i = 0; i < m_baudRates.size(); ++i) {
-        if (m_baudRates[i] == 115200) {
+        if (m_baudRates[i] == 500000) {
             m_selectedBaudrateIndex = i;
             break;
         }

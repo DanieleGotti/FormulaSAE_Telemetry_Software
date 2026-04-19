@@ -1,10 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Sat Oct 11 22:27:31 2025
-
-@author: Daniele Gotti
-"""
-
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
@@ -13,11 +7,11 @@ from serial_worker import SerialSender
 class TesterGUI:
     def __init__(self, root):
         self.root = root
-        self.root.title("Telemetry Spammer")
+        self.root.title("Telemetry Spammer SAE")
         self.root.geometry("450x200") 
         self.root.resizable(False, False)
 
-        self.baud_rates = [300, 600, 1200, 2400, 4800, 9600, 19200, 38400, 115200, 128000, 256000]
+        self.baud_rates =[9600, 19200, 38400, 115200, 128000, 256000, 500000, 1000000]
 
         self.sender = SerialSender()
         self.sender.on_error = self.handle_worker_error
@@ -42,7 +36,7 @@ class TesterGUI:
         ttk.Label(frame_conn, text="Baud:").pack(side="left", padx=(5, 2))
         self.combo_baud = ttk.Combobox(frame_conn, values=self.baud_rates, state="readonly", width=12)
         self.combo_baud.pack(side="left", padx=(0, 5))
-        self.combo_baud.set(115200)
+        self.combo_baud.set(500000)
 
         frame_ctrl = ttk.Frame(self.root)
         frame_ctrl.pack(fill="both", expand=True, **pad)
@@ -87,7 +81,7 @@ class TesterGUI:
             self.btn_stop.config(state="normal")
             self.combo_ports.config(state="disabled")
             self.combo_baud.config(state="disabled") 
-            self.set_status(f"Spamming su {port} a {baud} baud...")
+            self.set_status(f"Spamming su {port} a {baud} baud (Simulazione Drop attiva)...")
         else:
             self.set_status("Errore apertura porta.")
 
@@ -96,17 +90,14 @@ class TesterGUI:
         self.sender.stop()
         
     def handle_worker_stop(self):
-        """Chiamato dal worker quando si ferma (manualmente o per errore)."""
         self.root.after(0, self._reset_gui_state)
 
     def handle_worker_error(self, error_msg):
-        """Chiamato dal worker se c'è un'eccezione (es. porta virtuale chiusa)."""
         print(f"Callback errore: {error_msg}")
         self.root.after(0, lambda: self.set_status(f"Errore: {error_msg}"))
         self.root.after(0, lambda: messagebox.showerror("Errore Seriale", error_msg))
 
     def _reset_gui_state(self):
-        """MODIFICATO: Riabilita anche il menu del baud rate."""
         self.btn_start.config(state="normal")
         self.btn_stop.config(state="disabled")
         self.combo_ports.config(state="readonly")

@@ -1,90 +1,78 @@
 #include <iostream>
-#include <string>
 #include <chrono>
 #include "Telemetry/Services/SerialService.hpp"
 #include "Telemetry/data_acquisition/SerialDataSource.hpp"
-#include "Telemetry/data_acquisition/PacketParser.hpp"
 
-SerialService::SerialService(DataManager* dataManager): m_dataSource(std::make_unique<SerialDataSource>()), m_dataManager(dataManager) {}
+SerialService::SerialService(DataAggregator* aggregator)
+    : m_dataSource(std::make_unique<SerialDataSource>()), m_aggregator(aggregator) {}
 
-SerialService::~SerialService() {
-    stop();
-}
+SerialService::~SerialService() { stop(); }
 
 bool SerialService::configure(const SerialConfig& config) {
-    if (m_running) {
-        std::cerr << "ERRORE [SerialService]: Impossibile configurare SerialService mentre è in esecuzione." << std::endl;
-        return false;
-    }
+    if (m_running) return false;
     m_config = config;
     return true;
 }
 
 bool SerialService::start() {
-    if (m_running) {
-        std::cerr << "ERRORE [SerialService]: SerialService è già in esecuzione." << std::endl;
-        return true;
-    }
+    if (m_running) return true;
 
     if (!m_dataSource->open(m_config.port, m_config.baudrate)) {
-        std::cerr << "ERRORE [SerialService]: Impossibile aprire la sorgente dati." << std::endl;
+        std::cerr << "ERRORE[SerialService]: Impossibile aprire la porta." << std::endl;
         return false;
     }
 
+    m_parser.resetCounters();
+    m_queue.clear(); // Pulisce la coda se c'era sporcizia precedente
     m_running = true;
     m_thread = std::thread(&SerialService::acquisitionLoop, this);
-    std::cout << "INFO [SerialService]: SerialService avviato sulla porta " << m_config.port << std::endl;
+    m_processingThread = std::thread(&SerialService::processingLoop, this); // Avvia il secondo thread
+    std::cout << "INFO [SerialService]: Avviato sulla porta " << m_config.port << std::endl;
     return true;
 }
 
 void SerialService::stop() {
-    if (!m_running) {
-        return;
-    }
-
+    if (!m_running) return;
     m_running = false;
-    if (m_thread.joinable()) {
-        m_thread.join();
-    }
-    
+    if (m_thread.joinable()) m_thread.join();
+    if (m_processingThread.joinable()) m_processingThread.join(); // Attende la chiusura del secondo thread
     m_dataSource->close();
-    std::cout << "INFO [SerialService]: SerialService fermato." << std::endl;
 }
 
-bool SerialService::isRunning() const {
-    return m_running;
-}
+bool SerialService::isRunning() const { return m_running; }
 
 void SerialService::acquisitionLoop() {
-    std::string serialBuffer;
-
     while (m_running) {
         std::vector<uint8_t> rawData = m_dataSource->readPacket();
         if (!rawData.empty()) {
-            const auto reception_time = std::chrono::system_clock::now();
-            serialBuffer.append(rawData.begin(), rawData.end());
-            size_t pos;
-            while ((pos = serialBuffer.find('\n')) != std::string::npos) {
-                std::string line = serialBuffer.substr(0, pos);
-                serialBuffer.erase(0, pos + 1);
-                if (!line.empty() && line.back() == '\r') {
-                    line.pop_back();
-                }
+            // Mette i dati in coda IMMEDIATAMENTE, senza aspettare Parsing o UI
+            m_queue.push(std::move(rawData));
+        } else {
+            // Dorme pochissimo per non bruciare la CPU
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        }
+    }
+}
 
-                if (line.empty()) continue;
+void SerialService::processingLoop() {
+    std::vector<uint8_t> rxBuffer;
+    rxBuffer.reserve(8192); // Buffer largo per evitare riallocazioni
+    
+    while (m_running) {
+        // Aspetta fino a 10ms che arrivino dati
+        auto dataOpt = m_queue.wait_for_and_pop(std::chrono::milliseconds(10));
+        
+        if (dataOpt.has_value()) {
+            // Accoda i nuovi byte
+            rxBuffer.insert(rxBuffer.end(), dataOpt->begin(), dataOpt->end());
 
-                PacketParser packet = PacketParser::parse(line, reception_time);
-                
-                if (packet.packetType != PacketType::UNKNOWN && m_dataManager) {
-                    m_dataManager->processData(packet);
-                } else if (m_dataManager) { 
-                    // Log dei pacchetti malformati per debug
-                    std::cerr << "ATTENZIONE [SerialService]: Dato scartato dal parser: '" << std::get<std::string>(packet.data) << "'." << std::endl;
+            DbRow readyRow;
+            // Estrae tutti i pacchetti completi (il parser ci metterà il tempo che serve)
+            while (m_parser.parseLiveBytes(rxBuffer, readyRow)) {
+                if (m_aggregator) {
+                    m_aggregator->processRow(readyRow); // Questo ora può fermarsi sui Mutex della UI in totale sicurezza!
                 }
             }
-            std::cout << "INFO [SerialService]: Ricevuti " << rawData.size() << " byte." << std::endl;
-        } else {
-            std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
     }
 }

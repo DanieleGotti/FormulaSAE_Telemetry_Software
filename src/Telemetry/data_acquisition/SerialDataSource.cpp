@@ -122,6 +122,7 @@ bool SerialDataSource::open(const std::string &resource, int baudRate)
         case 115200: speed = CBR_115200; break;
         case 128000: speed = CBR_128000; break;
         case 256000: speed = CBR_256000; break;
+        case 500000: speed = 500000; break;
         default:
             std::cerr << "ERRORE [SerialDataSource]: Baud rate non supportato: " << baudRate << "." << std::endl;
             CloseHandle(handle);
@@ -142,11 +143,11 @@ bool SerialDataSource::open(const std::string &resource, int baudRate)
     }
 
     COMMTIMEOUTS timeouts = {0};
-    timeouts.ReadIntervalTimeout         = 50;
-    timeouts.ReadTotalTimeoutConstant    = 50;
-    timeouts.ReadTotalTimeoutMultiplier  = 10;
-    timeouts.WriteTotalTimeoutConstant   = 50;
-    timeouts.WriteTotalTimeoutMultiplier = 10;
+    timeouts.ReadIntervalTimeout         = MAXDWORD; // Ritorna immediatamente
+    timeouts.ReadTotalTimeoutConstant    = 0;
+    timeouts.ReadTotalTimeoutMultiplier  = 0;
+    timeouts.WriteTotalTimeoutConstant   = 0;
+    timeouts.WriteTotalTimeoutMultiplier = 0;
 
     if(!SetCommTimeouts(handle, &timeouts)) {
         std::cerr << "ERRORE [SerialDataSource]: Impossibile impostare i timeout della porta seriale." << std::endl;
@@ -187,6 +188,9 @@ bool SerialDataSource::open(const std::string &resource, int baudRate)
         case 38400: speed = B38400; break;
         case 57600: speed = B57600; break;
         case 115200: speed = B115200; break;
+        case 128000: speed = B128000; break;
+        case 256000: speed = B256000; break;
+        case 500000: speed = B500000; break;
         default:
             std::cerr << "ERRORE [SerialDataSource]: Baud rate non supportato: " << baudRate << "." << std::endl;
             ::close(fd);
@@ -201,8 +205,8 @@ bool SerialDataSource::open(const std::string &resource, int baudRate)
     tty.c_iflag &= ~IGNBRK;         // disable break processing
     tty.c_lflag = 0;                // no signaling chars, no echo, no canonical processing
     tty.c_oflag = 0;                // no remapping, no delays
-    tty.c_cc[VMIN]  = 1;            // read blocks until at least 1 char is available
-    tty.c_cc[VTIME] = 1;            // 0.1 seconds read timeout
+    tty.c_cc[VMIN]  = 0;            // read blocks until at least 1 char is available
+    tty.c_cc[VTIME] = 0;            // 0.1 seconds read timeout
 
     tty.c_iflag &= ~(IXON | IXOFF | IXANY); // shut off xon/xoff ctrl
     tty.c_cflag |= (CLOCAL | CREAD);// ignore modem controls, enable reading
@@ -272,9 +276,9 @@ void SerialDataSource::close()
 
 std::vector<int> SerialDataSource::supportedBaudRates() const {
 #if defined(_WIN32) || defined(_WIN64)
-    return {300, 600, 1200, 2400, 4800, 9600, 19200, 38400, 57600, 115200, 128000, 256000};
+    return {300, 600, 1200, 2400, 4800, 9600, 19200, 38400, 57600, 115200, 128000, 256000, 500000};
 #elif defined(__APPLE__)
-    return {300, 600, 1200, 2400, 4800, 9600, 19200, 38400, 57600, 115200};
+    return {300, 600, 1200, 2400, 4800, 9600, 19200, 38400, 57600, 115200, 128000, 256000, 500000};
 #else
     return {};
 #endif

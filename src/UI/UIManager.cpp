@@ -106,17 +106,16 @@ UiManager::UiManager() {
 }
 
 UiManager::~UiManager() {
-    if (ServiceManager::getAggregator()) {
-        if (m_dashboard) ServiceManager::getAggregator()->unsubscribe(m_dashboard.get());
-        if (m_accBrkWindow) ServiceManager::getAggregator()->unsubscribe(m_accBrkWindow.get());
-        if (m_statusWindow) ServiceManager::getAggregator()->unsubscribe(m_statusWindow.get());
-        if (m_steerWindow) ServiceManager::getAggregator()->unsubscribe(m_steerWindow.get());
-        if (m_suspensionWindow) ServiceManager::getAggregator()->unsubscribe(m_suspensionWindow.get());
-        if (m_hallWindow) ServiceManager::getAggregator()->unsubscribe(m_hallWindow.get());
-        if (m_temperatureWindow) ServiceManager::getAggregator()->unsubscribe(m_temperatureWindow.get());
-        if (m_modulesBatteryWindow) ServiceManager::getAggregator()->unsubscribe(m_modulesBatteryWindow.get());
-        if (m_tempDataSubscriber) ServiceManager::getAggregator()->unsubscribe(m_tempDataSubscriber.get());
-        if (m_varianceWindow) ServiceManager::getAggregator()->unsubscribe(m_varianceWindow.get());
+    if (ServiceManager::getDataManager()) {
+        if (m_dashboard) ServiceManager::getDataManager()->removeSubscriber(m_dashboard.get());
+        if (m_accBrkWindow) ServiceManager::getDataManager()->removeSubscriber(m_accBrkWindow.get());
+        if (m_statusWindow) ServiceManager::getDataManager()->removeSubscriber(m_statusWindow.get());
+        if (m_steerWindow) ServiceManager::getDataManager()->removeSubscriber(m_steerWindow.get());
+        if (m_suspensionWindow) ServiceManager::getDataManager()->removeSubscriber(m_suspensionWindow.get());
+        if (m_hallWindow) ServiceManager::getDataManager()->removeSubscriber(m_hallWindow.get());
+        if (m_temperatureWindow) ServiceManager::getDataManager()->removeSubscriber(m_temperatureWindow.get());
+        if (m_modulesBatteryWindow) ServiceManager::getDataManager()->removeSubscriber(m_modulesBatteryWindow.get());
+        if (m_varianceWindow) ServiceManager::getDataManager()->removeSubscriber(m_varianceWindow.get());
     }
     
     ImGui_ImplOpenGL3_Shutdown();
@@ -151,11 +150,7 @@ void UiManager::setupInitialState() {
         }
     };
 
-    auto onLoadFile = [this](const std::string& filePath, bool generateCsv) {
-        if (generateCsv) {
-            this->m_shouldGenerateCsvForPlayback = generateCsv;
-        }
-        
+    auto onLoadFile = [this](const std::string& filePath) {
         ServiceManager::setAcquisitionMethod(ACQUISITION_METHOD_FILE);
         ServiceManager::configureFile(filePath);
         ServiceManager::startServices(); 
@@ -190,19 +185,17 @@ void UiManager::transitionToConnectedState(AppState connectedState) {
     m_varianceWindow = std::make_shared<VarianceWindow>(this);
 
     if (connectedState == AppState::CONNECTED_LIVE) {
-        // In modalità live, tutte le finestre si iscrivono all'aggregator
-        auto aggregator = ServiceManager::getAggregator();
-        aggregator->subscribe(m_dashboard.get());
-        aggregator->subscribe(m_accBrkWindow.get());
-        aggregator->subscribe(m_statusWindow.get());
-        aggregator->subscribe(m_steerWindow.get());
-        aggregator->subscribe(m_suspensionWindow.get());
-        aggregator->subscribe(m_hallWindow.get());
-        aggregator->subscribe(m_temperatureWindow.get());
-        aggregator->subscribe(m_modulesBatteryWindow.get());
-        aggregator->subscribe(m_varianceWindow.get());
+        auto dataManager = ServiceManager::getDataManager();
+        dataManager->addSubscriber(m_dashboard.get());
+        dataManager->addSubscriber(m_accBrkWindow.get());
+        dataManager->addSubscriber(m_statusWindow.get());
+        dataManager->addSubscriber(m_steerWindow.get());
+        dataManager->addSubscriber(m_suspensionWindow.get());
+        dataManager->addSubscriber(m_hallWindow.get());
+        dataManager->addSubscriber(m_temperatureWindow.get());
+        dataManager->addSubscriber(m_modulesBatteryWindow.get());
+        dataManager->addSubscriber(m_varianceWindow.get());
     } else if (connectedState == AppState::CONNECTED_PLAYBACK) {
-        // In modalità lettura file, viene creata la finestra dei controlli
         m_playbackControls = std::make_shared<PlaybackControlsWindow>(this);
     }
 }
@@ -248,24 +241,6 @@ void UiManager::draw() {
         if (fileService && fileService->isFinished()) {
             
             auto loadedData = fileService->getResult();
-            
-            if (m_shouldGenerateCsvForPlayback && !loadedData.empty()) {
-                
-                std::filesystem::path inputPath(fileService->getConfig().filePath);
-                std::string newFilename = "analysis_" + inputPath.stem().string() + ".csv";
-                
-                std::filesystem::path outputPath = "../output_data";
-                outputPath /= newFilename;
-
-                std::filesystem::create_directories(outputPath.parent_path());
-                
-                CsvWriter::WriteToFile(
-                    outputPath.string(),
-                    ServiceManager::getAggregator()->getColumnOrder(),
-                    loadedData
-                );
-            }
-
             ServiceManager::getPlaybackManager()->setData(std::move(loadedData));
             transitionToConnectedState(AppState::CONNECTED_PLAYBACK);
 
@@ -380,6 +355,18 @@ void UiManager::showDockingSpace() {
 
 void UiManager::resetToHome() {
     std::cout << "INFO [UiManager]: Reset dell'interfaccia verso la schermata Home." << std::endl;
+
+    if (ServiceManager::getDataManager()) {
+        if (m_dashboard) ServiceManager::getDataManager()->removeSubscriber(m_dashboard.get());
+        if (m_accBrkWindow) ServiceManager::getDataManager()->removeSubscriber(m_accBrkWindow.get());
+        if (m_statusWindow) ServiceManager::getDataManager()->removeSubscriber(m_statusWindow.get());
+        if (m_steerWindow) ServiceManager::getDataManager()->removeSubscriber(m_steerWindow.get());
+        if (m_suspensionWindow) ServiceManager::getDataManager()->removeSubscriber(m_suspensionWindow.get());
+        if (m_hallWindow) ServiceManager::getDataManager()->removeSubscriber(m_hallWindow.get());
+        if (m_temperatureWindow) ServiceManager::getDataManager()->removeSubscriber(m_temperatureWindow.get());
+        if (m_modulesBatteryWindow) ServiceManager::getDataManager()->removeSubscriber(m_modulesBatteryWindow.get());
+        if (m_varianceWindow) ServiceManager::getDataManager()->removeSubscriber(m_varianceWindow.get());
+    }
 
     ServiceManager::resetForNewSession();
 

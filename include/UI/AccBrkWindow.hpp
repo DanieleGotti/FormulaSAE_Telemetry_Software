@@ -5,13 +5,9 @@
 #include <map>
 #include <chrono>
 #include "UIElement.hpp"
+#include "PlotGraph.hpp" // Usa la nuova classe
 #include "../Telemetry/data_writing/IAggregatedDataSubscriber.hpp"
 #include "../Telemetry/data_writing/DataAggregator.hpp"
-
-// Contiene dati di una singola linea di grafico
-struct PlotLineData {
-    std::vector<double> X, Y;
-};
 
 class UiManager;
 
@@ -24,12 +20,12 @@ public:
     void onAggregatedDataReceived(const DbRow& dataRow) override;
 
 private:
-    // Helper per convertire il timestamp stringa in un time_point
-    std::chrono::system_clock::time_point parseTimestamp(const std::string& ts_str);
-
     UiManager* m_uiManager;
     std::mutex m_dataMutex;
-    // Mappa per memorizzare i dati di ogni sensore da plottare
     std::map<std::string, PlotLineData> m_plotData;
-    const double MAX_HISTORY_SECONDS = 20.0;
+    const double MAX_HISTORY_SECONDS = 15.0; // Sufficiente per una finestra di 10s
+    
+    // Istanze gestite in automatico
+    PlotGraph m_accPlot;
+    PlotGraph m_brkPlot;
 };

@@ -5,8 +5,7 @@
 
 FileSelectionWindow::FileSelectionWindow(UiManager* manager, LoadCallback onLoadCallback)
     : m_uiManager(manager),
-      m_onLoadCallback(std::move(onLoadCallback)),
-      m_shouldGenerateCsv(true)
+      m_onLoadCallback(std::move(onLoadCallback)) // Rimosso m_shouldGenerateCsv(true)
 {
     m_filePathBuffer[0] = '\0';
 }
@@ -32,12 +31,11 @@ void FileSelectionWindow::draw() {
         }
     }
     
-    ImGui::Checkbox("Genera file .csv", &m_shouldGenerateCsv);
     ImGui::Separator();
     
     if (ImGui::Button("Carica e analizza")) {
         if (m_onLoadCallback && m_filePathBuffer[0] != '\0') {
-            m_onLoadCallback(std::string(m_filePathBuffer), m_shouldGenerateCsv);
+            m_onLoadCallback(std::string(m_filePathBuffer)); // Passa solo il percorso
         }
     }
 

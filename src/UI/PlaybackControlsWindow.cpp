@@ -45,38 +45,25 @@ void PlaybackControlsWindow::draw() {
     ImGui::Spacing();
 
     // Recupera prima i dati del timestamp
-    std::string timeStr = "--:--:--.---";
-    std::string dateStr = "----/--/--";
+    std::string timeStr = "--.---";
     if (auto rowOpt = playbackManager->getRowAtIndex(m_sliderPosition)) {
         if (rowOpt->count("timestamp")) {
-            const std::string& fullTimestamp = rowOpt->at("timestamp");
-            size_t separatorPos = fullTimestamp.find('T');
-            if (separatorPos != std::string::npos) {
-                dateStr = fullTimestamp.substr(0, separatorPos);
-                timeStr = fullTimestamp.substr(separatorPos + 1);
-            } else {
-                timeStr = fullTimestamp;
-            }
+            timeStr = rowOpt->at("timestamp");
         }
     }
 
-    // 1. Calcola gli spazi
     float arrowButtonWidth = ImGui::GetFrameHeight(); 
     float spacingWidth = ImGui::GetStyle().ItemSpacing.x;
-    
+
     if (m_uiManager && m_uiManager->font_data) ImGui::PushFont(m_uiManager->font_data);
-    const std::string timeLabel = "Timestamp: " + timeStr;
-    const std::string dateLabel = "Giorno: " + dateStr;
-    float textWidth = std::max(ImGui::CalcTextSize(timeLabel.c_str()).x, ImGui::CalcTextSize(dateLabel.c_str()).x);
+    const std::string timeLabel = "Timestamp: " + timeStr + " s"; // Solo il timestamp!
+    float textWidth = ImGui::CalcTextSize(timeLabel.c_str()).x;
     if (m_uiManager && m_uiManager->font_data) ImGui::PopFont();
 
     float totalControlsWidth = arrowButtonWidth + spacingWidth + textWidth + spacingWidth + arrowButtonWidth;
-    
     float windowWidth = ImGui::GetContentRegionAvail().x;
     float offsetX = (windowWidth - totalControlsWidth) * 0.5f;
-    if (offsetX > 0) {
-        ImGui::SetCursorPosX(ImGui::GetCursorPosX() + offsetX);
-    }
+    if (offsetX > 0) ImGui::SetCursorPosX(ImGui::GetCursorPosX() + offsetX);
 
     bool index_changed_by_buttons = false;
     
@@ -91,8 +78,7 @@ void PlaybackControlsWindow::draw() {
 
     ImGui::BeginGroup();
     if (m_uiManager && m_uiManager->font_data) ImGui::PushFont(m_uiManager->font_data);
-    ImGui::TextUnformatted(timeLabel.c_str());
-    ImGui::TextUnformatted(dateLabel.c_str());
+    ImGui::TextUnformatted(timeLabel.c_str()); // Togli il text del Giorno
     if (m_uiManager && m_uiManager->font_data) ImGui::PopFont();
     ImGui::EndGroup();
 

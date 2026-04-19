@@ -74,7 +74,6 @@ private:
     std::shared_ptr<LogTerminal> m_logTerminal;
     std::vector<std::unique_ptr<UIElement>> m_uiElements;
     std::vector<UIElement*> m_elementsToRemove;
-    bool m_shouldGenerateCsvForPlayback = false;
 
 #if defined(__APPLE__)
     const char* glsl_version = "#version 150";

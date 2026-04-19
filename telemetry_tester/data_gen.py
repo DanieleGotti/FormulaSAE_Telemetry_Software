@@ -1,127 +1,121 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Sat Oct 11 22:30:16 2025
-
-@author: Daniele Gotti
-"""
-
+import struct
 import random
 
-# Dati principali (ACC, BRK, STEER)
-EXPECTED_LABELS = ['ACC1A', 'ACC2A', 'ACC1B', 'ACC2B', 
-                    'BRK1', 'BRK2', 'STEER',
-                    'SOSPASX', 'SOSPADX', 'SOSPPSX', 'SOSPPDX',
-                    "VELASX", "VELADX", "VELPDX", "VELPSX",
-                    "TMPDX", "TMPSX", "TMPMOTORDX", "TMPMOTORSX"
-                   ]
-
-# Messaggi speciali/LED
-STATUS_LABELS = ['SDC_INPUT', 'RESET_BUTTON', 'TS_ON_BUTTON', 'R2D_BUTTON']
-
-# Messaggi di stato degli Inverter
-INVERTER_LABELS = ['LEFT_INVERTER_FSM', 'RIGHT_INVERTER_FSM']
-
-def generate_packet():
-    """
-    Genera un pacchetto di dati casuale in uno dei formati attesi dal ricevitore.
-    Formato: [ETICHETTA] [VALORE]\n
-    Senza timestamp e con lo spazio come separatore.
-    """
-    message_type = random.choices(
-        population=['main_data', 'battery_full', 'status', 'state', 'malformed'], 
-        weights=[80, 60, 15, 5, 0.5], 
-        k=1
-    )[0]
-
-    packet = ""
-
-    if message_type == 'main_data':
-        label = random.choice(EXPECTED_LABELS)
-        
-        if label.startswith('ACC'):
-            # ACC1A, ACC2A sono int
-            if label.endswith('A'):
-                value = random.randint(0, 4000)
+def calculate_crc16(data: bytes) -> int:
+    """Implementazione esatta del CRC16-CCITT del C++ in Python"""
+    crc = 0xFFFF
+    for byte in data:
+        crc ^= (byte << 8)
+        for _ in range(8):
+            if crc & 0x8000:
+                crc = ((crc << 1) ^ 0x1021) & 0xFFFF
             else:
-                # ACC1B, ACC2B sono float
-                value = round(random.uniform(0.0, 4000.0), 1)
-        elif label.startswith('BRK'):
-            # BRK1, BRK2 sono float
-            value = round(random.uniform(800.0, 2000.0), 1)
-        elif label == 'STEER':
-            # STEER è float
-            value = round(random.uniform(-180.0, 180.0), 1)
-        elif label.startswith('SOS'):
-            # Sospensioni sono float
-            value = round(random.uniform(-4.0, 4.0), 2)
-        elif label.startswith('VEL'):
-            # Velocità sono float
-            value = round(random.uniform(-50.0, 200.0), 2)
-        elif label.startswith('TMP'):
-            # Temperature sono float
-            value = round(random.uniform(0.0, 150.0), 2)
+                crc = (crc << 1) & 0xFFFF
+    return crc
 
-        packet = f"{label} {value}\n"
+def generate_packet_A(timestamp_val: int) -> bytes:
+    """Genera il pacchetto telemetria principale (5ms)"""
+    
+    # 1. Metadata (Come richiesto: 0x00 e 0xCC)
+    startByte1 = 0xCC
+    startByte2 = 0x11
+    timestamp = timestamp_val
 
-    # Generazione dati per i moduli batteria
-    elif message_type == 'battery_full':
-        mod_idx = random.randint(1, 14)
-        data_type = random.choice(['TMP1', 'TMP2', 'TENS', 'ERROR'])
-        
-        label = ""
-        value = 0
+    # 2. Generazione dati casuali
+    fl_v = random.uniform(0.0, 120.0)
+    fr_v = random.uniform(0.0, 120.0)
+    rl_v = random.uniform(0.0, 120.0)
+    rr_v = random.uniform(0.0, 120.0)
+    
+    fl_s = random.uniform(-5.0, 5.0)
+    fr_s = random.uniform(-5.0, 5.0)
+    
+    acc1 = random.randint(0, 4000)
+    acc2 = random.randint(0, 4000)
+    acc_map = random.uniform(0.0, 100.0)
+    
+    brk1 = random.randint(800, 2000)
+    brk2 = random.randint(800, 2000)
+    steer = random.uniform(-180.0, 180.0)
+    
+    sdc = random.choice([0, 1])
+    r2d = random.choice([0, 1])
+    ecu_res = random.choice([0, 1])
+    ts_on = random.choice([0, 1])
+    
+    emma_c = random.uniform(0.0, 250.0)
+    emma_v = random.uniform(450.0, 600.0)
+    emma_yaw = random.uniform(-1.0, 1.0)
+    emma_error = random.choice([0, 1, 2]) # uint16_t
+    
+    mean_vel = (fl_v + fr_v) / 2
+    real_yaw = random.uniform(-50.0, 50.0)
+    tot_trq = random.uniform(0.0, 200.0)
+    trq_tv_l = random.uniform(-10.0, 10.0)
+    trq_tv_r = random.uniform(-10.0, 10.0)
+    slip_l = random.uniform(0.0, 0.2)
+    slip_r = random.uniform(0.0, 0.2)
+    trq_red_l = random.uniform(0.0, 5.0)
+    trq_red_r = random.uniform(0.0, 5.0)
+    fin_trq_l = random.uniform(0.0, 100.0)
+    fin_trq_r = random.uniform(0.0, 100.0)
+    
+    inv_L_tc = random.randint(-500, 500)
+    inv_L_mc = random.randint(-100, 100)
+    inv_L_tm = random.randint(20, 120)
+    inv_R_tc = random.randint(-500, 500)
+    inv_R_mc = random.randint(-100, 100)
+    inv_R_tm = random.randint(20, 120)
+    
+    mot_L_tmp = random.uniform(20.0, 120.0)
+    mot_R_tmp = random.uniform(20.0, 120.0)
+    cool_L_tmp = random.uniform(20.0, 90.0)
+    cool_R_tmp = random.uniform(20.0, 90.0)
+    
+    l_inv_fsm = random.randint(0, 8)
+    r_inv_fsm = random.randint(0, 8)
+    ts_fsm = random.randint(0, 5)
+    ecu_mode = random.randint(0, 3)
 
-        if data_type == 'TMP1':
-            label = f"TMP1M{mod_idx}"
-            # Temperature sono float
-            value = round(random.uniform(30.0, 75.0), 1) 
-        elif data_type == 'TMP2':
-            # Temperature sono float
-            label = f"TMP2M{mod_idx}"
-            value = round(random.uniform(30.0, 75.0), 1)
-        elif data_type == 'TENS':
-            label = f"TENSM{mod_idx}"
-            # Voltaggi sono float
-            value = round(random.uniform(3.0, 4.3), 2)
-        elif data_type == 'ERROR':
-            label = f"ERRORM{mod_idx}"
-            value = 1 if random.random() > 0.95 else 0
+    # 3. Formato Struct Payload A
+    fmt = '< BB I 4f 2f 2H f 2H f 4B 3f H 11f 6h 4f 4B'
+    
+    payload = struct.pack(fmt,
+        startByte1, startByte2, timestamp,
+        fl_v, fr_v, rl_v, rr_v, fl_s, fr_s,
+        acc1, acc2, acc_map, brk1, brk2, steer,
+        sdc, r2d, ecu_res, ts_on,
+        emma_c, emma_v, emma_yaw, emma_error,
+        mean_vel, real_yaw, tot_trq, trq_tv_l, trq_tv_r, slip_l, slip_r, trq_red_l, trq_red_r, fin_trq_l, fin_trq_r,
+        inv_L_tc, inv_L_mc, inv_L_tm, inv_R_tc, inv_R_mc, inv_R_tm,
+        mot_L_tmp, mot_R_tmp, cool_L_tmp, cool_R_tmp,
+        l_inv_fsm, r_inv_fsm, ts_fsm, ecu_mode
+    )
 
-        packet = f"{label} {value}\n"
+    crc = calculate_crc16(payload)
+    return payload + struct.pack('<H', crc)
 
-    # Formato messaggi di stato/LED: es. "SDC_INPUT 1"
-    elif message_type == 'status':
-        label = random.choice(STATUS_LABELS)
-        value = random.choice([0, 1])
-        packet = f"{label} {value}\n"
-
-    # Formato stato Inverter: es. "STATE RIGHT_INVERTER_FSM 5"
-    elif message_type == 'state':
-        inverter_label = random.choice(INVERTER_LABELS)
-        state_value = random.randint(0, 8)
-        packet = f"STATE {inverter_label} {state_value}\n"
-
-    # Formati malformati per testare la robustezza del parser
-    elif message_type == 'malformed':
-        malformed_options = [
-            # Valore mancante
-            f"{random.choice(EXPECTED_LABELS)}\n",
-            # Valore mancante per lo stato
-            f"STATE {random.choice(INVERTER_LABELS)}\n",
-            # Etichetta sconosciuta
-            "UNKNOWN_SENSOR 42\n",
-            # Tipo di dato sbagliato (stringa invece di numero)
-            f"{random.choice(EXPECTED_LABELS)} not_a_number\n",
-            # Troppe parti nel messaggio
-            f"{random.choice(EXPECTED_LABELS)} 123 extra_data\n",
-            f"STATE {random.choice(INVERTER_LABELS)} 5 extra_part\n",
-            # Parola chiave sbagliata
-            f"STATUS {random.choice(INVERTER_LABELS)} 3\n",
-            # Riga vuota
-            "\n",
-            # Riga con solo spazi
-            "   \n"
-        ]
-        packet = random.choice(malformed_options)    
-        
-    return packet.encode('utf-8') # Restituisce i bytes pronti per la seriale
+def generate_packet_B(timestamp_val: int) -> bytes:
+    """Genera il pacchetto EMMA batteria (200ms)"""
+    
+    # 1. Metadata (Come richiesto: 0x00 e 0xEE)
+    startByte1 = 0xEE
+    startByte2 = 0x11
+    timestamp = timestamp_val
+    
+    # 2. Generazione dati EMMA
+    soc = random.randint(0, 100)
+    # Genero array di 14 voltaggi (uint8_t) e 28 temperature (uint16_t)
+    voltages =[random.randint(30, 42) for _ in range(14)] # Esempio: 3.0V - 4.2V mappato a int
+    temps =[random.randint(200, 600) for _ in range(28)]  # Esempio: 20.0C - 60.0C mappato a int
+    
+    # 3. Formato Struct Payload B
+    # < BB I B 14B 28H -> Little Endian, metadata + soc + 14 uint8 + 28 uint16
+    fmt = '< BB I B 14B 28H'
+    
+    # *voltages e *temps "spacchettano" le liste inserendole nei rispettivi 14B e 28H
+    payload = struct.pack(fmt, startByte1, startByte2, timestamp, soc, *voltages, *temps)
+    
+    crc = calculate_crc16(payload)
+    return payload + struct.pack('<H', crc)
