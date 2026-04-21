@@ -23,6 +23,8 @@
 #include "UI/PlaybackControlsWindow.hpp"
 #include "UI/TemperatureWindow.hpp"
 #include "UI/ModulesBatteryWindow.hpp"
+#include "UI/SpeedometerWindow.hpp"
+#include "UI/CreditsWindow.hpp"
 #include "Telemetry/Services/ServiceManager.hpp"
 #include "Telemetry/Services/FileService.hpp"
 #include "Telemetry/file_reading/PlaybackManager.hpp"
@@ -116,6 +118,7 @@ UiManager::~UiManager() {
         if (m_temperatureWindow) ServiceManager::getDataManager()->removeSubscriber(m_temperatureWindow.get());
         if (m_modulesBatteryWindow) ServiceManager::getDataManager()->removeSubscriber(m_modulesBatteryWindow.get());
         if (m_varianceWindow) ServiceManager::getDataManager()->removeSubscriber(m_varianceWindow.get());
+        if (m_speedometerWindow) ServiceManager::getDataManager()->removeSubscriber(m_speedometerWindow.get());
     }
     
     ImGui_ImplOpenGL3_Shutdown();
@@ -169,6 +172,9 @@ void UiManager::setupInitialState() {
     auto fileWin = std::make_unique<FileSelectionWindow>(this, onLoadFile);
     m_fileSelectionWindow = fileWin.get();
     addElement(std::move(fileWin));
+
+    auto creditsWin = std::make_unique<CreditsWindow>(this);
+    addElement(std::move(creditsWin));
 }
 
 void UiManager::transitionToConnectedState(AppState connectedState) {
@@ -183,6 +189,7 @@ void UiManager::transitionToConnectedState(AppState connectedState) {
     m_temperatureWindow = std::make_shared<TemperatureWindow>(this);
     m_modulesBatteryWindow = std::make_shared<ModulesBatteryWindow>(this);
     m_varianceWindow = std::make_shared<VarianceWindow>(this);
+    m_speedometerWindow = std::make_shared<SpeedometerWindow>(this);
 
     if (connectedState == AppState::CONNECTED_LIVE) {
         auto dataManager = ServiceManager::getDataManager();
@@ -195,6 +202,7 @@ void UiManager::transitionToConnectedState(AppState connectedState) {
         dataManager->addSubscriber(m_temperatureWindow.get());
         dataManager->addSubscriber(m_modulesBatteryWindow.get());
         dataManager->addSubscriber(m_varianceWindow.get());
+        dataManager->addSubscriber(m_speedometerWindow.get());
     } else if (connectedState == AppState::CONNECTED_PLAYBACK) {
         m_playbackControls = std::make_shared<PlaybackControlsWindow>(this);
     }
@@ -265,6 +273,7 @@ void UiManager::draw() {
         if (m_temperatureWindow) m_temperatureWindow->draw();
         if (m_modulesBatteryWindow) m_modulesBatteryWindow->draw();
         if (m_varianceWindow) m_varianceWindow->draw();
+        if (m_speedometerWindow) m_speedometerWindow->draw();
     }
 
     if (m_currentState == AppState::CONNECTED_PLAYBACK) {
@@ -366,6 +375,7 @@ void UiManager::resetToHome() {
         if (m_temperatureWindow) ServiceManager::getDataManager()->removeSubscriber(m_temperatureWindow.get());
         if (m_modulesBatteryWindow) ServiceManager::getDataManager()->removeSubscriber(m_modulesBatteryWindow.get());
         if (m_varianceWindow) ServiceManager::getDataManager()->removeSubscriber(m_varianceWindow.get());
+        if (m_speedometerWindow) ServiceManager::getDataManager()->removeSubscriber(m_speedometerWindow.get());
     }
 
     ServiceManager::resetForNewSession();
@@ -380,6 +390,7 @@ void UiManager::resetToHome() {
     m_modulesBatteryWindow.reset();
     m_playbackControls.reset();
     m_varianceWindow.reset();
+    m_speedometerWindow.reset();
 
     m_uiElements.clear();
     m_serialSelectionWindow = nullptr;

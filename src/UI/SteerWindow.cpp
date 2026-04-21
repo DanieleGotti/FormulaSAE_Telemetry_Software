@@ -51,14 +51,14 @@ SteerWindow::~SteerWindow() {
 void SteerWindow::onAggregatedDataReceived(const DbRow& dataRow) {
     std::lock_guard<std::mutex> lock(m_dataMutex);
     try {
-        if (dataRow.count("STEER")) { 
-            m_steeringAngle = std::stof(dataRow.at("STEER"));
+        if (dataRow.count("steer")) { 
+            m_steeringAngle = std::stof(dataRow.at("steer"));
         }
     } catch (const std::exception& e) {}
 }
 
 void SteerWindow::draw() {
-    ImGui::Begin("Sterzo");
+    ImGui::Begin("Steering wheel");
 
     float current_angle = 0.0f;
 
@@ -67,7 +67,7 @@ void SteerWindow::draw() {
         auto playbackManager = ServiceManager::getPlaybackManager();
         if (auto rowOpt = playbackManager->getCurrentRow()) {
             try {
-                current_angle = std::stof(rowOpt->at("STEER"));
+                current_angle = std::stof(rowOpt->at("steer"));
             } catch (const std::exception& e) {
                 // In caso di errore l'angolo rimane 0.
             }
@@ -78,10 +78,6 @@ void SteerWindow::draw() {
         current_angle = m_steeringAngle;
     }
 
-    ImGui::PushFont(m_uiManager->font_label);
-    ImGui::Text("Sensore angolo sterzo");
-    ImGui::PopFont();
-    ImGui::Separator();
     ImGui::Spacing();
 
     // Disegna il volante
@@ -127,12 +123,19 @@ void SteerWindow::draw() {
         );
         draw_list->AddLine(rotating_line_start, rotating_line_end, IM_COL32(255, 0, 0, 255), 3.0f);
 
-        // Valore dell'angolo sotto il volante
+        // Valore dell'angolo sotto il volante (Ancorato al fondo assoluto)
         char angle_text[16];
         ImGui::PushFont(m_uiManager->font_label);
         snprintf(angle_text, 16, "%.1f°", current_angle);
         ImVec2 angle_text_size = ImGui::CalcTextSize(angle_text);
-        ImVec2 text_pos(image_center.x - angle_text_size.x * 0.5f, image_center.y + image_size * 0.5f + 10.0f);
+        
+        // La X usa image_center per rimanere in asse col volante.
+        // La Y calcola il limite inferiore della finestra e sottrae l'altezza del testo e il margine.
+        ImVec2 text_pos(
+            image_center.x - angle_text_size.x * 0.5f, 
+            window_pos.y + available_space.y - angle_text_size.y - 20.0f
+        );
+        
         draw_list->AddText(text_pos, ImGui::GetColorU32(ImGuiCol_Text), angle_text);
         ImGui::PopFont();
     }

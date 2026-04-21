@@ -118,7 +118,7 @@ void ServiceManager::cleanup() {
     m_playbackManager.reset();
     m_settingsManager.reset();
     m_assetManager.reset();
-    std::cout << "INFO[ServiceManager]: ServiceManager pulito." << std::endl;
+    std::cout << "INFO [ServiceManager]: ServiceManager pulito." << std::endl;
 }
 
 bool ServiceManager::startLogging(const std::string& logIdentifier) {
@@ -147,7 +147,7 @@ void ServiceManager::stopLogging() {
         getDataManager()->removeSubscriber(m_csvWriter.get());
         m_csvWriter->stop();
         m_csvWriter.reset();
-        std::cout << "REGISTRAZIONE[ServiceManager]: Registrazione CSV fermata." << std::endl;
+        std::cout << "REGISTRAZIONE [ServiceManager]: Registrazione CSV fermata." << std::endl;
     }
 }
 

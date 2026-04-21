@@ -1,7 +1,5 @@
 #pragma once
 #include <string>
-#include <vector>
-#include <map>
 #include <mutex>
 #include "UIElement.hpp"
 #include "../Telemetry/data_writing/IAggregatedDataSubscriber.hpp"
@@ -18,11 +16,9 @@ public:
     void onAggregatedDataReceived(const DbRow& dataRow) override;
 
 private:
-    // Funzione helper per disegnare un LED con etichetta
     void drawLed(const char* label, bool state);
-    // Disegna un singolo indicatore LED con un'etichetta
-    void drawLedIndicator(const char* label, bool state);
-    // Larghezza iniziale pannello indicatori
+    void drawBattery(int soc);
+    
     float m_leftPaneWidth = 280.0f;
 
     UiManager* m_uiManager;
@@ -34,4 +30,7 @@ private:
     bool m_tsOnButtonState = false;
     std::string m_leftInverterFsm = "NULL";
     std::string m_rightInverterFsm = "NULL";
+    std::string m_tractiveSystemFsm = "NULL"; 
+    std::string m_ecuMode = "NULL";
+    int m_stateOfCharge = 0;
 };

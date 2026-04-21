@@ -50,6 +50,8 @@ public:
         int resourceId = 0;
         if (path == "steering_wheel.png") {
             resourceId = IDI_ICON_STEER;
+        } else if (path == "logo_erb.png") {
+            resourceId = IDI_ICON_ERB; 
         } else {
             std::cerr << "ERRORE [AssetManager]: Immagine non trovata nella risorsa: '" << path << "'." << std::endl;
             return {nullptr, 0};

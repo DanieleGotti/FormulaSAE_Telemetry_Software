@@ -3,8 +3,8 @@
 #include <limits>
 #include <algorithm>
 
-PlotGraph::PlotGraph(const std::string& title, const std::vector<std::string>& keys, double minY, double maxY)
-    : m_title(title), m_keys(keys), m_defaultMinY(minY), m_defaultMaxY(maxY) {}
+PlotGraph::PlotGraph(const std::string& title, const std::vector<std::pair<std::string, std::string>>& keysAndLabels, double minY, double maxY)
+    : m_title(title), m_keysAndLabels(keysAndLabels), m_defaultMinY(minY), m_defaultMaxY(maxY) {}
 
 int PlotGraph::TimeAxisFormatter(double value, char* buff, int size, void* user_data) {
     return snprintf(buff, size, "%.2f s", value);
@@ -67,8 +67,8 @@ void PlotGraph::draw(const std::map<std::string, PlotLineData>& plotData, double
         double max_y = std::numeric_limits<double>::lowest();
         bool has_data = false;
         
-        for (const auto& key : m_keys) {
-            auto it = plotData.find(key);
+        for (const auto& pair : m_keysAndLabels) {
+            auto it = plotData.find(pair.first); // Cerca usando la chiave di sistema
             if (it != plotData.end()) {
                 const auto& line = it->second;
                 for (size_t i = 0; i < line.X.size(); ++i) {
@@ -91,10 +91,11 @@ void PlotGraph::draw(const std::map<std::string, PlotLineData>& plotData, double
         }
 
         // Plotta i dati effettivi
-        for (const auto& key : m_keys) {
-            auto it = plotData.find(key);
+        for (const auto& pair : m_keysAndLabels) {
+            auto it = plotData.find(pair.first);
             if (it != plotData.end() && !it->second.X.empty()) {
-                ImPlot::PlotLine(key.c_str(), it->second.X.data(), it->second.Y.data(), it->second.X.size());
+                // Disegna usando il nome della legenda personalizzato!
+                ImPlot::PlotLine(pair.second.c_str(), it->second.X.data(), it->second.Y.data(), it->second.X.size());
             }
         }
 

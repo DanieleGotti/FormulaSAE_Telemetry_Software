@@ -5,9 +5,9 @@
 #include "Telemetry/file_reading/PlaybackManager.hpp"
 
 SuspensionWindow::SuspensionWindow(UiManager* manager) : m_uiManager(manager),
-    m_suspPlot("Potenziometri lineari", {"SOSPADX", "SOSPASX", "SOSPPDX", "SOSPPSX"}, -3.5, 3.5)
+    m_suspPlot("Potenziometri lineari", { { "front_left_suspension", "Front left" }, { "front_right_suspension", "Front right" }}, 0.0, 100.0)
 {
-    const std::vector<std::string> keys_to_plot = {"SOSPADX", "SOSPASX", "SOSPPDX", "SOSPPSX"};
+    const std::vector<std::string> keys_to_plot = {"front_left_suspension", "front_right_suspension"};
     for (const auto& key : keys_to_plot) {
         m_plotData[key] = PlotLineData();
     }
@@ -71,14 +71,10 @@ void SuspensionWindow::draw() {
         }
     }
 
-    ImGui::Begin("Sospensioni", nullptr, ImGuiWindowFlags_NoScrollbar);
+    ImGui::Begin("Suspension linear potentiometers", nullptr, ImGuiWindowFlags_NoScrollbar);
     
     float plot_height = ImGui::GetContentRegionAvail().y - ImGui::GetTextLineHeightWithSpacing() - ImGui::GetStyle().ItemSpacing.y;
     if (plot_height < 100) plot_height = 100;
-
-    ImGui::PushFont(m_uiManager->font_label);
-    ImGui::Text("Potenziometri lineari");
-    ImGui::PopFont();
     
     {
         std::lock_guard<std::mutex> lock(m_dataMutex);

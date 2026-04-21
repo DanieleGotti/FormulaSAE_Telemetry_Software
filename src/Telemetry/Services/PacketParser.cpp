@@ -2,6 +2,33 @@
 #include <sstream>
 #include <iomanip>
 
+// --- FUNZIONI DI MAPPATURA FSM ---
+static std::string getInverterFsmStr(uint8_t val) {
+    const char* states[] = {
+        "OFF", "SYSTEM_READY", "DC_CAPACITOR_CHARGE", "DC_OK", 
+        "ENABLE_INVERTER", "ENABLED", "ON", "OK", "ERROR"
+    };
+    if (val <= 8) return states[val];
+    return "UNKNOWN";
+}
+
+static std::string getTractiveFsmStr(uint8_t val) {
+    const char* states[] = {
+        "ENTRY_STATE", "START_LIGHT_TEST", "WAIT_LIGHT_TEST", "POWER_OFF", 
+        "TS_WAIT_ACTIVATION", "TS_WAIT_PRECHARGE", "TS_ACTIVE", "R2D_WAIT", 
+        "R2D_ACTIVE", "ERROR_STATE"
+    };
+    if (val <= 9) return states[val];
+    return "UNKNOWN";
+}
+
+static std::string getEcuModeStr(uint8_t val) {
+    if (val & 0x01) return "ENDURANCE";
+    if (val & 0x02) return "ACCELERATION";
+    if (val & 0x04) return "TEST";
+    return "UNKNOWN";
+}
+
 PacketParser::PacketParser() {
     resetCounters();
 }
@@ -39,33 +66,33 @@ void PacketParser::populateRowFromA(const TelemetryPacket_t* dataA, const DbRow&
     row["timestamp"] = formatDouble(time_sec, 3);
     
     // --- 1. DATI PACCHETTO A (5ms) TUTTI PRESENTI ---
-    row["VELASX"] = formatDouble(dataA->front_left_velocity, 1);
-    row["VELADX"] = formatDouble(dataA->front_right_velocity, 1);
-    row["VELPSX"] = formatDouble(dataA->rear_left_velocity, 1);
-    row["VELPDX"] = formatDouble(dataA->rear_right_velocity, 1);
+    row["front_left_velocity"] = formatDouble(dataA->front_left_velocity, 1);
+    row["front_right_velocity"] = formatDouble(dataA->front_right_velocity, 1);
+    row["rear_left_velocity"] = formatDouble(dataA->rear_left_velocity, 1);
+    row["rear_right_velocity"] = formatDouble(dataA->rear_right_velocity, 1);
+
+    row["front_left_suspension"] = formatDouble(dataA->front_left_suspension, 3);
+    row["front_right_suspension"] = formatDouble(dataA->front_right_suspension, 3);
+
+    row["accelerator1"] = std::to_string(dataA->accelerator1);
+    row["accelerator2"] = std::to_string(dataA->accelerator2);
+    row["accelerator_mapped"] = formatDouble(dataA->accelerator_mapped, 1);
     
-    row["SOSPASX"] = formatDouble(dataA->front_left_suspension, 2);
-    row["SOSPADX"] = formatDouble(dataA->front_right_suspension, 2);
+    row["brake1"] = std::to_string(dataA->brake1);
+    row["brake2"] = std::to_string(dataA->brake2);
+    row["steer"] = formatDouble(dataA->steer, 1);
     
-    row["ACC1"] = std::to_string(dataA->accelerator1);
-    row["ACC2"] = std::to_string(dataA->accelerator2);
-    row["ACC_MAPPED"] = formatDouble(dataA->accelerator_mapped, 1);
-    
-    row["BRK1"] = std::to_string(dataA->brake1);
-    row["BRK2"] = std::to_string(dataA->brake2);
-    row["STEER"] = formatDouble(dataA->steer, 1);
-    
-    row["SDC_INPUT"] = std::to_string(dataA->sdc);
-    row["R2D_BUTTON"] = std::to_string(dataA->ready_to_drive_button);
-    row["RESET_BUTTON"] = std::to_string(dataA->ecu_reset_button);
-    row["TS_ON_BUTTON"] = std::to_string(dataA->tractive_system_on_button);
+    row["sdc"] = std::to_string(dataA->sdc);
+    row["ready_to_drive_button"] = std::to_string(dataA->ready_to_drive_button);
+    row["ecu_reset_button"] = std::to_string(dataA->ecu_reset_button);
+    row["tractive_system_on_button"] = std::to_string(dataA->tractive_system_on_button);
     
     row["EMMA_CURRENT"] = formatDouble(dataA->emma_current, 1);
     row["EMMA_VOLTAGE"] = formatDouble(dataA->emma_voltage, 1);
     row["EMMA_YAW"] = formatDouble(dataA->emma_yaw, 2);
     row["EMMA_ERROR"] = std::to_string(dataA->emma_error);
     
-    row["MEAN_VELOCITY"] = formatDouble(dataA->mean_velocity, 1);
+    row["mean_velocity"] = formatDouble(dataA->mean_velocity, 1);
     row["REAL_YAW"] = formatDouble(dataA->real_yaw_rate, 2);
     row["TOTAL_TORQUE"] = formatDouble(dataA->total_torque_request, 1);
     row["TORQUE_TV_L"] = formatDouble(dataA->torque_tv_L, 1);
@@ -89,10 +116,10 @@ void PacketParser::populateRowFromA(const TelemetryPacket_t* dataA, const DbRow&
     row["TMPMOTORDX"] = formatDouble(dataA->right_motor_temp, 1);
     row["TMPMOTORSX"] = formatDouble(dataA->left_motor_temp, 1);
     
-    row["LEFT_INVERTER_FSM"] = std::to_string(dataA->left_inverter_fsm);
-    row["RIGHT_INVERTER_FSM"] = std::to_string(dataA->right_inverter_fsm);
-    row["TRACTIVE_SYS_FSM"] = std::to_string(dataA->tractive_system_fsm);
-    row["ECU_MODE"] = std::to_string(dataA->ECU_Mode);
+    row["left_inverter_fsm"] = getInverterFsmStr(dataA->left_inverter_fsm);
+    row["right_inverter_fsm"] = getInverterFsmStr(dataA->right_inverter_fsm);
+    row["tractive_system_fsm"] = getTractiveFsmStr(dataA->tractive_system_fsm);
+    row["ECU_Mode"] = getEcuModeStr(dataA->ECU_Mode);
 
     // --- 2. DATI PACCHETTO B (200ms) INCOLLATI DALLA CACHE ---
     for (const auto& kv : cachedDataB) {
@@ -100,13 +127,13 @@ void PacketParser::populateRowFromA(const TelemetryPacket_t* dataA, const DbRow&
     }
 
     // --- 3. PACCHETTI PERSI ---
-    row["LOST_PACKETS_A"] = std::to_string(m_lostA);
-    row["LOST_PACKETS_B"] = std::to_string(m_lostB);
-    row["LOST_PACKETS_TOT"] = std::to_string(getTotalLost());
+    row["lost_packets_A"] = std::to_string(m_lostA);
+    row["lost_packets_B"] = std::to_string(m_lostB);
+    row["lost_packets_tot"] = std::to_string(getTotalLost());
 }
 
 void PacketParser::populateRowFromB(const TelemetryPacket_EMMA_t* data) {
-    m_lastPacketBData["STATE_OF_CHARGE"] = std::to_string(data->state_of_charge);
+    m_lastPacketBData["state_of_charge"] = std::to_string(data->state_of_charge);
     // Srotoliamo i Volt in 14 colonne
     for(int i=0; i<14; ++i) {
         m_lastPacketBData["TENSM" + std::to_string(i+1)] = std::to_string(data->module_voltage[i]);
@@ -200,23 +227,22 @@ bool PacketParser::parseCsvLine(const std::string& line, DbRow& outRow) {
 std::vector<std::string> PacketParser::getColumnOrder() {
     std::vector<std::string> cols = {
         "timestamp", 
-        "VELASX", "VELADX", "VELPSX", "VELPDX", 
-        "SOSPASX", "SOSPADX",
-        "ACC1", "ACC2", "ACC_MAPPED", 
-        "BRK1", "BRK2", 
-        "STEER",
-        "SDC_INPUT", "R2D_BUTTON", "RESET_BUTTON", "TS_ON_BUTTON",
+        "front_left_velocity", "front_right_velocity", "rear_left_velocity", "rear_right_velocity",
+        "front_left_suspension", "front_right_suspension",
+        "accelerator1", "accelerator2", "accelerator_mapped",
+        "brake1", "brake2",
+        "steer",
+        "sdc", "ready_to_drive_button", "ecu_reset_button", "tractive_system_on_button",
         "EMMA_CURRENT", "EMMA_VOLTAGE", "EMMA_YAW", "EMMA_ERROR",
-        "MEAN_VELOCITY", "REAL_YAW", "TOTAL_TORQUE", 
+        "mean_velocity", "REAL_YAW", "TOTAL_TORQUE", 
         "TORQUE_TV_L", "TORQUE_TV_R", "SLIP_L", "SLIP_R", 
         "TORQUE_RED_L", "TORQUE_RED_R", "FINAL_TORQUE_L", "FINAL_TORQUE_R",
         "INV_L_TRQ_CURR", "INV_L_MAG_CURR", "INV_L_TEMP_MOT",
         "INV_R_TRQ_CURR", "INV_R_MAG_CURR", "INV_R_TEMP_MOT",
         "TMPDX", "TMPSX", "TMPMOTORDX", "TMPMOTORSX",
-        "LEFT_INVERTER_FSM", "RIGHT_INVERTER_FSM", "TRACTIVE_SYS_FSM", 
-        "ECU_MODE",
-        "STATE_OF_CHARGE", 
-        "LOST_PACKETS_A", "LOST_PACKETS_B", "LOST_PACKETS_TOT"
+        "left_inverter_fsm", "right_inverter_fsm", "tractive_system_fsm", 
+        "ECU_Mode",
+        "state_of_charge", 
     };
     
     // Le 14 tensioni
@@ -229,11 +255,16 @@ std::vector<std::string> PacketParser::getColumnOrder() {
     }
     
     // Campi statistici aggiunti dinamicamente dalla varianza (così vengono mostrati nel CSV/Dataset)
-    const std::vector<std::string> targetSensors = {"ACC1", "ACC2", "BRK1", "BRK2", "STEER"};
+    const std::vector<std::string> targetSensors = {"accelerator1", "accelerator2", "brake1", "brake2", "steer"};
     for (const auto& sensor : targetSensors) {
         cols.push_back(sensor + "_MEAN"); 
         cols.push_back(sensor + "_VAR"); 
         cols.push_back(sensor + "_STD");
     }
+
+    cols.push_back("lost_packets_A");
+    cols.push_back("lost_packets_B");   
+    cols.push_back("lost_packets_tot");
+    
     return cols;
 }

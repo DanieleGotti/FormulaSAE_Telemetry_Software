@@ -1,22 +1,52 @@
 #include <imgui.h>
 #include <string>
-#include <sstream>
+#include <algorithm>
 #include "UI/StatusWindow.hpp"
 #include "UI/UIManager.hpp"
 #include "Telemetry/Services/ServiceManager.hpp"
 #include "Telemetry/file_reading/PlaybackManager.hpp"
+
+// Funzioni helper per ricavare il numero dalla stringa
+static std::string formatInverterFsm(const std::string& stateStr) {
+    const char* states[] = {"OFF", "SYSTEM_READY", "DC_CAPACITOR_CHARGE", "DC_OK", 
+                            "ENABLE_INVERTER", "ENABLED", "ON", "OK", "ERROR"};
+    for (int i = 0; i <= 8; i++) {
+        if (stateStr == states[i]) return "(" + std::to_string(i) + ") " + stateStr;
+    }
+    return stateStr;
+}
+
+static std::string formatTractiveFsm(const std::string& stateStr) {
+    const char* states[] = {"ENTRY_STATE", "START_LIGHT_TEST", "WAIT_LIGHT_TEST", "POWER_OFF", 
+                            "TS_WAIT_ACTIVATION", "TS_WAIT_PRECHARGE", "TS_ACTIVE", "R2D_WAIT", 
+                            "R2D_ACTIVE", "ERROR_STATE"};
+    for (int i = 0; i <= 9; i++) {
+        if (stateStr == states[i]) return "(" + std::to_string(i) + ") " + stateStr;
+    }
+    return stateStr;
+}
+
+static std::string formatEcuMode(const std::string& stateStr) {
+    if (stateStr == "ENDURANCE") return "(0x01) ENDURANCE";
+    if (stateStr == "ACCELERATION") return "(0x02) ACCELERATION";
+    if (stateStr == "TEST") return "(0x04) TEST";
+    return stateStr;
+}
 
 StatusWindow::StatusWindow(UiManager* manager) : m_uiManager(manager) {}
 
 void StatusWindow::onAggregatedDataReceived(const DbRow& dataRow) {
     std::lock_guard<std::mutex> lock(m_dataMutex);
     try {
-        if (dataRow.count("R2D_BUTTON")) m_r2dButtonState = (std::stoi(dataRow.at("R2D_BUTTON")) == 1);
-        if (dataRow.count("RESET_BUTTON")) m_resetButtonState = (std::stoi(dataRow.at("RESET_BUTTON")) == 1);
-        if (dataRow.count("SDC_INPUT")) m_sdcInputState = (std::stoi(dataRow.at("SDC_INPUT")) == 1);
-        if (dataRow.count("TS_ON_BUTTON")) m_tsOnButtonState = (std::stoi(dataRow.at("TS_ON_BUTTON")) == 1);
-        if (dataRow.count("LEFT_INVERTER_FSM")) m_leftInverterFsm = dataRow.at("LEFT_INVERTER_FSM");
-        if (dataRow.count("RIGHT_INVERTER_FSM")) m_rightInverterFsm = dataRow.at("RIGHT_INVERTER_FSM");
+        if (dataRow.count("sdc")) m_sdcInputState = (std::stoi(dataRow.at("sdc")) == 1);
+        if (dataRow.count("ready_to_drive_button")) m_r2dButtonState = (std::stoi(dataRow.at("ready_to_drive_button")) == 1);
+        if (dataRow.count("ecu_reset_button")) m_resetButtonState = (std::stoi(dataRow.at("ecu_reset_button")) == 1);
+        if (dataRow.count("tractive_system_on_button")) m_tsOnButtonState = (std::stoi(dataRow.at("tractive_system_on_button")) == 1);
+        if (dataRow.count("left_inverter_fsm")) m_leftInverterFsm = dataRow.at("left_inverter_fsm");
+        if (dataRow.count("right_inverter_fsm")) m_rightInverterFsm = dataRow.at("right_inverter_fsm");
+        if (dataRow.count("tractive_system_fsm")) m_tractiveSystemFsm = dataRow.at("tractive_system_fsm");
+        if (dataRow.count("ECU_Mode")) m_ecuMode = dataRow.at("ECU_Mode");
+        if (dataRow.count("state_of_charge")) m_stateOfCharge = std::stoi(dataRow.at("state_of_charge"));
     } catch (const std::exception& e) {}
 }
 
@@ -32,123 +62,181 @@ void StatusWindow::drawLed(const char* label, bool state) {
     ImGui::Text("%s", label);
 }
 
+void StatusWindow::drawBattery(int soc) {
+    // Stessa altezza calcolata per i campi FSM: box_height = ImGui::GetTextLineHeightWithSpacing() * 1.25f;
+    float h = ImGui::GetTextLineHeightWithSpacing() * 1.5f; 
+    float w = 84.0f;  
+    float polo_w = 4.0f;
+
+    ImVec2 p = ImGui::GetCursorScreenPos();
+    ImDrawList* draw_list = ImGui::GetWindowDrawList();
+
+    // Colori
+    ImU32 outlineColor = m_uiManager->m_isDarkTheme ? IM_COL32(220, 220, 220, 255) : IM_COL32(40, 40, 40, 255);
+    
+    // Corpo e polo
+    draw_list->AddRect(p, ImVec2(p.x + w, p.y + h), outlineColor, 2.0f, 0, 2.0f);
+    draw_list->AddRectFilled(ImVec2(p.x + w, p.y + h * 0.3f), ImVec2(p.x + w + polo_w, p.y + h * 0.7f), outlineColor, 1.0f);
+
+    // Riempimento dinamico
+    ImU32 fillColor;
+    if (soc > 50) fillColor = IM_COL32(0, 200, 0, 255);        
+    else if (soc > 20) fillColor = IM_COL32(255, 180, 0, 255); 
+    else fillColor = IM_COL32(255, 0, 0, 255);                 
+
+    float fillWidth = (w - 4.0f) * (std::clamp(soc, 0, 100) / 100.0f);
+    if (fillWidth > 1.0f) {
+        draw_list->AddRectFilled(ImVec2(p.x + 2.0f, p.y + 2.0f), ImVec2(p.x + 2.0f + fillWidth, p.y + h - 2.0f), fillColor, 1.0f);
+    }
+
+    // Dummy per occupare l'ingombro reale nel layout di ImGui
+    ImGui::Dummy(ImVec2(w + polo_w, h));
+}
+
 void StatusWindow::draw() {
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-    ImGui::Begin("Pannello stati", nullptr, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8.0f, 8.0f));
+    
+    // RIMOSSI I FLAG DI NO-SCROLL: ora se stringi verso l'alto apparirà la scrollbar
+    ImGui::Begin("Pannello stati", nullptr); 
     ImGui::PopStyleVar();
 
-    bool r2dState = false;
-    bool resetState = false;
-    bool sdcState = false;
+    bool r2dState = false; 
+    bool resetState = false; 
+    bool sdcState = false; 
     bool tsOnState = false;
-    std::string leftFsm = "NULL";
+    std::string leftFsm = "NULL"; 
     std::string rightFsm = "NULL";
+    std::string tsFsm = "NULL";
+    std::string ecuMode = "NULL";
+    int currentSoc = 0;
 
     if (m_uiManager->getCurrentState() == AppState::CONNECTED_PLAYBACK) {
-        // Modalità lettura file
         auto playbackManager = ServiceManager::getPlaybackManager();
         if (auto rowOpt = playbackManager->getCurrentRow()) {
             const DbRow& row = *rowOpt;
             try {
-                if (row.count("R2D_BUTTON")) r2dState = (std::stoi(row.at("R2D_BUTTON")) == 1);
-                if (row.count("RESET_BUTTON")) resetState = (std::stoi(row.at("RESET_BUTTON")) == 1);
-                if (row.count("SDC_INPUT")) sdcState = (std::stoi(row.at("SDC_INPUT")) == 1);
-                if (row.count("TS_ON_BUTTON")) tsOnState = (std::stoi(row.at("TS_ON_BUTTON")) == 1);
-                if (row.count("LEFT_INVERTER_FSM")) leftFsm = row.at("LEFT_INVERTER_FSM");
-                if (row.count("RIGHT_INVERTER_FSM")) rightFsm = row.at("RIGHT_INVERTER_FSM");
-            } catch (const std::exception& e) {
-                // Errore di parsing, i valori di default verranno usati.
-            }
+                if (row.count("sdc")) sdcState = (std::stoi(row.at("sdc")) == 1);
+                if (row.count("ready_to_drive_button")) r2dState = (std::stoi(row.at("ready_to_drive_button")) == 1);
+                if (row.count("ecu_reset_button")) resetState = (std::stoi(row.at("ecu_reset_button")) == 1);
+                if (row.count("tractive_system_on_button")) tsOnState = (std::stoi(row.at("tractive_system_on_button")) == 1);
+                if (row.count("left_inverter_fsm")) leftFsm = row.at("left_inverter_fsm");
+                if (row.count("right_inverter_fsm")) rightFsm = row.at("right_inverter_fsm");
+                if (row.count("tractive_system_fsm")) tsFsm = row.at("tractive_system_fsm");
+                if (row.count("state_of_charge")) currentSoc = std::stoi(row.at("state_of_charge"));
+                if (row.count("ECU_Mode")) ecuMode = row.at("ECU_Mode");
+            } catch (const std::exception& e) {}
         }
     } else {
-        // Modalità live
         std::lock_guard<std::mutex> lock(m_dataMutex);
-        r2dState = m_r2dButtonState;
+        r2dState = m_r2dButtonState; 
         resetState = m_resetButtonState;
-        sdcState = m_sdcInputState;
+        sdcState = m_sdcInputState; 
         tsOnState = m_tsOnButtonState;
-        leftFsm = m_leftInverterFsm;
-        rightFsm = m_rightInverterFsm;
+        leftFsm = m_leftInverterFsm; 
+        rightFsm = m_rightInverterFsm; 
+        tsFsm = m_tractiveSystemFsm;
+        ecuMode = m_ecuMode;
+        currentSoc = m_stateOfCharge;
     }
 
-    // Pannello indicatori LED
-    ImGui::BeginChild("LeftPane", ImVec2(m_leftPaneWidth, 0), false, ImGuiWindowFlags_NoBackground);
-    ImGui::SetCursorPos(ImVec2(10, 10));
-    ImGui::BeginGroup();
-    ImGui::PushFont(m_uiManager->font_label);
-    ImGui::Text("Indicatori di stato");
-    ImGui::PopFont();
-    ImGui::Separator();
-    
-    drawLed("TS On", tsOnState);
-    ImGui::SameLine(0, 20.f);
-    drawLed("SDC", sdcState);
-    ImGui::SameLine(0, 20.f);
-    drawLed("R2D", r2dState);
-    ImGui::SameLine(0, 20.f);
-    drawLed("Reset", resetState);
+    std::string formattedLeft = formatInverterFsm(leftFsm);
+    std::string formattedRight = formatInverterFsm(rightFsm);
+    std::string formattedTs = formatTractiveFsm(tsFsm);
+    std::string formattedEcuMode = formatEcuMode(ecuMode);
 
-    ImGui::EndGroup();
-    ImGui::EndChild();
+    if (ImGui::BeginTable("StatusTable", 3, ImGuiTableFlags_BordersInnerV | ImGuiTableFlags_SizingFixedFit)) {
+        
+        ImGui::TableSetupColumn("LEDs", ImGuiTableColumnFlags_WidthFixed, 240.0f);
+        ImGui::TableSetupColumn("FSMs", ImGuiTableColumnFlags_WidthStretch);
+        ImGui::TableSetupColumn("Battery", ImGuiTableColumnFlags_WidthFixed, 160.0f);
 
-    ImGui::SameLine();
+        // --- RIGA TITOLI ---
+        ImGui::TableNextRow();
+        
+        ImGui::TableSetColumnIndex(0);
+        ImGui::PushFont(m_uiManager->font_label); ImGui::Text("Digital inputs"); ImGui::PopFont();
+        ImGui::Separator();
 
-    // Separatore 
-    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
-    ImGui::Button("##v_splitter", ImVec2(8.0f, -1));
-    ImGui::PopStyleVar();
-    if (ImGui::IsItemHovered()) ImGui::SetMouseCursor(ImGuiMouseCursor_ResizeEW);
-    if (ImGui::IsItemActive()) {
-        m_leftPaneWidth += ImGui::GetIO().MouseDelta.x;
-        if (m_leftPaneWidth < 150.0f) m_leftPaneWidth = 150.0f;
-        float max_width = ImGui::GetWindowWidth() - 250.0f; 
-        if (m_leftPaneWidth > max_width) m_leftPaneWidth = max_width;
+        ImGui::TableSetColumnIndex(1);
+        ImGui::PushFont(m_uiManager->font_label); ImGui::Text("State machines"); ImGui::PopFont();
+        ImGui::Separator();
+
+        ImGui::TableSetColumnIndex(2);
+        ImGui::PushFont(m_uiManager->font_label); ImGui::Text("State of charge"); ImGui::PopFont();
+        ImGui::Separator();
+
+        // --- RIGA CONTENUTI ---
+        ImGui::TableNextRow();
+
+        // CELLA 1: LED 
+        ImGui::TableSetColumnIndex(0);
+        ImGui::Spacing();
+        ImGui::BeginGroup();
+        drawLed("SDC", sdcState); ImGui::SameLine(100.0f); drawLed("R2D button", r2dState);
+        drawLed("Reset button", resetState); ImGui::SameLine(100.0f); drawLed("TS ON button", tsOnState);
+        ImGui::EndGroup();
+
+        // CELLA 2: FSM 
+        ImGui::TableSetColumnIndex(1);
+        ImGui::Spacing();
+        
+        float avail_w = ImGui::GetContentRegionAvail().x;
+        float item_spacing = ImGui::GetStyle().ItemSpacing.x;
+        float box_width = (avail_w - (item_spacing * 3)) / 4.0f;
+        if (box_width < 40.0f) box_width = 40.0f; 
+        
+        // <-- ALTEZZA RIDOTTA DEI CAMPI NERI (da 1.6f a 1.25f per renderli più snelli)
+        float box_height = ImGui::GetTextLineHeightWithSpacing() * 1.5f; 
+
+        auto drawFsmBox = [&](const char* title, const char* id, const std::string& text) {
+            ImGui::BeginGroup();
+            ImGui::PushFont(m_uiManager->font_body); 
+            ImGui::Text("%s", title); 
+            
+            ImGui::BeginChild(id, ImVec2(box_width, box_height), true);
+            ImVec2 text_size = ImGui::CalcTextSize(text.c_str());
+            ImGui::SetCursorPos(ImVec2((box_width - text_size.x) * 0.5f, (box_height - text_size.y) * 0.5f));
+            ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), "%s", text.c_str());
+            ImGui::EndChild();
+            
+            ImGui::PopFont();
+            ImGui::EndGroup();
+        };
+
+        drawFsmBox("Left inverter FSM:", "LeftInverterPanel", formattedLeft); ImGui::SameLine();
+        drawFsmBox("Right inverter FSM:", "RightInverterPanel", formattedRight); ImGui::SameLine();
+        drawFsmBox("Tractive system FSM:", "TsPanel", formattedTs); ImGui::SameLine();
+        drawFsmBox("ECU mode:", "EcuModePanel", formattedEcuMode); 
+
+        // CELLA 3: BATTERIA 
+        ImGui::TableSetColumnIndex(2);
+        ImGui::Spacing(); // Fondamentale: allinea la partenza al livello delle altre celle
+        
+        ImGui::BeginGroup();
+        
+        // --- 1. TESTO PERCENTUALE (Allineato in Y con i titoli FSM) ---
+        char soc_text[16];
+        snprintf(soc_text, sizeof(soc_text), "%d%%", currentSoc);
+        
+        // Centratura X del testo
+        float cell_w = ImGui::GetContentRegionAvail().x;
+        float text_w = ImGui::CalcTextSize(soc_text).x;
+        ImGui::SetCursorPosX(ImGui::GetCursorPosX() + (cell_w - text_w) * 0.5f);
+        
+        ImGui::PushFont(m_uiManager->font_label); // Usa lo stesso font dei titoli Inverter/TS
+        ImGui::Text("%s", soc_text);
+        ImGui::PopFont();
+        
+        // --- 2. ICONA BATTERIA (Allineata in Y con i box FSM neri) ---
+        float batt_total_width = 84.0f + 4.0f; // Larghezza base (w) + polo_w
+        ImGui::SetCursorPosX(ImGui::GetCursorPosX() + (cell_w - batt_total_width) * 0.5f);
+        
+        drawBattery(currentSoc);
+        
+        ImGui::EndGroup();
+
+        ImGui::EndTable();
     }
 
-    ImGui::SameLine();
-
-    // Pannello Inverter
-    ImGui::BeginChild("RightPane", ImVec2(0, 0), false, ImGuiWindowFlags_NoBackground);
-    ImGui::SetCursorPos(ImVec2(10, 10));
-    ImGui::BeginGroup();
-    ImGui::PushFont(m_uiManager->font_label);
-    ImGui::Text("Stati inverter");
-    ImGui::PopFont();
-    ImGui::Separator();
-    
-    float available_width = ImGui::GetContentRegionAvail().x;
-    float panel_width = (available_width - ImGui::CalcTextSize("Left: Right: ").x - ImGui::GetStyle().ItemSpacing.x) / 2.0f;
-    if (panel_width < 50.0f) panel_width = 50.0f;
-    float panel_height = ImGui::GetFrameHeightWithSpacing();
-
-    ImGui::PushFont(m_uiManager->font_body); ImGui::Text("Left:"); ImGui::PopFont();
-    ImGui::SameLine();
-    ImGui::BeginChild("LeftInverterPanel", ImVec2(panel_width, panel_height), true);
-    ImGui::PushFont(m_uiManager->font_body);
-    ImVec2 text_size = ImGui::CalcTextSize(leftFsm.c_str());
-    ImVec2 panel_size = ImGui::GetContentRegionAvail();
-    ImGui::SetCursorPosX(ImGui::GetCursorPosX() + (panel_size.x - text_size.x) * 0.5f);
-    ImGui::SetCursorPosY(ImGui::GetCursorPosY() + (panel_size.y - text_size.y) * 0.5f);
-    ImGui::Text("%s", leftFsm.c_str());
-    ImGui::PopFont();
-    ImGui::EndChild();
-
-    ImGui::SameLine();
-
-    ImGui::PushFont(m_uiManager->font_body); ImGui::Text("Right:"); ImGui::PopFont();
-    ImGui::SameLine();
-    ImGui::BeginChild("RightInverterPanel", ImVec2(panel_width, panel_height), true);
-    ImGui::PushFont(m_uiManager->font_body);
-    text_size = ImGui::CalcTextSize(rightFsm.c_str());
-    panel_size = ImGui::GetContentRegionAvail();
-    ImGui::SetCursorPosX(ImGui::GetCursorPosX() + (panel_size.x - text_size.x) * 0.5f);
-    ImGui::SetCursorPosY(ImGui::GetCursorPosY() + (panel_size.y - text_size.y) * 0.5f);
-    ImGui::Text("%s", rightFsm.c_str());
-    ImGui::PopFont();
-    ImGui::EndChild();
-
-    ImGui::EndGroup();
-    ImGui::EndChild(); 
-    
     ImGui::End();
 }

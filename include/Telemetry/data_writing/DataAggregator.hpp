@@ -30,7 +30,7 @@ private:
 
     // Sensori di cui calcoliamo le statistiche
     const std::vector<std::string> m_targetSensors = {
-        "ACC1", "ACC2", "BRK1", "BRK2", "STEER"
+        "accelerator1", "accelerator2", "brake1", "brake2", "steer"
     };
     const double STATS_WINDOW = 3.0; // Secondi
 };

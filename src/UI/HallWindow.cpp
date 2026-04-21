@@ -5,9 +5,9 @@
 #include <iostream>
 
 HallWindow::HallWindow(UiManager* manager) : m_uiManager(manager),
-    m_hallPlot("Sensori effetto Hall", {"VELADX", "VELASX", "VELPSX", "VELPDX"}, 0.0, 120.0)
+    m_hallPlot("Sensori effetto Hall", {{ "front_right_velocity", "Front right" }, { "front_left_velocity", "Front left" }, { "rear_left_velocity", "Rear left" }, { "rear_right_velocity", "Rear right" }}, 0.0, 100.0)
 {
-    const std::vector<std::string> keys_to_plot = {"VELADX", "VELASX", "VELPSX", "VELPDX"};
+    const std::vector<std::string> keys_to_plot = {"front_right_velocity", "front_left_velocity", "rear_left_velocity", "rear_right_velocity"};
     for (const auto& key : keys_to_plot) {
         m_plotData[key] = PlotLineData();
     }
@@ -71,10 +71,7 @@ void HallWindow::draw() {
         }
     }
 
-    ImGui::Begin("Velocità", nullptr, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
-    ImGui::PushFont(m_uiManager->font_label);
-    ImGui::Text("Sensori effetto Hall");
-    ImGui::PopFont();
+    ImGui::Begin("Hall sensors", nullptr, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 
     {
         std::lock_guard<std::mutex> lock(m_dataMutex);

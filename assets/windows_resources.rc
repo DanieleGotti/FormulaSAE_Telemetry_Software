@@ -1,6 +1,7 @@
 #include "resources.h"
 IDI_ICON1           ICON    "windows_icon.ico"
 IDI_ICON_STEER      RCDATA  "./images/steering_wheel.png"
+IDI_ICON_ERB        RCDATA  "./images/logo_erb.png"
 
 IDR_FONT_REGULAR    RCDATA "./fonts/RobotoCondensed-Regular.ttf"
 IDR_FONT_BOLD       RCDATA "./fonts/RobotoCondensed-Bold.ttf"

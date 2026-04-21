@@ -14,6 +14,8 @@
 #include "TemperatureWindow.hpp"
 #include "ModulesBatteryWindow.hpp"
 #include "VarianceWindow.hpp"
+#include "SpeedometerWindow.hpp"
+#include "CreditsWindow.hpp"
 #include "Telemetry/data_writing/IAggregatedDataSubscriber.hpp"
 
 struct ImFont;
@@ -70,6 +72,7 @@ private:
     std::shared_ptr<ModulesBatteryWindow> m_modulesBatteryWindow;
     std::shared_ptr<PlaybackControlsWindow> m_playbackControls;
     std::shared_ptr<VarianceWindow> m_varianceWindow;
+    std::shared_ptr<SpeedometerWindow> m_speedometerWindow;
     std::shared_ptr<IAggregatedDataSubscriber> m_tempDataSubscriber;
     std::shared_ptr<LogTerminal> m_logTerminal;
     std::vector<std::unique_ptr<UIElement>> m_uiElements;

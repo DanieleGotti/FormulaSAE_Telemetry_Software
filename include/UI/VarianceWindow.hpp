@@ -23,6 +23,6 @@ private:
 
     // Questa lista deve essere identica a quella del DataAggregator
     const std::vector<std::string> m_targetSensors = {
-        "ACC1", "ACC2", "BRK1", "BRK2", "STEER"
+        "accelerator1", "accelerator2", "brake1", "brake2", "steer"
     };
 };

@@ -6,10 +6,10 @@
 
 AccBrkWindow::AccBrkWindow(UiManager* manager) : m_uiManager(manager),
     // Passiamo qui le variabili esatte decise
-    m_accPlot("Acceleratori", {"ACC1", "ACC2", "ACC_MAPPED"}, 0.0, 100.0),
-    m_brkPlot("Freni", {"BRK1", "BRK2"}, 800.0, 1000.0)
+    m_accPlot("Acceleratori", {{ "accelerator1", "Accelerator1" }, { "accelerator2", "Accelerator2" }, { "accelerator_mapped", "Accelerator mapped" }}, 0.0, 100.0),
+    m_brkPlot("Freni", {{ "brake1", "Brake1" }, { "brake2", "Brake2" }}, 0.0, 100.0)
 {
-    const std::vector<std::string> keys_to_plot = {"ACC1", "ACC2", "ACC_MAPPED", "BRK1", "BRK2"};
+    const std::vector<std::string> keys_to_plot = {"accelerator1", "accelerator2", "accelerator_mapped", "brake1", "brake2"};
     for (const auto& key : keys_to_plot) {
         m_plotData[key] = PlotLineData();
     }
@@ -73,16 +73,13 @@ void AccBrkWindow::draw() {
         }
     }
 
-    ImGui::Begin("Acceleratore e freno", nullptr, ImGuiWindowFlags_NoScrollbar);
+    ImGui::Begin("Accelerator and brake sensors", nullptr, ImGuiWindowFlags_NoScrollbar);
     
     float available_height = ImGui::GetContentRegionAvail().y;
     float non_plot_height = (2 * ImGui::GetTextLineHeightWithSpacing()) + (3 * ImGui::GetStyle().ItemSpacing.y);
     float plot_height = (available_height - non_plot_height) / 2.0f;
     if (plot_height < 100) plot_height = 100;
 
-    ImGui::PushFont(m_uiManager->font_label);
-    ImGui::Text("Sensori acceleratori");
-    ImGui::PopFont();
     {
         std::lock_guard<std::mutex> lock(m_dataMutex);
         m_accPlot.draw(m_plotData, cursor_time, isPlayback, plot_height);
@@ -90,9 +87,6 @@ void AccBrkWindow::draw() {
 
     ImGui::Spacing();
 
-    ImGui::PushFont(m_uiManager->font_label);
-    ImGui::Text("Sensori freni");
-    ImGui::PopFont();
     {
         std::lock_guard<std::mutex> lock(m_dataMutex);
         m_brkPlot.draw(m_plotData, cursor_time, isPlayback, plot_height);

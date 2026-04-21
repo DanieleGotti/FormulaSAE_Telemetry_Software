@@ -6,6 +6,7 @@
 
 #define IDI_ICON1        201
 #define IDI_ICON_STEER   202
+#define IDI_ICON_ERB     203
 
 #define IDR_IMGUI_CONFIG 301
 

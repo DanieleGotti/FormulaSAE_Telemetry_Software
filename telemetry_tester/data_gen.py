@@ -23,10 +23,10 @@ def generate_packet_A(timestamp_val: int) -> bytes:
     timestamp = timestamp_val
 
     # 2. Generazione dati casuali
-    fl_v = random.uniform(0.0, 120.0)
-    fr_v = random.uniform(0.0, 120.0)
-    rl_v = random.uniform(0.0, 120.0)
-    rr_v = random.uniform(0.0, 120.0)
+    fl_v = random.uniform(0.0, 100.0)
+    fr_v = random.uniform(0.0, 100.0)
+    rl_v = random.uniform(0.0, 100.0)
+    rr_v = random.uniform(0.0, 100.0)
     
     fl_s = random.uniform(-5.0, 5.0)
     fr_s = random.uniform(-5.0, 5.0)
@@ -35,8 +35,8 @@ def generate_packet_A(timestamp_val: int) -> bytes:
     acc2 = random.randint(0, 4000)
     acc_map = random.uniform(0.0, 100.0)
     
-    brk1 = random.randint(800, 2000)
-    brk2 = random.randint(800, 2000)
+    brk1 = random.randint(0, 1000)
+    brk2 = random.randint(0, 1000)
     steer = random.uniform(-180.0, 180.0)
     
     sdc = random.choice([0, 1])
@@ -49,7 +49,7 @@ def generate_packet_A(timestamp_val: int) -> bytes:
     emma_yaw = random.uniform(-1.0, 1.0)
     emma_error = random.choice([0, 1, 2]) # uint16_t
     
-    mean_vel = (fl_v + fr_v) / 2
+    mean_vel = random.uniform(0.0, 120.0)
     real_yaw = random.uniform(-50.0, 50.0)
     tot_trq = random.uniform(0.0, 200.0)
     trq_tv_l = random.uniform(-10.0, 10.0)
@@ -75,8 +75,8 @@ def generate_packet_A(timestamp_val: int) -> bytes:
     
     l_inv_fsm = random.randint(0, 8)
     r_inv_fsm = random.randint(0, 8)
-    ts_fsm = random.randint(0, 5)
-    ecu_mode = random.randint(0, 3)
+    ts_fsm = random.randint(0, 9)
+    ecu_mode = random.choice([0x01, 0x02, 0x04])
 
     # 3. Formato Struct Payload A
     fmt = '< BB I 4f 2f 2H f 2H f 4B 3f H 11f 6h 4f 4B'
