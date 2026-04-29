@@ -32,19 +32,13 @@ void VarianceWindow::draw() {
         }
     }
 
-    ImGui::Begin("Statistiche sensori", nullptr);
-
-    ImGui::PushFont(m_uiManager->font_label);
-    ImGui::Text("Statistiche sensori aggiornate ogni 3 secondi");
-    ImGui::PopFont();
-    ImGui::Separator();
-    ImGui::Spacing();
+    ImGui::Begin("Sensor statistics (3 s)", nullptr);
 
     if (ImGui::BeginTable("StatisticheTable", 4, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_SizingStretchProp)) {
-        ImGui::TableSetupColumn("Sensore", ImGuiTableColumnFlags_WidthFixed, 100.0f);
-        ImGui::TableSetupColumn("Media (\u03BC)");
-        ImGui::TableSetupColumn("Varianza (\u03C3\u00B2)");
-        ImGui::TableSetupColumn("Deviazione standard (\u03C3)");
+        ImGui::TableSetupColumn("Sensor", ImGuiTableColumnFlags_WidthFixed, 100.0f);
+        ImGui::TableSetupColumn("Mean (\u03BC)");
+        ImGui::TableSetupColumn("Variance (\u03C3\u00B2)");
+        ImGui::TableSetupColumn("Standard deviation (\u03C3)");
         ImGui::TableHeadersRow();
 
         auto printStat = [&](const std::string& key) {
@@ -67,13 +61,13 @@ void VarianceWindow::draw() {
             ImGui::TextUnformatted(sensor.c_str());
             
             ImGui::TableSetColumnIndex(1);
-            printStat(sensor + "_MEAN");
+            printStat(sensor + "_mean");
 
             ImGui::TableSetColumnIndex(2);
-            printStat(sensor + "_VAR");
+            printStat(sensor + "_var");
 
             ImGui::TableSetColumnIndex(3);
-            printStat(sensor + "_STD");
+            printStat(sensor + "_std");
         }
         ImGui::EndTable();
     }

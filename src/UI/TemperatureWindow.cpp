@@ -49,7 +49,7 @@ void TemperatureWindow::printColoredValue(const std::string& label, const std::s
 }
 
 void TemperatureWindow::draw() {
-    ImGui::Begin("Temperature");
+    ImGui::Begin("External thermal data");
 
     DbRow dataToDisplay;
     bool hasData = false;
@@ -69,31 +69,31 @@ void TemperatureWindow::draw() {
     }
 
     if (hasData) {
-        ImGui::PushFont(m_uiManager->font_label);
-        ImGui::Text("Liquido di raffreddamento");
+        ImGui::PushFont(m_uiManager->font_body);
+        ImGui::Text("Coolant pump temperatures");
         ImGui::PopFont();
         
         ImGui::Separator();
         ImGui::Spacing();
 
         ImGui::PushFont(m_uiManager->font_body);
-        printColoredValue("Pompa DX", "TMPDX", dataToDisplay, 60.0f, 80.0f);
-        printColoredValue("Pompa SX", "TMPSX", dataToDisplay, 60.0f, 80.0f);
+        printColoredValue("Left", "left_coolant_temp", dataToDisplay, 60.0f, 80.0f);
+        printColoredValue("Right", "right_coolant_temp", dataToDisplay, 60.0f, 80.0f);
         ImGui::PopFont();
 
         ImGui::Spacing();
         ImGui::Separator();
 
-        ImGui::PushFont(m_uiManager->font_label);
-        ImGui::Text("Motori");
+        ImGui::PushFont(m_uiManager->font_body);
+        ImGui::Text("Motor temperatures");
         ImGui::PopFont();
         
         ImGui::Separator();
         ImGui::Spacing();
 
         ImGui::PushFont(m_uiManager->font_body);
-        printColoredValue(" Motore DX", "TMPMOTORDX", dataToDisplay, 100.0f,120.0f);
-        printColoredValue(" Motore SX", "TMPMOTORSX", dataToDisplay, 100.0f, 120.0f);
+        printColoredValue("Left", "left_motor_temp", dataToDisplay, 100.0f, 120.0f);
+        printColoredValue("Right", "right_motor_temp", dataToDisplay, 100.0f,120.0f);
         ImGui::PopFont();
 
     } else {

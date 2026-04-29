@@ -24,6 +24,8 @@
 #include "UI/TemperatureWindow.hpp"
 #include "UI/ModulesBatteryWindow.hpp"
 #include "UI/SpeedometerWindow.hpp"
+#include "UI/DynamicsPowertrainWindow.hpp"
+#include "UI/InverterDataWindow.hpp"
 #include "UI/CreditsWindow.hpp"
 #include "Telemetry/Services/ServiceManager.hpp"
 #include "Telemetry/Services/FileService.hpp"
@@ -119,6 +121,8 @@ UiManager::~UiManager() {
         if (m_modulesBatteryWindow) ServiceManager::getDataManager()->removeSubscriber(m_modulesBatteryWindow.get());
         if (m_varianceWindow) ServiceManager::getDataManager()->removeSubscriber(m_varianceWindow.get());
         if (m_speedometerWindow) ServiceManager::getDataManager()->removeSubscriber(m_speedometerWindow.get());
+        if (m_dynamicsWindow) ServiceManager::getDataManager()->removeSubscriber(m_dynamicsWindow.get());
+        if (m_inverterWindow) ServiceManager::getDataManager()->removeSubscriber(m_inverterWindow.get());
     }
     
     ImGui_ImplOpenGL3_Shutdown();
@@ -190,6 +194,8 @@ void UiManager::transitionToConnectedState(AppState connectedState) {
     m_modulesBatteryWindow = std::make_shared<ModulesBatteryWindow>(this);
     m_varianceWindow = std::make_shared<VarianceWindow>(this);
     m_speedometerWindow = std::make_shared<SpeedometerWindow>(this);
+    m_dynamicsWindow = std::make_shared<DynamicsPowertrainWindow>(this);
+    m_inverterWindow = std::make_shared<InverterDataWindow>(this);
 
     if (connectedState == AppState::CONNECTED_LIVE) {
         auto dataManager = ServiceManager::getDataManager();
@@ -203,6 +209,8 @@ void UiManager::transitionToConnectedState(AppState connectedState) {
         dataManager->addSubscriber(m_modulesBatteryWindow.get());
         dataManager->addSubscriber(m_varianceWindow.get());
         dataManager->addSubscriber(m_speedometerWindow.get());
+        dataManager->addSubscriber(m_dynamicsWindow.get());
+        dataManager->addSubscriber(m_inverterWindow.get());
     } else if (connectedState == AppState::CONNECTED_PLAYBACK) {
         m_playbackControls = std::make_shared<PlaybackControlsWindow>(this);
     }
@@ -274,6 +282,8 @@ void UiManager::draw() {
         if (m_modulesBatteryWindow) m_modulesBatteryWindow->draw();
         if (m_varianceWindow) m_varianceWindow->draw();
         if (m_speedometerWindow) m_speedometerWindow->draw();
+        if (m_dynamicsWindow) m_dynamicsWindow->draw();
+        if (m_inverterWindow) m_inverterWindow->draw();
     }
 
     if (m_currentState == AppState::CONNECTED_PLAYBACK) {
@@ -376,6 +386,8 @@ void UiManager::resetToHome() {
         if (m_modulesBatteryWindow) ServiceManager::getDataManager()->removeSubscriber(m_modulesBatteryWindow.get());
         if (m_varianceWindow) ServiceManager::getDataManager()->removeSubscriber(m_varianceWindow.get());
         if (m_speedometerWindow) ServiceManager::getDataManager()->removeSubscriber(m_speedometerWindow.get());
+        if (m_dynamicsWindow) ServiceManager::getDataManager()->removeSubscriber(m_dynamicsWindow.get());
+        if (m_inverterWindow) ServiceManager::getDataManager()->removeSubscriber(m_inverterWindow.get());
     }
 
     ServiceManager::resetForNewSession();
@@ -391,6 +403,8 @@ void UiManager::resetToHome() {
     m_playbackControls.reset();
     m_varianceWindow.reset();
     m_speedometerWindow.reset();
+    m_dynamicsWindow.reset();
+    m_inverterWindow.reset();
 
     m_uiElements.clear();
     m_serialSelectionWindow = nullptr;

@@ -15,6 +15,8 @@
 #include "ModulesBatteryWindow.hpp"
 #include "VarianceWindow.hpp"
 #include "SpeedometerWindow.hpp"
+#include "DynamicsPowertrainWindow.hpp"
+#include "InverterDataWindow.hpp"
 #include "CreditsWindow.hpp"
 #include "Telemetry/data_writing/IAggregatedDataSubscriber.hpp"
 
@@ -73,6 +75,8 @@ private:
     std::shared_ptr<PlaybackControlsWindow> m_playbackControls;
     std::shared_ptr<VarianceWindow> m_varianceWindow;
     std::shared_ptr<SpeedometerWindow> m_speedometerWindow;
+    std::shared_ptr<DynamicsPowertrainWindow> m_dynamicsWindow;
+    std::shared_ptr<InverterDataWindow> m_inverterWindow;
     std::shared_ptr<IAggregatedDataSubscriber> m_tempDataSubscriber;
     std::shared_ptr<LogTerminal> m_logTerminal;
     std::vector<std::unique_ptr<UIElement>> m_uiElements;

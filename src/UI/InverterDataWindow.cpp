@@ -1,0 +1,93 @@
+#include <imgui.h>
+#include <iostream>
+#include <string>
+#include <stdexcept> 
+#include "UI/UIManager.hpp"
+#include "UI/InverterDataWindow.hpp" 
+#include "Telemetry/Services/ServiceManager.hpp"
+
+InverterDataWindow::InverterDataWindow(UiManager* manager) : m_uiManager(manager) {}
+
+void InverterDataWindow::onAggregatedDataReceived(const DbRow& dataRow) {
+    std::lock_guard<std::mutex> lock(m_dataMutex);
+    m_latestData = dataRow;
+}
+
+void InverterDataWindow::printValue(const std::string& label, const std::string& key, const DbRow& dataMap, const std::string& unit) {
+    ImGui::Text("%s: ", label.c_str());
+    ImGui::SameLine();
+
+    auto it = dataMap.find(key);
+    if (it != dataMap.end()) {
+        ImGui::PushFont(m_uiManager->font_label); 
+        if (unit.empty()) {
+            ImGui::Text("%s", it->second.c_str());
+        } else {
+            ImGui::Text("%s %s", it->second.c_str(), unit.c_str());
+        }
+        ImGui::PopFont();
+    } else {
+        ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1.0f), "N/D");
+    }
+}
+
+void InverterDataWindow::draw() {
+    ImGui::Begin("Internal inverter data");
+
+    DbRow dataToDisplay;
+    bool hasData = false;
+
+    if (m_uiManager->getCurrentState() == AppState::CONNECTED_PLAYBACK) {
+        auto playbackManager = ServiceManager::getPlaybackManager();
+        if (auto row = playbackManager->getCurrentRow()) {
+            dataToDisplay = *row;
+            hasData = true;
+        }
+    } else {
+        std::lock_guard<std::mutex> lock(m_dataMutex);
+        if (!m_latestData.empty()) {
+            dataToDisplay = m_latestData;
+            hasData = true;
+        }
+    }
+
+    if (hasData) {
+        ImGui::PushFont(m_uiManager->font_body);
+        ImGui::Text("Torque current");
+        ImGui::PopFont();
+        ImGui::Separator();
+        ImGui::Spacing();
+
+        printValue("Left", "inv_L_torqueCurrent", dataToDisplay, "A");
+        printValue("Right", "inv_R_torqueCurrent", dataToDisplay, "A");
+
+        ImGui::Spacing();
+        ImGui::Separator();
+        
+        ImGui::PushFont(m_uiManager->font_body);
+        ImGui::Text("Magnetizing current");
+        ImGui::PopFont();
+        ImGui::Separator();
+        ImGui::Spacing();
+        
+        printValue("Left", "inv_L_magnetizingCurrent", dataToDisplay, "A");
+        printValue("Right", "inv_R_magnetizingCurrent", dataToDisplay, "A");
+        
+        ImGui::Spacing();
+        ImGui::Separator();
+        
+        ImGui::PushFont(m_uiManager->font_body);
+        ImGui::Text("Motor temperature");
+        ImGui::PopFont();
+        ImGui::Separator();
+        ImGui::Spacing();
+
+        printValue("Left", "inv_L_tempMotor", dataToDisplay, "°C");
+        printValue("Right", "inv_R_tempMotor", dataToDisplay, "°C"); 
+
+    } else {
+        ImGui::Text("In attesa di dati.");
+    }
+
+    ImGui::End();
+}

@@ -31,12 +31,12 @@ def generate_packet_A(timestamp_val: int) -> bytes:
     fl_s = random.uniform(-5.0, 5.0)
     fr_s = random.uniform(-5.0, 5.0)
     
-    acc1 = random.randint(0, 4000)
-    acc2 = random.randint(0, 4000)
+    acc1 = random.randint(0, 100)
+    acc2 = random.randint(0, 100)
     acc_map = random.uniform(0.0, 100.0)
     
-    brk1 = random.randint(0, 1000)
-    brk2 = random.randint(0, 1000)
+    brk1 = random.randint(0, 100)
+    brk2 = random.randint(0, 100)
     steer = random.uniform(-180.0, 180.0)
     
     sdc = random.choice([0, 1])
@@ -47,7 +47,7 @@ def generate_packet_A(timestamp_val: int) -> bytes:
     emma_c = random.uniform(0.0, 250.0)
     emma_v = random.uniform(450.0, 600.0)
     emma_yaw = random.uniform(-1.0, 1.0)
-    emma_error = random.choice([0, 1, 2]) # uint16_t
+    emma_error = random.choice([0, 1, 2]) 
     
     mean_vel = random.uniform(0.0, 120.0)
     real_yaw = random.uniform(-50.0, 50.0)
@@ -68,10 +68,10 @@ def generate_packet_A(timestamp_val: int) -> bytes:
     inv_R_mc = random.randint(-100, 100)
     inv_R_tm = random.randint(20, 120)
     
-    mot_L_tmp = random.uniform(20.0, 120.0)
-    mot_R_tmp = random.uniform(20.0, 120.0)
     cool_L_tmp = random.uniform(20.0, 90.0)
     cool_R_tmp = random.uniform(20.0, 90.0)
+    mot_R_tmp = random.uniform(20.0, 120.0)
+    mot_L_tmp = random.uniform(20.0, 120.0)
     
     l_inv_fsm = random.randint(0, 8)
     r_inv_fsm = random.randint(0, 8)

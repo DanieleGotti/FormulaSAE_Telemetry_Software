@@ -47,9 +47,9 @@ void DataAggregator::processRow(DbRow row) {
 
     // Aggiunge le statistiche calcolate alla riga
     for (const auto& sensor : m_targetSensors) {
-        row[sensor + "_MEAN"] = std::to_string(m_currentStats[sensor].mean);
-        row[sensor + "_VAR"] = std::to_string(m_currentStats[sensor].variance);
-        row[sensor + "_STD"] = std::to_string(m_currentStats[sensor].stdDev);
+        row[sensor + "_mean"] = std::to_string(m_currentStats[sensor].mean);
+        row[sensor + "_var"] = std::to_string(m_currentStats[sensor].variance);
+        row[sensor + "_std"] = std::to_string(m_currentStats[sensor].stdDev);
     }
 
     if (m_onRowReadyCallback) m_onRowReadyCallback(row);

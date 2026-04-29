@@ -1,6 +1,8 @@
 #include "Telemetry/data_acquisition/PacketParser.hpp"
 #include <sstream>
 #include <iomanip>
+#include <iostream> 
+
 
 // --- FUNZIONI DI MAPPATURA FSM ---
 static std::string getInverterFsmStr(uint8_t val) {
@@ -93,28 +95,28 @@ void PacketParser::populateRowFromA(const TelemetryPacket_t* dataA, const DbRow&
     row["EMMA_ERROR"] = std::to_string(dataA->emma_error);
     
     row["mean_velocity"] = formatDouble(dataA->mean_velocity, 1);
-    row["REAL_YAW"] = formatDouble(dataA->real_yaw_rate, 2);
-    row["TOTAL_TORQUE"] = formatDouble(dataA->total_torque_request, 1);
-    row["TORQUE_TV_L"] = formatDouble(dataA->torque_tv_L, 1);
-    row["TORQUE_TV_R"] = formatDouble(dataA->torque_tv_R, 1);
-    row["SLIP_L"] = formatDouble(dataA->slip_L, 2);
-    row["SLIP_R"] = formatDouble(dataA->slip_R, 2);
-    row["TORQUE_RED_L"] = formatDouble(dataA->torque_reduction_L, 1);
-    row["TORQUE_RED_R"] = formatDouble(dataA->torque_reduction_R, 1);
-    row["FINAL_TORQUE_L"] = formatDouble(dataA->final_torque_target_L, 1);
-    row["FINAL_TORQUE_R"] = formatDouble(dataA->final_torque_target_R, 1);
+    row["real_yaw_rate"] = formatDouble(dataA->real_yaw_rate, 2);
+    row["total_torque_request"] = formatDouble(dataA->total_torque_request, 2);
+    row["torque_tv_L"] = formatDouble(dataA->torque_tv_L, 2);
+    row["torque_tv_R"] = formatDouble(dataA->torque_tv_R, 2);
+    row["slip_L"] = formatDouble(dataA->slip_L, 3);
+    row["slip_R"] = formatDouble(dataA->slip_R, 3);
+    row["torque_reduction_L"] = formatDouble(dataA->torque_reduction_L, 2);
+    row["torque_reduction_R"] = formatDouble(dataA->torque_reduction_R, 2);
+    row["final_torque_target_L"] = formatDouble(dataA->final_torque_target_L, 2);
+    row["final_torque_target_R"] = formatDouble(dataA->final_torque_target_R, 2);
 
-    row["INV_L_TRQ_CURR"] = std::to_string(dataA->inv_L_torqueCurrent);
-    row["INV_L_MAG_CURR"] = std::to_string(dataA->inv_L_magnetizingCurrent);
-    row["INV_L_TEMP_MOT"] = std::to_string(dataA->inv_L_tempMotor);
-    row["INV_R_TRQ_CURR"] = std::to_string(dataA->inv_R_torqueCurrent);
-    row["INV_R_MAG_CURR"] = std::to_string(dataA->inv_R_magnetizingCurrent);
-    row["INV_R_TEMP_MOT"] = std::to_string(dataA->inv_R_tempMotor);
+    row["inv_L_torqueCurrent"] = formatDouble(dataA->inv_L_torqueCurrent, 2);
+    row["inv_L_magnetizingCurrent"] = formatDouble(dataA->inv_L_magnetizingCurrent, 2);
+    row["inv_L_tempMotor"] = formatDouble(dataA->inv_L_tempMotor, 1);
+    row["inv_R_torqueCurrent"] = formatDouble(dataA->inv_R_torqueCurrent, 2);
+    row["inv_R_magnetizingCurrent"] = formatDouble(dataA->inv_R_magnetizingCurrent, 2);
+    row["inv_R_tempMotor"] = formatDouble(dataA->inv_R_tempMotor, 1);
     
-    row["TMPDX"] = formatDouble(dataA->right_coolant_temp, 1);
-    row["TMPSX"] = formatDouble(dataA->left_coolant_temp, 1);
-    row["TMPMOTORDX"] = formatDouble(dataA->right_motor_temp, 1);
-    row["TMPMOTORSX"] = formatDouble(dataA->left_motor_temp, 1);
+    row["left_motor_temp"] = formatDouble(dataA->left_motor_temp, 1);
+    row["right_motor_temp"] = formatDouble(dataA->right_motor_temp, 1);
+    row["left_coolant_temp"] = formatDouble(dataA->left_coolant_temp, 1);
+    row["right_coolant_temp"] = formatDouble(dataA->right_coolant_temp, 1);
     
     row["left_inverter_fsm"] = getInverterFsmStr(dataA->left_inverter_fsm);
     row["right_inverter_fsm"] = getInverterFsmStr(dataA->right_inverter_fsm);
@@ -162,15 +164,24 @@ bool PacketParser::parseLiveBytes(std::vector<uint8_t>& rxBuffer, DbRow& outRow)
 
         if (syncIndex == std::string::npos) return false;
         
-        // Pulizia spazzatura precedente al pacchetto
-        if (syncIndex > 0) rxBuffer.erase(rxBuffer.begin(), rxBuffer.begin() + syncIndex);
+        // 1. STAMPA DATI A CASO (Spazzatura prima dell'header)
+        if (syncIndex > 0) {
+            std::cerr << "\n[WARNING] Trovati " << syncIndex << " byte di spazzatura prima del sync. Dati scartati: ";
+            for (size_t k = 0; k < syncIndex; ++k) {
+                // Stampa i byte in formato esadecimale
+                std::cerr << std::hex << std::uppercase << std::setw(2) << std::setfill('0') << (int)rxBuffer[k] << " ";
+            }
+            std::cerr << std::dec << std::endl; // Riporta cout in decimale
+            
+            rxBuffer.erase(rxBuffer.begin(), rxBuffer.begin() + syncIndex);
+        }
 
         if (packetType == 1) { 
             TelemetryPacket_t* data = reinterpret_cast<TelemetryPacket_t*>(rxBuffer.data());
             uint16_t crc = Calculate_CRC16(rxBuffer.data(), sizeof(TelemetryPacket_t) - 2);
             
             if (crc == data->crc16) {
-                // MODIFICA QUI: Aggiunto filtro limite diff < 5000
+                // ... (Codice originale intatto) ...
                 if (!m_firstA && data->timestamp > m_lastTimestampA) {
                     uint32_t diff = data->timestamp - m_lastTimestampA;
                     if (diff > 1 && diff < 5000) { 
@@ -184,6 +195,11 @@ bool PacketParser::parseLiveBytes(std::vector<uint8_t>& rxBuffer, DbRow& outRow)
                 rxBuffer.erase(rxBuffer.begin(), rxBuffer.begin() + sizeof(TelemetryPacket_t));
                 return true; 
             } else {
+                // 2A. STAMPA PACCHETTO TIPO 1 ROTTO (CRC Mismatch)
+                std::cerr << "\n[ERROR] Pacchetto A (Type 1) corrotto! CRC atteso: 0x" 
+                          << std::hex << data->crc16 << ", Calcolato: 0x" << crc 
+                          << std::dec << ". Elimino l'header e cerco il prossimo." << std::endl;
+                          
                 rxBuffer.erase(rxBuffer.begin(), rxBuffer.begin() + 1); 
             }
             
@@ -192,7 +208,7 @@ bool PacketParser::parseLiveBytes(std::vector<uint8_t>& rxBuffer, DbRow& outRow)
             uint16_t crc = Calculate_CRC16(rxBuffer.data(), sizeof(TelemetryPacket_EMMA_t) - 2);
             
             if (crc == data->crc16) {
-                // MODIFICA QUI: Aggiunto filtro limite
+                // ... (Codice originale intatto) ...
                 if (!m_firstB && data->timestamp > m_lastTimestampB) {
                     uint32_t diff = data->timestamp - m_lastTimestampB;
                     if (diff > 40 && diff < 100000) {
@@ -204,6 +220,11 @@ bool PacketParser::parseLiveBytes(std::vector<uint8_t>& rxBuffer, DbRow& outRow)
                 populateRowFromB(data); 
                 rxBuffer.erase(rxBuffer.begin(), rxBuffer.begin() + sizeof(TelemetryPacket_EMMA_t));
             } else {
+                // 2B. STAMPA PACCHETTO EMMA ROTTO (CRC Mismatch)
+                std::cerr << "\n[ERROR] Pacchetto B (EMMA) corrotto! CRC atteso: 0x" 
+                          << std::hex << data->crc16 << ", Calcolato: 0x" << crc 
+                          << std::dec << ". Elimino l'header e cerco il prossimo." << std::endl;
+                          
                 rxBuffer.erase(rxBuffer.begin(), rxBuffer.begin() + 1);
             }
         }
@@ -234,12 +255,12 @@ std::vector<std::string> PacketParser::getColumnOrder() {
         "steer",
         "sdc", "ready_to_drive_button", "ecu_reset_button", "tractive_system_on_button",
         "EMMA_CURRENT", "EMMA_VOLTAGE", "EMMA_YAW", "EMMA_ERROR",
-        "mean_velocity", "REAL_YAW", "TOTAL_TORQUE", 
-        "TORQUE_TV_L", "TORQUE_TV_R", "SLIP_L", "SLIP_R", 
-        "TORQUE_RED_L", "TORQUE_RED_R", "FINAL_TORQUE_L", "FINAL_TORQUE_R",
-        "INV_L_TRQ_CURR", "INV_L_MAG_CURR", "INV_L_TEMP_MOT",
-        "INV_R_TRQ_CURR", "INV_R_MAG_CURR", "INV_R_TEMP_MOT",
-        "TMPDX", "TMPSX", "TMPMOTORDX", "TMPMOTORSX",
+        "mean_velocity", "real_yaw_rate", "total_torque_request", 
+        "torque_tv_L", "torque_tv_R", "slip_L", "slip_R", 
+        "torque_reduction_L", "torque_reduction_R", "final_torque_target_L", "final_torque_target_R",
+        "inv_L_torqueCurrent", "inv_L_magnetizingCurrent", "inv_L_tempMotor",
+        "inv_R_torqueCurrent", "inv_R_magnetizingCurrent", "inv_R_tempMotor",
+        "left_motor_temp", "right_motor_temp", "left_coolant_temp", "right_coolant_temp",
         "left_inverter_fsm", "right_inverter_fsm", "tractive_system_fsm", 
         "ECU_Mode",
         "state_of_charge", 
@@ -257,9 +278,9 @@ std::vector<std::string> PacketParser::getColumnOrder() {
     // Campi statistici aggiunti dinamicamente dalla varianza (così vengono mostrati nel CSV/Dataset)
     const std::vector<std::string> targetSensors = {"accelerator1", "accelerator2", "brake1", "brake2", "steer"};
     for (const auto& sensor : targetSensors) {
-        cols.push_back(sensor + "_MEAN"); 
-        cols.push_back(sensor + "_VAR"); 
-        cols.push_back(sensor + "_STD");
+        cols.push_back(sensor + "_mean"); 
+        cols.push_back(sensor + "_var"); 
+        cols.push_back(sensor + "_std");
     }
 
     cols.push_back("lost_packets_A");
