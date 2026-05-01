@@ -14,20 +14,31 @@ void InverterDataWindow::onAggregatedDataReceived(const DbRow& dataRow) {
 }
 
 void InverterDataWindow::printValue(const std::string& label, const std::string& key, const DbRow& dataMap, const std::string& unit) {
-    ImGui::Text("%s: ", label.c_str());
-    ImGui::SameLine();
+    ImGui::Text("%s:", label.c_str());
 
     auto it = dataMap.find(key);
     if (it != dataMap.end()) {
         ImGui::PushFont(m_uiManager->font_label); 
-        if (unit.empty()) {
-            ImGui::Text("%s", it->second.c_str());
+        float text_width = ImGui::CalcTextSize(it->second.c_str()).x;
+        ImGui::SameLine(140.0f - text_width); // Stesso offset di Dynamics per coerenza visiva
+        
+        ImGui::Text("%s", it->second.c_str()); 
+        ImGui::PopFont();
+
+        ImGui::SameLine(145.0f); 
+        ImGui::PushFont(m_uiManager->font_body); 
+        if (!unit.empty()) {
+            ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "[%s]", unit.c_str());
         } else {
-            ImGui::Text("%s %s", it->second.c_str(), unit.c_str());
+            ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "[-]");
         }
         ImGui::PopFont();
     } else {
-        ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1.0f), "N/D");
+        ImGui::PushFont(m_uiManager->font_label);
+        float text_width = ImGui::CalcTextSize("N/D").x;
+        ImGui::SameLine(140.0f - text_width);
+        ImGui::Text("N/D");
+        ImGui::PopFont();
     }
 }
 
@@ -52,7 +63,7 @@ void InverterDataWindow::draw() {
     }
 
     if (hasData) {
-        ImGui::PushFont(m_uiManager->font_body);
+        ImGui::PushFont(m_uiManager->font_label);
         ImGui::Text("Torque current");
         ImGui::PopFont();
         ImGui::Separator();
@@ -64,7 +75,7 @@ void InverterDataWindow::draw() {
         ImGui::Spacing();
         ImGui::Separator();
         
-        ImGui::PushFont(m_uiManager->font_body);
+        ImGui::PushFont(m_uiManager->font_label);
         ImGui::Text("Magnetizing current");
         ImGui::PopFont();
         ImGui::Separator();
@@ -76,7 +87,7 @@ void InverterDataWindow::draw() {
         ImGui::Spacing();
         ImGui::Separator();
         
-        ImGui::PushFont(m_uiManager->font_body);
+        ImGui::PushFont(m_uiManager->font_label);
         ImGui::Text("Motor temperature");
         ImGui::PopFont();
         ImGui::Separator();

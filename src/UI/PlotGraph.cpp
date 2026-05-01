@@ -7,7 +7,7 @@ PlotGraph::PlotGraph(const std::string& title, const std::vector<std::pair<std::
     : m_title(title), m_keysAndLabels(keysAndLabels), m_defaultMinY(minY), m_defaultMaxY(maxY) {}
 
 int PlotGraph::TimeAxisFormatter(double value, char* buff, int size, void* user_data) {
-    return snprintf(buff, size, "%.2f s", value);
+    return snprintf(buff, size, "%.0f s", value);
 }
 
 void PlotGraph::draw(const std::map<std::string, PlotLineData>& plotData, double cursorTime, bool isPlayback, float height) {

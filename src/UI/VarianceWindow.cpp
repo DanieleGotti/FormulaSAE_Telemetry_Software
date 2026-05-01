@@ -34,8 +34,11 @@ void VarianceWindow::draw() {
 
     ImGui::Begin("Sensor statistics (3 s)", nullptr);
 
-    if (ImGui::BeginTable("StatisticheTable", 4, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_SizingStretchProp)) {
-        ImGui::TableSetupColumn("Sensor", ImGuiTableColumnFlags_WidthFixed, 100.0f);
+    // Usa SizingStretchSame per forzare colonne uguali
+    if (ImGui::BeginTable("StatisticheTable", 4, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_SizingStretchSame)) {
+        
+        // Ho rimosso il WidthFixed dalla prima colonna. Ora tutte e 4 divideranno lo spazio al 25% esatto.
+        ImGui::TableSetupColumn("Sensor"); 
         ImGui::TableSetupColumn("Mean (\u03BC)");
         ImGui::TableSetupColumn("Variance (\u03C3\u00B2)");
         ImGui::TableSetupColumn("Standard deviation (\u03C3)");

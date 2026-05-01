@@ -28,7 +28,9 @@ private:
     // Helper per ottenere il colore in base ai limiti (modificabile in futuro)
     ImVec4 getTempColor(float value);
     ImVec4 getVoltageColor(float value);
-    
-    // Helper per disegnare il LED di errore
-    void drawErrorLed(bool isError);
+    void printErrorValue(const std::string& label, const DbRow& dataMap);
+    void printValue(const std::string& label, const std::string& key, const DbRow& dataMap, const std::string& unit = "");
+
+    // Funzione per decodificare gli errori di EMMA
+    std::string decodeEmmaError(uint16_t error);
 };

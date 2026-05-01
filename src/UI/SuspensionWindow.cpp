@@ -18,6 +18,15 @@ void SuspensionWindow::onAggregatedDataReceived(const DbRow& dataRow) {
     try {
         if (!dataRow.count("timestamp")) return;
         double unix_timestamp = std::stod(dataRow.at("timestamp")); 
+
+        // NUOVO: Rileva i salti temporali (pausa/riavvio o reset del sistema)
+        if (m_lastTimestamp >= 0.0 && (unix_timestamp < m_lastTimestamp || unix_timestamp - m_lastTimestamp > 1.5)) {
+            for (auto& pair : m_plotData) {
+                pair.second.X.clear();
+                pair.second.Y.clear();
+            }
+        }
+        m_lastTimestamp = unix_timestamp;
         
         for (auto& pair : m_plotData) {
             const std::string& label = pair.first;

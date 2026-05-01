@@ -13,17 +13,14 @@ void TemperatureWindow::onAggregatedDataReceived(const DbRow& dataRow) {
     m_latestData = dataRow;
 }
 
-// Restituisce un colore basato sui limiti specificati
 ImVec4 TemperatureWindow::getColorForThreshold(float value, float limitGreen, float limitRed) {
-    if (value <= limitGreen) return ImVec4(0.0f, 1.0f, 0.0f, 1.0f); 
-    else if (value >= limitRed) return ImVec4(1.0f, 0.0f, 0.0f, 1.0f); 
-    else return ImVec4(1.0f, 0.64f, 0.0f, 1.0f); 
+    if (value <= limitGreen) return ImVec4(0.1f, 0.8f, 0.1f, 1.0f);       // Verde scuro
+    else if (value >= limitRed) return ImVec4(0.85f, 0.1f, 0.1f, 1.0f);   // Rosso scuro
+    else return ImVec4(1.0f, 0.5f, 0.0f, 1.0f);                           // Arancione
 }
 
-// Stampa un valore con colore basato sui limiti
 void TemperatureWindow::printColoredValue(const std::string& label, const std::string& key, const DbRow& dataMap, float limitGreen, float limitRed) {
-    ImGui::Text("%s: ", label.c_str());
-    ImGui::SameLine();
+    ImGui::Text("%s:", label.c_str());
 
     auto it = dataMap.find(key);
     if (it != dataMap.end()) {
@@ -31,20 +28,34 @@ void TemperatureWindow::printColoredValue(const std::string& label, const std::s
         try {
             float val = std::stof(strVal);
             ImVec4 color = getColorForThreshold(val, limitGreen, limitRed);
+            
             ImGui::PushFont(m_uiManager->font_label);
+            float text_width = ImGui::CalcTextSize(strVal.c_str()).x;
+            ImGui::SameLine(140.0f - text_width); // Stesso offset per allineamento UI perfetto
             ImGui::TextColored(color, "%s", strVal.c_str());
-            ImGui::SameLine();
-            ImGui::Text("°C");
+            ImGui::PopFont();
+
+            ImGui::SameLine(145.0f);
+            ImGui::PushFont(m_uiManager->font_body);
+            ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "[°C]");
             ImGui::PopFont();
             
             if (val >= limitRed && ImGui::IsItemHovered()) {
                 ImGui::SetTooltip("ATTENZIONE: Valore critico");
             }
         } catch (const std::invalid_argument&) {
-            std::cerr << "ERRORE [TemperatureWindow]: Errore di conversione della temperatura." << std::endl;
+            ImGui::PushFont(m_uiManager->font_label);
+            float w = ImGui::CalcTextSize("NaN").x;
+            ImGui::SameLine(140.0f - w);
+            ImGui::Text("NaN");
+            ImGui::PopFont();
         }
     } else {
-        ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1.0f), "N/D");
+        ImGui::PushFont(m_uiManager->font_label);
+        float w = ImGui::CalcTextSize("N/D").x;
+        ImGui::SameLine(140.0f - w);
+        ImGui::Text("N/D");
+        ImGui::PopFont();
     }
 }
 
@@ -69,7 +80,7 @@ void TemperatureWindow::draw() {
     }
 
     if (hasData) {
-        ImGui::PushFont(m_uiManager->font_body);
+        ImGui::PushFont(m_uiManager->font_label);
         ImGui::Text("Coolant pump temperatures");
         ImGui::PopFont();
         
@@ -84,7 +95,7 @@ void TemperatureWindow::draw() {
         ImGui::Spacing();
         ImGui::Separator();
 
-        ImGui::PushFont(m_uiManager->font_body);
+        ImGui::PushFont(m_uiManager->font_label);
         ImGui::Text("Motor temperatures");
         ImGui::PopFont();
         

@@ -131,7 +131,7 @@ bool ServiceManager::startLogging(const std::string& logIdentifier) {
             m_csvWriter = std::make_shared<CsvWriter>();
             // Usiamo il getColumnOrder del PacketParser!
             if(m_csvWriter->createFile(logIdentifier, PacketParser::getColumnOrder())) {
-                getDataManager()->addSubscriber(m_csvWriter.get());
+                getDataManager()->addLogSubscriber(m_csvWriter.get());
                 std::cout << "REGISTRAZIONE [ServiceManager]: Generazione .csv avviata." << std::endl;
                 return true;
             }
@@ -144,7 +144,7 @@ bool ServiceManager::startLogging(const std::string& logIdentifier) {
 
 void ServiceManager::stopLogging() {
     if (m_csvWriter) {
-        getDataManager()->removeSubscriber(m_csvWriter.get());
+        getDataManager()->removeLogSubscriber(m_csvWriter.get());
         m_csvWriter->stop();
         m_csvWriter.reset();
         std::cout << "REGISTRAZIONE [ServiceManager]: Registrazione CSV fermata." << std::endl;

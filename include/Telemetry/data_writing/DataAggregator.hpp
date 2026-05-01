@@ -9,8 +9,6 @@ using DbRow = std::map<std::string, std::string>;
 class DataAggregator {
 public:
     explicit DataAggregator(std::function<void(const DbRow&)> onRowReady);
-    
-    // Riceve la riga grezza da PacketParser. Vi appende le varianze.
     void processRow(DbRow row);
     void reset();
 
@@ -25,12 +23,15 @@ private:
     std::function<void(const DbRow&)> m_onRowReadyCallback;
 
     double m_statsWindowStart = -1.0;
-    std::map<std::string, std::vector<double>> m_statsBuffers;
-    std::map<std::string, StatData> m_currentStats;
+    
+    // Buffer per accumulare i dati nei 3 secondi
+    std::map<std::string, std::vector<double>> m_currentBuffers;
+    
+    // Mantiene l'ultima statistica valida per stamparla in UI e CSV
+    std::map<std::string, StatData> m_lastPublishedStats;
 
-    // Sensori di cui calcoliamo le statistiche
     const std::vector<std::string> m_targetSensors = {
         "accelerator1", "accelerator2", "brake1", "brake2", "steer"
     };
-    const double STATS_WINDOW = 3.0; // Secondi
+    const double STATS_WINDOW = 3.0; // Secondi esatti
 };

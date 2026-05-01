@@ -14,20 +14,31 @@ void DynamicsPowertrainWindow::onAggregatedDataReceived(const DbRow& dataRow) {
 }
 
 void DynamicsPowertrainWindow::printValue(const std::string& label, const std::string& key, const DbRow& dataMap, const std::string& unit) {
-    ImGui::Text("%s: ", label.c_str());
-    ImGui::SameLine();
+    ImGui::Text("%s:", label.c_str());
 
     auto it = dataMap.find(key);
     if (it != dataMap.end()) {
-        ImGui::PushFont(m_uiManager->font_label); 
-        if (unit.empty()) {
-            ImGui::Text("%s", it->second.c_str());
+        ImGui::PushFont(m_uiManager->font_label); // Valore in grassetto
+        float text_width = ImGui::CalcTextSize(it->second.c_str()).x;
+        ImGui::SameLine(190.0f - text_width); // Offset avvicinato
+        
+        ImGui::Text("%s", it->second.c_str()); // Colore default (si adatta al tema)
+        ImGui::PopFont();
+
+        ImGui::SameLine(195.0f); // Offset unità
+        ImGui::PushFont(m_uiManager->font_body); 
+        if (!unit.empty()) {
+            ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "[%s]", unit.c_str());
         } else {
-            ImGui::Text("%s %s", it->second.c_str(), unit.c_str());
+            ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "[-]");
         }
         ImGui::PopFont();
     } else {
-        ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1.0f), "N/D");
+        ImGui::PushFont(m_uiManager->font_label);
+        float text_width = ImGui::CalcTextSize("N/D").x;
+        ImGui::SameLine(190.0f - text_width);
+        ImGui::Text("N/D");
+        ImGui::PopFont();
     }
 }
 
@@ -52,7 +63,7 @@ void DynamicsPowertrainWindow::draw() {
     }
 
     if (hasData) {
-        ImGui::PushFont(m_uiManager->font_body);
+        ImGui::PushFont(m_uiManager->font_label);
         ImGui::Text("Vehicle dynamics");
         ImGui::PopFont();
         ImGui::Separator();
@@ -65,19 +76,19 @@ void DynamicsPowertrainWindow::draw() {
         ImGui::Spacing();
         ImGui::Separator();
         
-        ImGui::PushFont(m_uiManager->font_body);
+        ImGui::PushFont(m_uiManager->font_label);
         ImGui::Text("Tyre slips");
         ImGui::PopFont();
         ImGui::Separator();
         ImGui::Spacing();
         
-        printValue("Left", "slip_L", dataToDisplay);
-        printValue("Right", "slip_R", dataToDisplay);
+        printValue("Left", "slip_L", dataToDisplay, "");
+        printValue("Right", "slip_R", dataToDisplay, "");
         
         ImGui::Spacing();
         ImGui::Separator();
         
-        ImGui::PushFont(m_uiManager->font_body);
+        ImGui::PushFont(m_uiManager->font_label);
         ImGui::Text("Torque vectoring");
         ImGui::PopFont();
         ImGui::Separator();
@@ -89,7 +100,7 @@ void DynamicsPowertrainWindow::draw() {
         ImGui::Spacing();
         ImGui::Separator();
         
-        ImGui::PushFont(m_uiManager->font_body);
+        ImGui::PushFont(m_uiManager->font_label);
         ImGui::Text("Traction control");
         ImGui::PopFont();
         ImGui::Separator();
@@ -101,7 +112,7 @@ void DynamicsPowertrainWindow::draw() {
         ImGui::Spacing();
         ImGui::Separator();
         
-        ImGui::PushFont(m_uiManager->font_body);
+        ImGui::PushFont(m_uiManager->font_label);
         ImGui::Text("Final torque targets");
         ImGui::PopFont();
         ImGui::Separator();

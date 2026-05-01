@@ -3,8 +3,8 @@
 #include <thread>
 #include <atomic>
 #include <vector>
-#include <memory>
-#include "../data_writing/DataAggregator.hpp" 
+#include <mutex>
+#include "Telemetry/data_writing/DataAggregator.hpp" 
 
 struct FileConfig {
     std::string filePath;
@@ -24,6 +24,8 @@ public:
 
 private:
     void loadingLoop();
+    void loadCsv(const std::string& filePath);
+    void loadBin(const std::string& filePath);
     
     FileConfig m_config;
     std::atomic<bool> m_isLoading{false};

@@ -47,12 +47,6 @@ bool CsvWriter::createFile(const std::string& directoryPath, const std::vector<s
 void CsvWriter::onAggregatedDataReceived(const DbRow& dataRow) {
     if (!m_outputFile.is_open()) return;
 
-    // Ignora la prima riga per dare tempo ai pacchetti di stabilizzarsi
-    if (m_isFirstRow) {
-        m_isFirstRow = false;
-        return; 
-    }
-
     double relative_ts = 0.0;
     bool has_ts = dataRow.count("timestamp");
     if (has_ts) {

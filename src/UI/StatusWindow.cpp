@@ -56,7 +56,7 @@ void StatusWindow::drawLed(const char* label, bool state) {
     ImVec2 p = ImGui::GetCursorScreenPos();
     ImVec2 center(p.x + radius, p.y + ImGui::GetTextLineHeight() / 2.0f);
     ImGui::Dummy(ImVec2(radius * 2, ImGui::GetTextLineHeight()));
-    ImU32 color = state ? IM_COL32(0, 255, 0, 255) : IM_COL32(255, 0, 0, 255);
+    ImU32 color = state ? IM_COL32(25, 204, 25, 255) : IM_COL32(217, 25, 25, 255);
     draw_list->AddCircleFilled(center, radius, color);
     ImGui::SameLine();
     ImGui::Text("%s", label);
@@ -80,9 +80,9 @@ void StatusWindow::drawBattery(int soc) {
 
     // Riempimento dinamico
     ImU32 fillColor;
-    if (soc > 50) fillColor = IM_COL32(0, 200, 0, 255);        
-    else if (soc > 20) fillColor = IM_COL32(255, 180, 0, 255); 
-    else fillColor = IM_COL32(255, 0, 0, 255);                 
+    if (soc > 50) fillColor = IM_COL32(25, 204, 25, 255);        
+    else if (soc > 20) fillColor = IM_COL32(255, 128, 0, 255); 
+    else fillColor = IM_COL32(217, 25, 25, 255);             
 
     float fillWidth = (w - 4.0f) * (std::clamp(soc, 0, 100) / 100.0f);
     if (fillWidth > 1.0f) {
@@ -196,7 +196,7 @@ void StatusWindow::draw() {
             ImGui::BeginChild(id, ImVec2(box_width, box_height), true);
             ImVec2 text_size = ImGui::CalcTextSize(text.c_str());
             ImGui::SetCursorPos(ImVec2((box_width - text_size.x) * 0.5f, (box_height - text_size.y) * 0.5f));
-            ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), "%s", text.c_str());
+            ImGui::Text("%s", text.c_str());
             ImGui::EndChild();
             
             ImGui::PopFont();

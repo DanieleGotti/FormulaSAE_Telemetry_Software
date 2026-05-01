@@ -142,6 +142,7 @@ if(APPLE)
     # --- Gestione Immagini ---
     set(IMAGES_SOURCES
         "${CMAKE_CURRENT_SOURCE_DIR}/assets/images/steering_wheel.png"
+        "${CMAKE_CURRENT_SOURCE_DIR}/assets/images/logo_erb.png"
     )
 
     # Itera su ogni font per impostare la proprietà e aggiungerlo singolarmente

@@ -24,6 +24,7 @@ private:
     std::mutex m_dataMutex;
     std::map<std::string, PlotLineData> m_plotData;
     const double MAX_HISTORY_SECONDS = 15.0;
+    double m_lastTimestamp = -1.0; // NUOVO: traccia i salti temporali
     
     PlotGraph m_hallPlot;
 };

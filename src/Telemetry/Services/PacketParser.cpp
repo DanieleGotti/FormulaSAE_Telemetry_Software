@@ -4,7 +4,31 @@
 #include <iostream> 
 
 
-// --- FUNZIONI DI MAPPATURA FSM ---
+// --- FUNZIONI DI MAPPATURA 
+static std::string getEmmaErrorStr(uint16_t error) {
+    if (error == 0) return "EMMA_STATUS_OK";
+    
+    std::vector<std::string> flags;
+    if (error & 0x0001) flags.push_back("ERR_UNDERVOLTAGE");
+    if (error & 0x0002) flags.push_back("ERR_OVERVOLTAGE");
+    if (error & 0x0004) flags.push_back("ERR_OVERTEMP_CELL");
+    if (error & 0x0008) flags.push_back("ERR_UNDERTEMP_CELL");
+    if (error & 0x0010) flags.push_back("ERR_OVERTEMP_PCB");
+    if (error & 0x0020) flags.push_back("ERR_UNDERTEMP_PCB");
+    if (error & 0x0040) flags.push_back("ERR_CELL_MISMATCH");
+    if (error & 0x0080) flags.push_back("ERR_BSPD");
+    if (error & 0x0100) flags.push_back("ERR_DAISY_CHAIN");
+    if (error & 0x0200) flags.push_back("IMD_AMS_LATCH");
+    if (error & 0x8000) flags.push_back("ERR_CRITICAL_FAULT");
+    
+    std::string res;
+    for (size_t i = 0; i < flags.size(); ++i) {
+        res += flags[i];
+        if (i < flags.size() - 1) res += " | ";
+    }
+    return res.empty() ? "UNKNOWN" : res;
+}
+
 static std::string getInverterFsmStr(uint8_t val) {
     const char* states[] = {
         "OFF", "SYSTEM_READY", "DC_CAPACITOR_CHARGE", "DC_OK", 
@@ -89,10 +113,10 @@ void PacketParser::populateRowFromA(const TelemetryPacket_t* dataA, const DbRow&
     row["ecu_reset_button"] = std::to_string(dataA->ecu_reset_button);
     row["tractive_system_on_button"] = std::to_string(dataA->tractive_system_on_button);
     
-    row["EMMA_CURRENT"] = formatDouble(dataA->emma_current, 1);
-    row["EMMA_VOLTAGE"] = formatDouble(dataA->emma_voltage, 1);
-    row["EMMA_YAW"] = formatDouble(dataA->emma_yaw, 2);
-    row["EMMA_ERROR"] = std::to_string(dataA->emma_error);
+    row["emma_current"] = formatDouble(dataA->emma_current, 1);
+    row["emma_voltage"] = formatDouble(dataA->emma_voltage, 1);
+    row["emma_yaw"] = formatDouble(dataA->emma_yaw, 2);
+    row["emma_error"] = getEmmaErrorStr(dataA->emma_error);
     
     row["mean_velocity"] = formatDouble(dataA->mean_velocity, 1);
     row["real_yaw_rate"] = formatDouble(dataA->real_yaw_rate, 2);
@@ -138,13 +162,13 @@ void PacketParser::populateRowFromB(const TelemetryPacket_EMMA_t* data) {
     m_lastPacketBData["state_of_charge"] = std::to_string(data->state_of_charge);
     // Srotoliamo i Volt in 14 colonne
     for(int i=0; i<14; ++i) {
-        m_lastPacketBData["TENSM" + std::to_string(i+1)] = std::to_string(data->module_voltage[i]);
+        m_lastPacketBData["VoltageModule" + std::to_string(i+1)] = std::to_string(data->module_voltage[i]);
     }
     // Srotoliamo le Temp in 28 colonne
     for(int i=0; i<28; ++i) {
         int mod = (i / 2) + 1;
         int tIdx = (i % 2) + 1;
-        m_lastPacketBData["TMP" + std::to_string(tIdx) + "M" + std::to_string(mod)] = formatDouble(data->module_temperatures[i] / 10.0, 1); 
+        m_lastPacketBData["Temperature" + std::to_string(tIdx) + "Module" + std::to_string(mod)] = formatDouble(data->module_temperatures[i] / 10.0, 1); 
     }
 }
 
@@ -168,36 +192,97 @@ bool PacketParser::parseLiveBytes(std::vector<uint8_t>& rxBuffer, DbRow& outRow)
         if (syncIndex > 0) {
             std::cerr << "\n[WARNING] Trovati " << syncIndex << " byte di spazzatura prima del sync. Dati scartati: ";
             for (size_t k = 0; k < syncIndex; ++k) {
-                // Stampa i byte in formato esadecimale
                 std::cerr << std::hex << std::uppercase << std::setw(2) << std::setfill('0') << (int)rxBuffer[k] << " ";
             }
-            std::cerr << std::dec << std::endl; // Riporta cout in decimale
+            std::cerr << std::dec << std::endl; 
             
             rxBuffer.erase(rxBuffer.begin(), rxBuffer.begin() + syncIndex);
         }
+        
+        // ORA IL PACCHETTO È SEMPRE ALL'INDICE 0
 
         if (packetType == 1) { 
-            TelemetryPacket_t* data = reinterpret_cast<TelemetryPacket_t*>(rxBuffer.data());
-            uint16_t crc = Calculate_CRC16(rxBuffer.data(), sizeof(TelemetryPacket_t) - 2);
+            TelemetryPacket_t* dataA = reinterpret_cast<TelemetryPacket_t*>(rxBuffer.data());
+            uint16_t crcA = Calculate_CRC16(rxBuffer.data(), sizeof(TelemetryPacket_t) - 2);
             
-            if (crc == data->crc16) {
-                // ... (Codice originale intatto) ...
-                if (!m_firstA && data->timestamp > m_lastTimestampA) {
-                    uint32_t diff = data->timestamp - m_lastTimestampA;
+            if (crcA == dataA->crc16) {
+                
+                // --- INIZIO LOOKAHEAD (Gestione Sincronia .BIN) ---
+                // Se un pacchetto B segue immediatamente il pacchetto A, lo parsiamo 
+                // e aggiorniamo la cache PRIMA di emettere la riga di A.
+                size_t packetB_start = sizeof(TelemetryPacket_t);
+                
+                // Controlliamo se abbiamo almeno i primi 2 byte del pacchetto successivo
+                if (rxBuffer.size() >= packetB_start + 2) {
+                    if (rxBuffer[packetB_start] == 0xEE && rxBuffer[packetB_start+1] == 0x11) {
+                        
+                        // È un pacchetto B! Assicuriamoci di averlo intero nel buffer
+                        if (rxBuffer.size() < packetB_start + sizeof(TelemetryPacket_EMMA_t)) {
+                            return false; // Aspettiamo di finire di leggerlo (chunk diviso)
+                        }
+                        
+                        TelemetryPacket_EMMA_t* dataB = reinterpret_cast<TelemetryPacket_EMMA_t*>(rxBuffer.data() + packetB_start);
+                        uint16_t crcB = Calculate_CRC16(rxBuffer.data() + packetB_start, sizeof(TelemetryPacket_EMMA_t) - 2);
+                        
+                        if (crcB == dataB->crc16) {
+                            // 1. Aggiorna Statistiche e Cache B
+                            if (!m_firstB && dataB->timestamp > m_lastTimestampB) {
+                                uint32_t diff = dataB->timestamp - m_lastTimestampB;
+                                if (diff > 40 && diff < 100000) {
+                                    m_lostB += (diff / 40) - 1;
+                                }
+                            }
+                            m_lastTimestampB = dataB->timestamp; 
+                            m_firstB = false;
+                            
+                            // QUESTA RIGA AGGIORNA LA CACHE IN TEMPO!
+                            populateRowFromB(dataB); 
+                            
+                            // 2. Procedi col Pacchetto A
+                            if (!m_firstA && dataA->timestamp > m_lastTimestampA) {
+                                uint32_t diff = dataA->timestamp - m_lastTimestampA;
+                                if (diff > 1 && diff < 5000) { 
+                                    m_lostA += (diff - 1);
+                                }
+                            }
+                            m_lastTimestampA = dataA->timestamp; 
+                            m_firstA = false;
+
+                            outRow.clear();
+                            // Ora usa la Cache B aggiornata
+                            populateRowFromA(dataA, m_lastPacketBData, outRow);
+                            
+                            // Eliminiamo ENTRAMBI i pacchetti dal buffer in un colpo solo
+                            rxBuffer.erase(rxBuffer.begin(), rxBuffer.begin() + packetB_start + sizeof(TelemetryPacket_EMMA_t));
+                            return true;
+                        }
+                        // Se il CRC di B fallisce qui, lo ignoriamo. Il Pacchetto A 
+                        // verrà stampato e il B corrotto sarà scartato al prossimo giro.
+                    }
+                } else if (rxBuffer.size() >= packetB_start && rxBuffer.size() < packetB_start + 2) {
+                    // Siamo a cavallo di un chunk (probabilità rarissima ma possibile).
+                    // Aspettiamo di avere i 2 byte per non rischiare di sfasare la lettura.
+                    return false;
+                }
+                // --- FINE LOOKAHEAD ---
+
+                // Comportamento Standard (Se non c'è il pacchetto B subito dietro)
+                if (!m_firstA && dataA->timestamp > m_lastTimestampA) {
+                    uint32_t diff = dataA->timestamp - m_lastTimestampA;
                     if (diff > 1 && diff < 5000) { 
                         m_lostA += (diff - 1);
                     }
                 }
-                m_lastTimestampA = data->timestamp; m_firstA = false;
+                m_lastTimestampA = dataA->timestamp; m_firstA = false;
 
                 outRow.clear();
-                populateRowFromA(data, m_lastPacketBData, outRow);
+                populateRowFromA(dataA, m_lastPacketBData, outRow);
                 rxBuffer.erase(rxBuffer.begin(), rxBuffer.begin() + sizeof(TelemetryPacket_t));
                 return true; 
+                
             } else {
-                // 2A. STAMPA PACCHETTO TIPO 1 ROTTO (CRC Mismatch)
                 std::cerr << "\n[ERROR] Pacchetto A (Type 1) corrotto! CRC atteso: 0x" 
-                          << std::hex << data->crc16 << ", Calcolato: 0x" << crc 
+                          << std::hex << dataA->crc16 << ", Calcolato: 0x" << crcA 
                           << std::dec << ". Elimino l'header e cerco il prossimo." << std::endl;
                           
                 rxBuffer.erase(rxBuffer.begin(), rxBuffer.begin() + 1); 
@@ -208,7 +293,6 @@ bool PacketParser::parseLiveBytes(std::vector<uint8_t>& rxBuffer, DbRow& outRow)
             uint16_t crc = Calculate_CRC16(rxBuffer.data(), sizeof(TelemetryPacket_EMMA_t) - 2);
             
             if (crc == data->crc16) {
-                // ... (Codice originale intatto) ...
                 if (!m_firstB && data->timestamp > m_lastTimestampB) {
                     uint32_t diff = data->timestamp - m_lastTimestampB;
                     if (diff > 40 && diff < 100000) {
@@ -220,7 +304,6 @@ bool PacketParser::parseLiveBytes(std::vector<uint8_t>& rxBuffer, DbRow& outRow)
                 populateRowFromB(data); 
                 rxBuffer.erase(rxBuffer.begin(), rxBuffer.begin() + sizeof(TelemetryPacket_EMMA_t));
             } else {
-                // 2B. STAMPA PACCHETTO EMMA ROTTO (CRC Mismatch)
                 std::cerr << "\n[ERROR] Pacchetto B (EMMA) corrotto! CRC atteso: 0x" 
                           << std::hex << data->crc16 << ", Calcolato: 0x" << crc 
                           << std::dec << ". Elimino l'header e cerco il prossimo." << std::endl;
@@ -254,7 +337,7 @@ std::vector<std::string> PacketParser::getColumnOrder() {
         "brake1", "brake2",
         "steer",
         "sdc", "ready_to_drive_button", "ecu_reset_button", "tractive_system_on_button",
-        "EMMA_CURRENT", "EMMA_VOLTAGE", "EMMA_YAW", "EMMA_ERROR",
+        "emma_current", "emma_voltage", "emma_yaw", "emma_error",
         "mean_velocity", "real_yaw_rate", "total_torque_request", 
         "torque_tv_L", "torque_tv_R", "slip_L", "slip_R", 
         "torque_reduction_L", "torque_reduction_R", "final_torque_target_L", "final_torque_target_R",
@@ -267,12 +350,12 @@ std::vector<std::string> PacketParser::getColumnOrder() {
     };
     
     // Le 14 tensioni
-    for(int i=1; i<=14; ++i) cols.push_back("TENSM" + std::to_string(i));
+    for(int i=1; i<=14; ++i) cols.push_back("VoltageModule" + std::to_string(i));
     
     // Le 28 temperature
     for(int i=1; i<=14; ++i) {
-        cols.push_back("TMP1M" + std::to_string(i));
-        cols.push_back("TMP2M" + std::to_string(i));
+        cols.push_back("Temperature1Module" + std::to_string(i));
+        cols.push_back("Temperature2Module" + std::to_string(i));
     }
     
     // Campi statistici aggiunti dinamicamente dalla varianza (così vengono mostrati nel CSV/Dataset)
