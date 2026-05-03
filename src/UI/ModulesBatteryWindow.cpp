@@ -55,7 +55,7 @@ void ModulesBatteryWindow::printValue(const std::string& label, const std::strin
 
     auto it = dataMap.find(key);
     if (it != dataMap.end()) {
-        ImGui::PushFont(m_uiManager->font_label); 
+        ImGui::PushFont(m_uiManager->font_body); 
         float text_width = ImGui::CalcTextSize(it->second.c_str()).x;
         ImGui::SameLine(130.0f - text_width); // Offset ridotto
         ImGui::Text("%s", it->second.c_str()); // Usa colore di default del tema
@@ -70,7 +70,7 @@ void ModulesBatteryWindow::printValue(const std::string& label, const std::strin
         }
         ImGui::PopFont();
     } else {
-        ImGui::PushFont(m_uiManager->font_label);
+        ImGui::PushFont(m_uiManager->font_body);
         float text_width = ImGui::CalcTextSize("N/D").x;
         ImGui::SameLine(130.0f - text_width);
         ImGui::Text("N/D");
@@ -162,7 +162,7 @@ void ModulesBatteryWindow::drawModuleCard(int index, const DbRow& dataMap) {
 
         // --- Stampa Valore ---
         ImGui::SameLine(offsetX);
-        ImGui::PushFont(m_uiManager->font_label); 
+        ImGui::PushFont(m_uiManager->font_body); 
         if (hasValidValue) {
             ImGui::TextColored(valColor, "%s", valStr.c_str()); 
         } else {
@@ -216,7 +216,7 @@ void ModulesBatteryWindow::draw() {
         
         printValue("Current", "emma_current", dataToDisplay, "A");
         printValue("Voltage", "emma_voltage", dataToDisplay, "V");
-        printValue("Yaw", "emma_yaw", dataToDisplay, "");
+        printValue("Yaw", "emma_yaw", dataToDisplay, "°/s");
         printErrorValue("Error", dataToDisplay);
         
         ImGui::Spacing();

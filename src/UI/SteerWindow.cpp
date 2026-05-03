@@ -125,7 +125,7 @@ void SteerWindow::draw() {
 
         // Valore dell'angolo sotto il volante (Ancorato al fondo assoluto)
         char angle_text[16];
-        ImGui::PushFont(m_uiManager->font_label);
+        ImGui::PushFont(m_uiManager->font_body);
         snprintf(angle_text, 16, "%.1f°", current_angle);
         ImVec2 angle_text_size = ImGui::CalcTextSize(angle_text);
         

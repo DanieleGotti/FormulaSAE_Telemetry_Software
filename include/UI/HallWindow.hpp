@@ -27,4 +27,6 @@ private:
     double m_lastTimestamp = -1.0; // NUOVO: traccia i salti temporali
     
     PlotGraph m_hallPlot;
+
+    bool m_playbackDataLoaded = false;
 };

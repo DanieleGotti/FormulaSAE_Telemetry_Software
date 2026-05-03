@@ -29,4 +29,6 @@ private:
     // Istanze gestite in automatico
     PlotGraph m_accPlot;
     PlotGraph m_brkPlot;
+    
+    bool m_playbackDataLoaded = false;
 };

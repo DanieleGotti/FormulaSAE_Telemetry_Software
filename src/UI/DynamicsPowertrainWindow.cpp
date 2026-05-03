@@ -18,7 +18,7 @@ void DynamicsPowertrainWindow::printValue(const std::string& label, const std::s
 
     auto it = dataMap.find(key);
     if (it != dataMap.end()) {
-        ImGui::PushFont(m_uiManager->font_label); // Valore in grassetto
+        ImGui::PushFont(m_uiManager->font_body); // Valore in grassetto
         float text_width = ImGui::CalcTextSize(it->second.c_str()).x;
         ImGui::SameLine(190.0f - text_width); // Offset avvicinato
         
@@ -34,7 +34,7 @@ void DynamicsPowertrainWindow::printValue(const std::string& label, const std::s
         }
         ImGui::PopFont();
     } else {
-        ImGui::PushFont(m_uiManager->font_label);
+        ImGui::PushFont(m_uiManager->font_body);
         float text_width = ImGui::CalcTextSize("N/D").x;
         ImGui::SameLine(190.0f - text_width);
         ImGui::Text("N/D");

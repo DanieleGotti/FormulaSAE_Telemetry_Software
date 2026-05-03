@@ -156,6 +156,9 @@ bool SerialDataSource::open(const std::string &resource, int baudRate)
         return false;
     }
 
+    // Svuota i buffer di Windows per evitare vecchi dati e falsi packet lost
+    PurgeComm(handle, PURGE_RXCLEAR | PURGE_TXCLEAR);
+
     return true;
 #endif
 #if defined(__APPLE__)
@@ -220,6 +223,9 @@ bool SerialDataSource::open(const std::string &resource, int baudRate)
         fd = -1;
         return false;
     }
+
+    // Svuota i buffer POSIX per evitare vecchi dati e falsi packet lost
+    tcflush(fd, TCIOFLUSH);
 
     return true;
 #endif

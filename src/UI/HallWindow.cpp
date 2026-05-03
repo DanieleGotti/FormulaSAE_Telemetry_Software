@@ -48,33 +48,39 @@ void HallWindow::draw() {
 
     if (isPlayback) {
         auto playbackManager = ServiceManager::getPlaybackManager();
-        size_t currentIndex = playbackManager->getCurrentIndex();
-        auto currentRowOpt = playbackManager->getCurrentRow();
-        
-        if (currentRowOpt && currentRowOpt->count("timestamp")) {
-            cursor_time = std::stod(currentRowOpt->at("timestamp"));
-            double startTime = cursor_time - 5.0;
-            double endTime = cursor_time + 5.0;
-            auto dataWindow = playbackManager->getDataWindow(currentIndex, 2500);
+        if (auto currentRowOpt = playbackManager->getCurrentRow()) {
+            if (currentRowOpt->count("timestamp")) {
+                try { cursor_time = std::stod(currentRowOpt->at("timestamp")); } catch(...) {}
+            }
+        }
 
-            std::lock_guard<std::mutex> lock(m_dataMutex);
+        std::lock_guard<std::mutex> lock(m_dataMutex);
+        if (!m_playbackDataLoaded && playbackManager->getTotalRows() > 0) {
             for (auto& pair : m_plotData) {
                 pair.second.X.clear();
                 pair.second.Y.clear();
-                const std::string& label = pair.first;
-                for (const auto& row : dataWindow) {
-                    if (row.count("timestamp") && row.count(label)) {
-                        double unix_ts = std::stod(row.at("timestamp"));
-                        if (unix_ts >= startTime && unix_ts <= endTime) {
-                            pair.second.X.push_back(unix_ts);
-                            pair.second.Y.push_back(std::stod(row.at(label)));
+            }
+            
+            size_t total = playbackManager->getTotalRows();
+            for (size_t i = 0; i < total; ++i) {
+                auto row = playbackManager->getRowAtIndex(i);
+                if (row && row->count("timestamp")) {
+                    try {
+                        double unix_ts = std::stod(row->at("timestamp"));
+                        for (auto& pair : m_plotData) {
+                            if (row->count(pair.first)) {
+                                pair.second.X.push_back(unix_ts);
+                                pair.second.Y.push_back(std::stod(row->at(pair.first)));
+                            }
                         }
-                    }
+                    } catch (...) {}
                 }
             }
+            m_playbackDataLoaded = true;
         }
     } else {
         std::lock_guard<std::mutex> lock(m_dataMutex);
+        m_playbackDataLoaded = false;
         if (!m_plotData.empty() && !m_plotData.begin()->second.X.empty()) {
             cursor_time = m_plotData.begin()->second.X.back();
         }
@@ -84,6 +90,7 @@ void HallWindow::draw() {
 
     {
         std::lock_guard<std::mutex> lock(m_dataMutex);
+        // Usa -1.0f come da tua implementazione originale per riempire lo spazio
         m_hallPlot.draw(m_plotData, cursor_time, isPlayback, -1.0f);
     }
     ImGui::End();

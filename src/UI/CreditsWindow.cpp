@@ -54,7 +54,22 @@ void CreditsWindow::draw() {
     // --- 3. DISEGNAMO (con il tuo centraggio orizzontale) ---
     if (m_textureID && m_imgWidth > 0) {
         ImGui::SetCursorPosX((window_width - TARGET_IMAGE_WIDTH) * 0.5f);
-        ImGui::Image((void*)(intptr_t)m_textureID, ImVec2(TARGET_IMAGE_WIDTH, target_height));
+        
+        // Calcola la tinta (tint_col) in base al tema corrente
+        ImVec4 tint_col = m_uiManager->m_isDarkTheme ? 
+                          ImVec4(1.0f, 1.0f, 1.0f, 1.0f) : // Tema Scuro: nessun filtro (bianco)
+                          ImVec4(0.15f, 0.15f, 0.15f, 1.0f); // Tema Chiaro: grigio molto scuro
+
+        // Colore del bordo invisibile (il sesto parametro richiesto per evitare ambiguità)
+        ImVec4 border_col = ImVec4(0.0f, 0.0f, 0.0f, 0.0f);
+
+        // Chiamata con tutti i 6 argomenti espliciti e cast a ImTextureID
+        ImGui::Image((ImTextureID)(intptr_t)m_textureID, 
+                     ImVec2(TARGET_IMAGE_WIDTH, target_height), 
+                     ImVec2(0.0f, 0.0f), 
+                     ImVec2(1.0f, 1.0f), 
+                     tint_col, 
+                     border_col);
     }
 
     ImGui::SetCursorPosY(ImGui::GetCursorPosY() + spacing); // Aggiungiamo lo spazio

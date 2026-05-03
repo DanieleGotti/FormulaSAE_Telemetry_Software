@@ -29,7 +29,7 @@ void TemperatureWindow::printColoredValue(const std::string& label, const std::s
             float val = std::stof(strVal);
             ImVec4 color = getColorForThreshold(val, limitGreen, limitRed);
             
-            ImGui::PushFont(m_uiManager->font_label);
+            ImGui::PushFont(m_uiManager->font_body);
             float text_width = ImGui::CalcTextSize(strVal.c_str()).x;
             ImGui::SameLine(140.0f - text_width); // Stesso offset per allineamento UI perfetto
             ImGui::TextColored(color, "%s", strVal.c_str());
@@ -44,14 +44,14 @@ void TemperatureWindow::printColoredValue(const std::string& label, const std::s
                 ImGui::SetTooltip("ATTENZIONE: Valore critico");
             }
         } catch (const std::invalid_argument&) {
-            ImGui::PushFont(m_uiManager->font_label);
+            ImGui::PushFont(m_uiManager->font_body);
             float w = ImGui::CalcTextSize("NaN").x;
             ImGui::SameLine(140.0f - w);
             ImGui::Text("NaN");
             ImGui::PopFont();
         }
     } else {
-        ImGui::PushFont(m_uiManager->font_label);
+        ImGui::PushFont(m_uiManager->font_body);
         float w = ImGui::CalcTextSize("N/D").x;
         ImGui::SameLine(140.0f - w);
         ImGui::Text("N/D");

@@ -124,7 +124,7 @@ void SpeedometerWindow::draw() {
     // 7. TESTO ALLINEAMENTO ASSOLUTO (Identico allo SteerWindow)
     // 7. TESTO ALLINEAMENTO ASSOLUTO (Ancorato al fondo)
     char angle_text[16];
-    ImGui::PushFont(m_uiManager->font_label);
+    ImGui::PushFont(m_uiManager->font_body);
     snprintf(angle_text, 16, "%.1f km/h", currentSpeed);
     ImVec2 angle_text_size = ImGui::CalcTextSize(angle_text);
     

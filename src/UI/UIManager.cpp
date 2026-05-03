@@ -102,7 +102,9 @@ UiManager::UiManager() {
     assert(font_body != nullptr && "ERRORE [UiManager]: Impossibile caricare i font.");
     std::cout << "INFO [UiManager]: Font caricati." << std::endl;
 
-    ApplyTheme(ImGui::GetStyle(), ServiceManager::getSettingsManager()->getDarkMode());
+    m_isDarkTheme = ServiceManager::getSettingsManager()->getDarkMode();
+    ApplyTheme(ImGui::GetStyle(), m_isDarkTheme);
+
     ImGui_ImplGlfw_InitForOpenGL((GLFWwindow*)m_window, true);
     ImGui_ImplOpenGL3_Init(glsl_version);
     
@@ -229,6 +231,21 @@ void UiManager::run() {
         ImGui::PopFont();
         
         ImGui::Render();
+        
+        // --- INIZIO FIX PULIZIA OPENGL ---
+        // Recupera le dimensioni correnti della finestra
+        int display_w, display_h;
+        glfwGetFramebufferSize((GLFWwindow*)m_window, &display_w, &display_h);
+        glViewport(0, 0, display_w, display_h);
+        
+        // Scegli il colore di "vernice di fondo" in base al tema
+        ImVec4 clear_color = m_isDarkTheme ? ImVec4(0.1f, 0.1f, 0.1f, 1.0f) : ImVec4(0.9f, 0.9f, 0.9f, 1.0f);
+        
+        // Pulisci il buffer hardware della GPU
+        glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
+        glClear(GL_COLOR_BUFFER_BIT);
+        // --- FINE FIX ---
+
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     
         if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
@@ -346,6 +363,7 @@ void UiManager::showDockingSpace() {
                 bool isDark = ServiceManager::getSettingsManager()->getDarkMode();
                 if (ImGui::MenuItem(isDark ? "Tema Chiaro" : "Tema Scuro")) {
                     ServiceManager::getSettingsManager()->setDarkMode(!isDark);
+                    m_isDarkTheme = !isDark;
                     ApplyTheme(ImGui::GetStyle(), !isDark);
                 }
                 ImGui::Separator();
