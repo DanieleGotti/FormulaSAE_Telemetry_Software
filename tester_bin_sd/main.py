@@ -62,22 +62,20 @@ def generate_packet_A(timestamp_val: int) -> bytes:
     
     inv_L_tc = random.randint(-500, 500)
     inv_L_mc = random.randint(-100, 100)
-    inv_L_tm = random.randint(20, 120)
+    inv_L_tm = random.randint(200, 1200)
     inv_R_tc = random.randint(-500, 500)
     inv_R_mc = random.randint(-100, 100)
-    inv_R_tm = random.randint(20, 120)
+    inv_R_tm = random.randint(200, 1200)
     
     cool_L_tmp = random.uniform(20.0, 90.0)
     cool_R_tmp = random.uniform(20.0, 90.0)
-    mot_R_tmp = random.uniform(20.0, 120.0)
-    mot_L_tmp = random.uniform(20.0, 120.0)
     
     l_inv_fsm = random.randint(0, 8)
     r_inv_fsm = random.randint(0, 8)
     ts_fsm = random.randint(0, 9)
     ecu_mode = random.choice([0x01, 0x02, 0x04])
 
-    fmt = '< BB I 4f 2f 2H f 2H f 4B 3f H 11f 6h 4f 4B'
+    fmt = '< BB I 4f 2f 2H f 2H f 4B 3f H 11f 6h 2f 4B'
     
     payload = struct.pack(fmt,
         startByte1, startByte2, timestamp,
@@ -87,7 +85,7 @@ def generate_packet_A(timestamp_val: int) -> bytes:
         emma_c, emma_v, emma_yaw, emma_error,
         mean_vel, real_yaw, tot_trq, trq_tv_l, trq_tv_r, slip_l, slip_r, trq_red_l, trq_red_r, fin_trq_l, fin_trq_r,
         inv_L_tc, inv_L_mc, inv_L_tm, inv_R_tc, inv_R_mc, inv_R_tm,
-        mot_L_tmp, mot_R_tmp, cool_L_tmp, cool_R_tmp,
+        cool_L_tmp, cool_R_tmp,
         l_inv_fsm, r_inv_fsm, ts_fsm, ecu_mode
     )
 
@@ -102,7 +100,7 @@ def generate_packet_B(timestamp_val: int) -> bytes:
     timestamp = timestamp_val
     
     soc = random.randint(0, 100)
-    voltages =[random.randint(30, 42) for _ in range(14)] 
+    voltages =[random.randint(100, 220) for _ in range(14)] 
     temps =[random.randint(200, 600) for _ in range(28)]  
     
     fmt = '< BB I B 14B 28H'

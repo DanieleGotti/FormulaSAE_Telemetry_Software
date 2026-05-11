@@ -9,94 +9,92 @@ typedef struct {
     // --- Telemetry packet id and metadata ---
     uint8_t startByte1; // 0xCC
     uint8_t startByte2; // 0x11
-    uint32_t timestamp;
+    uint32_t timestamp; // counter int
 
     // --- Wheel velocities ---
-    float front_left_velocity;
-    float front_right_velocity;
-    float rear_left_velocity;
-    float rear_right_velocity;
+    float front_left_velocity; // km/h
+    float front_right_velocity; // km/h
+    float rear_left_velocity; // km/h
+    float rear_right_velocity; // km/h
 
     // --- Suspension length ---
-    float front_left_suspension;
-    float front_right_suspension;
+    float front_left_suspension; // cm
+    float front_right_suspension; // cm
 
     // --- APPS ---
-    uint16_t accelerator1;
-    uint16_t accelerator2;
-    float accelerator_mapped;
+    uint16_t accelerator1; // 0-4095
+    uint16_t accelerator2; // 0-4095
+    float accelerator_mapped; // 0.0-1.0
 
     // --- Brake ---
-    uint16_t brake1;
-    uint16_t brake2;
+    uint16_t brake1; // 0-4095
+    uint16_t brake2; // 0-4095
 
     // --- Steer ---
-    float steer;
+    float steer; // degrees, -180 to 180
 
     // --- Digital in ---
-    uint8_t sdc;
-    uint8_t ready_to_drive_button;
-    uint8_t ecu_reset_button;
-    uint8_t tractive_system_on_button;
+    uint8_t sdc; // digital, 0 or 1
+    uint8_t ready_to_drive_button; // digital, 0 or 1
+    uint8_t ecu_reset_button; // digital, 0 or 1
+    uint8_t tractive_system_on_button; // digital, 0 or 1
 
     // --- Battery (EMMA) ---
-    float emma_current;
-    float emma_voltage;
-    float emma_yaw;
-    uint16_t emma_error;
+    float emma_current; // A
+    float emma_voltage; // V
+    float emma_yaw; // degrees/s
+    uint16_t emma_error; // mask
 
     // --- Vehicle Dynamics & Powertrain Targets ---
-    float mean_velocity;
-    float real_yaw_rate;
-    float total_torque_request;
-    float torque_tv_L;
-    float torque_tv_R;
-    float slip_L;
-    float slip_R;
-    float torque_reduction_L;
-    float torque_reduction_R;
-    float final_torque_target_L;
-    float final_torque_target_R;
+    float mean_velocity; // m/s
+    float real_yaw_rate; // degrees/s
+    float total_torque_request; // Nm
+    float torque_tv_L; // Nm
+    float torque_tv_R; // Nm
+    float slip_L; // dimensionless
+    float slip_R; // dimensionless
+    float torque_reduction_L; // Nm
+    float torque_reduction_R; // Nm
+    float final_torque_target_L; // Nm
+    float final_torque_target_R; // Nm
 
     // --- Inverter Internal Data ---
-    int16_t inv_L_torqueCurrent;
-    int16_t inv_L_magnetizingCurrent;
-    int16_t inv_L_tempMotor;
-    int16_t inv_R_torqueCurrent;
-    int16_t inv_R_magnetizingCurrent;
-    int16_t inv_R_tempMotor;
+    int16_t inv_L_torqueCurrent; // A (/10)
+    int16_t inv_L_magnetizingCurrent; // A (/10)
+    int16_t inv_L_tempMotor; // °C (/10)
+    int16_t inv_R_torqueCurrent; // A (/10)
+    int16_t inv_R_magnetizingCurrent; // A (/10)  
+    int16_t inv_R_tempMotor; // °C (/10)
 
     // --- External Thermal Data ---
-    float left_motor_temp;
-    float right_motor_temp;
-    float left_coolant_temp;
-    float right_coolant_temp;
+    float left_coolant_temp; // °C 
+    float right_coolant_temp; // °C
 
     // --- State machines ---
-    uint8_t left_inverter_fsm;
-    uint8_t right_inverter_fsm;
-    uint8_t tractive_system_fsm;
+    uint8_t left_inverter_fsm; // 0-7
+    uint8_t right_inverter_fsm; // 0-7
+    uint8_t tractive_system_fsm; // 0-9
 
     // --- ECU mode ---
-    uint8_t ECU_Mode;
+    uint8_t ECU_Mode; // mask
 
     // --- CRC for corrupted packages ---
-    uint16_t crc16;
+    uint16_t crc16; // int calculated
 } TelemetryPacket_t;
 
 typedef struct {
     // --- Telemetry packet id and metadata ---
     uint8_t startByte1; // 0xEE
     uint8_t startByte2; // 0x11
-    uint32_t timestamp;
+    uint32_t timestamp; // counter int
 
     // --- Inverter states ---
-    uint8_t state_of_charge;
-    uint8_t module_voltage[14];
-    uint16_t module_temperatures[28];
+    uint8_t state_of_charge; // 0-100
+    uint8_t module_voltage[14]; // V ((V+200)/100)
+    uint16_t module_temperatures[28]; // °C (/10)
 
     // --- CRC for corrupted packages ---
-    uint16_t crc16;
+    uint16_t crc16; // int calculated
 } TelemetryPacket_EMMA_t;
 #pragma pack(pop)
 

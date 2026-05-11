@@ -5,10 +5,10 @@
       "name": "Debug MacOS",
       "type": "lldb",
       "request": "launch",
-      "program": "${workspaceFolder}/build/telemetry_vulkan.app/Contents/MacOS/telemetry_vulkan",
+      "program": "${workspaceFolder}/build/telemetry.app/Contents/MacOS/telemetry",
       "args": [],
       // "stopAtEntry": false,
-      "cwd": "${workspaceFolder}/build/telemetry_vulkan.app/Contents/MacOS/",
+      "cwd": "${workspaceFolder}/build/telemetry.app/Contents/MacOS/",
       // "preLaunchTask": "cmake-build", // Opzionale: un task per rebuildare prima del debug
       "externalConsole": true,        // Se vuoi vedere l'output in una console esterna
       "stopAtEntry": false,           // Se vuoi fermarti all'inizio di main()
@@ -18,7 +18,7 @@
       "name": "Debug Windows",
       "type": "cppvsdbg",                  // usa il debugger di Visual Studio
       "request": "launch",
-      "program": "${workspaceFolder}/build/telemetry_vulkan.exe",
+      "program": "${workspaceFolder}/build/telemetry.exe",
       "args": [],
       "cwd": "${workspaceFolder}/build/",  // directory di lavoro
       "environment": [],

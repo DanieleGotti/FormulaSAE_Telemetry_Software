@@ -21,7 +21,6 @@
 #include "UI/HallWindow.hpp"
 #include "UI/VarianceWindow.hpp"
 #include "UI/PlaybackControlsWindow.hpp"
-#include "UI/TemperatureWindow.hpp"
 #include "UI/ModulesBatteryWindow.hpp"
 #include "UI/SpeedometerWindow.hpp"
 #include "UI/DynamicsPowertrainWindow.hpp"
@@ -119,7 +118,6 @@ UiManager::~UiManager() {
         if (m_steerWindow) ServiceManager::getDataManager()->removeSubscriber(m_steerWindow.get());
         if (m_suspensionWindow) ServiceManager::getDataManager()->removeSubscriber(m_suspensionWindow.get());
         if (m_hallWindow) ServiceManager::getDataManager()->removeSubscriber(m_hallWindow.get());
-        if (m_temperatureWindow) ServiceManager::getDataManager()->removeSubscriber(m_temperatureWindow.get());
         if (m_modulesBatteryWindow) ServiceManager::getDataManager()->removeSubscriber(m_modulesBatteryWindow.get());
         if (m_varianceWindow) ServiceManager::getDataManager()->removeSubscriber(m_varianceWindow.get());
         if (m_speedometerWindow) ServiceManager::getDataManager()->removeSubscriber(m_speedometerWindow.get());
@@ -192,7 +190,6 @@ void UiManager::transitionToConnectedState(AppState connectedState) {
     m_steerWindow = std::make_shared<SteerWindow>(this);
     m_suspensionWindow = std::make_shared<SuspensionWindow>(this);
     m_hallWindow = std::make_shared<HallWindow>(this);
-    m_temperatureWindow = std::make_shared<TemperatureWindow>(this);
     m_modulesBatteryWindow = std::make_shared<ModulesBatteryWindow>(this);
     m_varianceWindow = std::make_shared<VarianceWindow>(this);
     m_speedometerWindow = std::make_shared<SpeedometerWindow>(this);
@@ -207,7 +204,6 @@ void UiManager::transitionToConnectedState(AppState connectedState) {
         dataManager->addSubscriber(m_steerWindow.get());
         dataManager->addSubscriber(m_suspensionWindow.get());
         dataManager->addSubscriber(m_hallWindow.get());
-        dataManager->addSubscriber(m_temperatureWindow.get());
         dataManager->addSubscriber(m_modulesBatteryWindow.get());
         dataManager->addSubscriber(m_varianceWindow.get());
         dataManager->addSubscriber(m_speedometerWindow.get());
@@ -295,7 +291,6 @@ void UiManager::draw() {
         if (m_steerWindow) m_steerWindow->draw();
         if (m_suspensionWindow) m_suspensionWindow->draw();
         if (m_hallWindow) m_hallWindow->draw();
-        if (m_temperatureWindow) m_temperatureWindow->draw();
         if (m_modulesBatteryWindow) m_modulesBatteryWindow->draw();
         if (m_varianceWindow) m_varianceWindow->draw();
         if (m_speedometerWindow) m_speedometerWindow->draw();
@@ -400,7 +395,6 @@ void UiManager::resetToHome() {
         if (m_steerWindow) ServiceManager::getDataManager()->removeSubscriber(m_steerWindow.get());
         if (m_suspensionWindow) ServiceManager::getDataManager()->removeSubscriber(m_suspensionWindow.get());
         if (m_hallWindow) ServiceManager::getDataManager()->removeSubscriber(m_hallWindow.get());
-        if (m_temperatureWindow) ServiceManager::getDataManager()->removeSubscriber(m_temperatureWindow.get());
         if (m_modulesBatteryWindow) ServiceManager::getDataManager()->removeSubscriber(m_modulesBatteryWindow.get());
         if (m_varianceWindow) ServiceManager::getDataManager()->removeSubscriber(m_varianceWindow.get());
         if (m_speedometerWindow) ServiceManager::getDataManager()->removeSubscriber(m_speedometerWindow.get());
@@ -416,7 +410,6 @@ void UiManager::resetToHome() {
     m_steerWindow.reset();
     m_suspensionWindow.reset();
     m_hallWindow.reset();
-    m_temperatureWindow.reset();
     m_modulesBatteryWindow.reset();
     m_playbackControls.reset();
     m_varianceWindow.reset();
@@ -461,6 +454,12 @@ void UiManager::SetWindowIconFromResource() {
     std::vector<unsigned char> pixels(width * height * 4);
     GetDIBits(memDC, iconInfo.hbmColor, 0, height, pixels.data(), &bmi, DIB_RGB_COLORS);
 
+  for (size_t i = 0; i < pixels.size(); i += 4) {
+        unsigned char temp = pixels[i];       // Salva il byte Blu (indice 0)
+        pixels[i] = pixels[i + 2];            // Metti il Rosso (indice 2) al posto del Blu
+        pixels[i + 2] = temp;                 // Metti il Blu al posto del Rosso
+    }
+    
     GLFWimage img{width, height, pixels.data()};
     glfwSetWindowIcon((GLFWwindow*)m_window, 1, &img);
 

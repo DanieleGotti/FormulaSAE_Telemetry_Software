@@ -88,6 +88,13 @@ void HallWindow::draw() {
 
     ImGui::Begin("Hall sensors", nullptr, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 
+    ImGui::PushFont(m_uiManager->font_body);
+    ImGui::Text("Speed" ); 
+    ImGui::SameLine(0.0f, ImGui::CalcTextSize(" ").x);
+    ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "[m/s]");
+    ImGui::PopFont();
+    ImGui::Separator();
+
     {
         std::lock_guard<std::mutex> lock(m_dataMutex);
         // Usa -1.0f come da tua implementazione originale per riempire lo spazio

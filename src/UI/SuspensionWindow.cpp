@@ -87,6 +87,13 @@ void SuspensionWindow::draw() {
     }
 
     ImGui::Begin("Suspension linear potentiometers", nullptr, ImGuiWindowFlags_NoScrollbar);
+
+    ImGui::PushFont(m_uiManager->font_body);
+    ImGui::Text("Damper travel" ); 
+    ImGui::SameLine(0.0f, ImGui::CalcTextSize(" ").x);
+    ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "[cm]");
+    ImGui::PopFont();
+    ImGui::Separator();
     
     {
         std::lock_guard<std::mutex> lock(m_dataMutex);

@@ -16,8 +16,10 @@ class SerialSender:
 
     @staticmethod
     def list_ports():
-        ports = []
+        """Lists available serial ports across different operating systems."""
+        ports =[]
         if sys.platform.startswith('win'):
+            # Windows fallback approach
             for i in range(1, 257):
                 port_name = f'COM{i}'
                 try:
@@ -27,11 +29,13 @@ class SerialSender:
                 except (OSError, serial.SerialException):
                     pass
         else:
+            # POSIX systems
             available_ports = serial.tools.list_ports.comports()
             ports = [port.device for port in available_ports]
         return ports
 
     def start(self, port_name, baudrate=256000):
+        """Starts the transmission thread."""
         if self._is_running:
             return
 
@@ -48,6 +52,7 @@ class SerialSender:
             return False
 
     def stop(self):
+        """Stops the transmission gracefully."""
         if not self._is_running:
             return
             
@@ -65,24 +70,26 @@ class SerialSender:
             self.on_stop()
 
     def _sending_loop(self):        
-        interval = 0.005  # 5 millisecondi esatti
+        interval = 0.005  # Exactly 5 milliseconds
         next_time = time.perf_counter() + interval
-        tick_counter = 0  # ogni tick = 5ms
+        tick_counter = 0  # 1 tick = 5ms
 
         while self._is_running:
             try:
-                # Pacchetto A — sempre, ogni 5ms
+                # Packet A — always sent, every 5ms
                 data_A = generate_packet_A(tick_counter)
                 self.serial_port.write(data_A)
 
-                # Pacchetto B — sempre, ogni 40 tick (200ms)
+                # Packet B — sent every 40 ticks (200ms)
                 if tick_counter % 40 == 0:
                     data_B = generate_packet_B(tick_counter)
                     self.serial_port.write(data_B)
 
-                # Sincronizzazione precisa a 5ms
+                # Precise synchronization to 5ms intervals
                 now = time.perf_counter()
                 sleep_time = next_time - now
+                
+                # Active wait for extreme precision (sleep only if we have plenty of time)
                 if sleep_time > 0.002:
                     time.sleep(sleep_time - 0.001)
                 while time.perf_counter() < next_time:
@@ -92,16 +99,16 @@ class SerialSender:
                 tick_counter += 1
 
             except serial.SerialException as e:
-                print(f"Errore durante l'invio: {e}")
+                print(f"Sending error: {e}")
                 self._is_running = False
                 if self.on_error:
-                    self.on_error(f"Connessione persa: {str(e)}")
+                    self.on_error(f"Connection lost: {str(e)}")
                 break
             except Exception as e:
-                print(f"Errore imprevisto: {e}")
+                print(f"Unexpected error: {e}")
                 self._is_running = False
                 if self.on_error:
-                    self.on_error(f"Errore: {str(e)}")
+                    self.on_error(f"Error: {str(e)}")
                 break
 
         self.stop()

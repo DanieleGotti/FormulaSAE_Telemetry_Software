@@ -6,8 +6,8 @@
 
 AccBrkWindow::AccBrkWindow(UiManager* manager) : m_uiManager(manager),
     // Passiamo qui le variabili esatte decise
-    m_accPlot("Acceleratori", {{ "accelerator1", "Accelerator1" }, { "accelerator2", "Accelerator2" }, { "accelerator_mapped", "Accelerator mapped" }}, 0.0, 100.0),
-    m_brkPlot("Freni", {{ "brake1", "Brake1" }, { "brake2", "Brake2" }}, 0.0, 100.0)
+    m_accPlot("Acceleratori", {{ "accelerator1", "1" }, { "accelerator2", "2" }, { "accelerator_mapped", "Mapped" }}, 0.0, 100.0),
+    m_brkPlot("Freni", {{ "brake1", "1" }, { "brake2", "2" }}, 0.0, 100.0)
 {
     const std::vector<std::string> keys_to_plot = {"accelerator1", "accelerator2", "accelerator_mapped", "brake1", "brake2"};
     for (const auto& key : keys_to_plot) {
@@ -91,6 +91,13 @@ void AccBrkWindow::draw() {
     }
 
     ImGui::Begin("Accelerator and brake sensors", nullptr, ImGuiWindowFlags_NoScrollbar);
+
+    ImGui::PushFont(m_uiManager->font_body);
+    ImGui::Text("Accelerator raw value" ); 
+    ImGui::SameLine(0.0f, ImGui::CalcTextSize(" ").x);
+    ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "[-]");
+    ImGui::PopFont();
+    ImGui::Separator();
     
     float available_height = ImGui::GetContentRegionAvail().y;
     float non_plot_height = (2 * ImGui::GetTextLineHeightWithSpacing()) + (3 * ImGui::GetStyle().ItemSpacing.y);
@@ -102,7 +109,12 @@ void AccBrkWindow::draw() {
         m_accPlot.draw(m_plotData, cursor_time, isPlayback, plot_height);
     }
 
-    ImGui::Spacing();
+    ImGui::PushFont(m_uiManager->font_body);
+    ImGui::Text("Brake raw value" ); 
+    ImGui::SameLine(0.0f, ImGui::CalcTextSize(" ").x);
+    ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "[-]");
+    ImGui::PopFont();
+    ImGui::Separator();
 
     {
         std::lock_guard<std::mutex> lock(m_dataMutex);

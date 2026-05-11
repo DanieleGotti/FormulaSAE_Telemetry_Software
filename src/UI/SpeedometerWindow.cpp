@@ -58,7 +58,7 @@ void SpeedometerWindow::draw() {
     float angle_span  = end_angle - start_angle;
     
     float max_speed = 180.0f;
-    float normalized_speed = std::clamp(currentSpeed / max_speed, 0.0f, 1.0f);
+    float normalized_speed = std::clamp(currentSpeed * 3.6f/ max_speed, 0.0f, 1.0f);
     float current_angle = start_angle + (normalized_speed * angle_span);
 
     // 1. TRACCIATO DI SFONDO (Più spesso e massiccio)
@@ -125,7 +125,7 @@ void SpeedometerWindow::draw() {
     // 7. TESTO ALLINEAMENTO ASSOLUTO (Ancorato al fondo)
     char angle_text[16];
     ImGui::PushFont(m_uiManager->font_body);
-    snprintf(angle_text, 16, "%.1f km/h", currentSpeed);
+    snprintf(angle_text, 16, "%.1f km/h", currentSpeed * 3.6);
     ImVec2 angle_text_size = ImGui::CalcTextSize(angle_text);
     
     // Manteniamo la X centrata rispetto al mozzo centrale.

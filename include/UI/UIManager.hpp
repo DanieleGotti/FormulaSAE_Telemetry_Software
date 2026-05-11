@@ -11,7 +11,6 @@
 #include "PlaybackControlsWindow.hpp"
 #include "LogTerminal.hpp"
 #include "FileSelectionWindow.hpp"
-#include "TemperatureWindow.hpp"
 #include "ModulesBatteryWindow.hpp"
 #include "VarianceWindow.hpp"
 #include "SpeedometerWindow.hpp"
@@ -70,7 +69,6 @@ private:
     std::shared_ptr<SteerWindow> m_steerWindow;
     std::shared_ptr<SuspensionWindow> m_suspensionWindow;
     std::shared_ptr<HallWindow> m_hallWindow;
-    std::shared_ptr<TemperatureWindow> m_temperatureWindow;
     std::shared_ptr<ModulesBatteryWindow> m_modulesBatteryWindow;
     std::shared_ptr<PlaybackControlsWindow> m_playbackControls;
     std::shared_ptr<VarianceWindow> m_varianceWindow;

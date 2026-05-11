@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 import struct
 import random
+import os
 
 def calculate_crc16(data: bytes) -> int:
-    """Implementazione esatta del CRC16-CCITT del C++ in Python"""
+    """Exact implementation of C++ CRC16-CCITT in Python"""
     crc = 0xFFFF
     for byte in data:
         crc ^= (byte << 8)
@@ -15,14 +16,14 @@ def calculate_crc16(data: bytes) -> int:
     return crc
 
 def generate_packet_A(timestamp_val: int) -> bytes:
-    """Genera il pacchetto telemetria principale (5ms)"""
+    """Generates the main telemetry packet (5ms)"""
     
-    # 1. Metadata (Come richiesto: 0x00 e 0xCC)
+    # 1. Metadata (As required: 0xCC and 0x11)
     startByte1 = 0xCC
     startByte2 = 0x11
     timestamp = timestamp_val
 
-    # 2. Generazione dati casuali
+    # 2. Random data generation
     fl_v = random.uniform(0.0, 100.0)
     fr_v = random.uniform(0.0, 100.0)
     rl_v = random.uniform(0.0, 100.0)
@@ -63,23 +64,21 @@ def generate_packet_A(timestamp_val: int) -> bytes:
     
     inv_L_tc = random.randint(-500, 500)
     inv_L_mc = random.randint(-100, 100)
-    inv_L_tm = random.randint(20, 120)
+    inv_L_tm = random.randint(200, 1200)
     inv_R_tc = random.randint(-500, 500)
     inv_R_mc = random.randint(-100, 100)
-    inv_R_tm = random.randint(20, 120)
+    inv_R_tm = random.randint(200, 1200)
     
     cool_L_tmp = random.uniform(20.0, 90.0)
     cool_R_tmp = random.uniform(20.0, 90.0)
-    mot_R_tmp = random.uniform(20.0, 120.0)
-    mot_L_tmp = random.uniform(20.0, 120.0)
     
     l_inv_fsm = random.randint(0, 8)
     r_inv_fsm = random.randint(0, 8)
     ts_fsm = random.randint(0, 9)
     ecu_mode = random.choice([0x01, 0x02, 0x04])
 
-    # 3. Formato Struct Payload A
-    fmt = '< BB I 4f 2f 2H f 2H f 4B 3f H 11f 6h 4f 4B'
+    # 3. Format Struct Payload A (Fixed format string for 46 items)
+    fmt = '< BB I 4f 2f 2H f 2H f 4B 3f H 11f 6h 2f 4B'
     
     payload = struct.pack(fmt,
         startByte1, startByte2, timestamp,
@@ -89,7 +88,7 @@ def generate_packet_A(timestamp_val: int) -> bytes:
         emma_c, emma_v, emma_yaw, emma_error,
         mean_vel, real_yaw, tot_trq, trq_tv_l, trq_tv_r, slip_l, slip_r, trq_red_l, trq_red_r, fin_trq_l, fin_trq_r,
         inv_L_tc, inv_L_mc, inv_L_tm, inv_R_tc, inv_R_mc, inv_R_tm,
-        mot_L_tmp, mot_R_tmp, cool_L_tmp, cool_R_tmp,
+        cool_L_tmp, cool_R_tmp,
         l_inv_fsm, r_inv_fsm, ts_fsm, ecu_mode
     )
 
@@ -97,25 +96,71 @@ def generate_packet_A(timestamp_val: int) -> bytes:
     return payload + struct.pack('<H', crc)
 
 def generate_packet_B(timestamp_val: int) -> bytes:
-    """Genera il pacchetto EMMA batteria (200ms)"""
+    """Generates the EMMA battery packet (200ms)"""
     
-    # 1. Metadata (Come richiesto: 0x00 e 0xEE)
+    # 1. Metadata (As required: 0xEE and 0x11)
     startByte1 = 0xEE
     startByte2 = 0x11
     timestamp = timestamp_val
     
-    # 2. Generazione dati EMMA
+    # 2. EMMA Data generation
     soc = random.randint(0, 100)
-    # Genero array di 14 voltaggi (uint8_t) e 28 temperature (uint16_t)
-    voltages =[random.randint(30, 42) for _ in range(14)] # Esempio: 3.0V - 4.2V mappato a int
-    temps =[random.randint(200, 600) for _ in range(28)]  # Esempio: 20.0C - 60.0C mappato a int
     
-    # 3. Formato Struct Payload B
+    # Generate array of 14 voltages (uint8_t) and 28 temperatures (uint16_t)
+    # FIX: uint8_t max value is 255. 100 = 3.0V, 220 = 4.2V based on (V+200)/100.0 formula
+    voltages = [random.randint(100, 220) for _ in range(14)] 
+    temps = [random.randint(200, 600) for _ in range(28)]  # 20.0°C to 60.0°C (scaled by 10)
+    
+    # 3. Format Struct Payload B
     # < BB I B 14B 28H -> Little Endian, metadata + soc + 14 uint8 + 28 uint16
     fmt = '< BB I B 14B 28H'
     
-    # *voltages e *temps "spacchettano" le liste inserendole nei rispettivi 14B e 28H
+    # *voltages and *temps "unpack" the lists inserting them into the respective 14B and 28H
     payload = struct.pack(fmt, startByte1, startByte2, timestamp, soc, *voltages, *temps)
     
     crc = calculate_crc16(payload)
     return payload + struct.pack('<H', crc)
+
+def generate_telemetry_file(filename="tester_bin.bin", duration_sec=10):
+    """Generates exactly `duration_sec` of data and saves it in a binary file at the script's location."""
+    
+    interval_ms = 5
+    total_ticks = int((duration_sec * 1000) / interval_ms)
+    
+    count_A = 0
+    count_B = 0
+
+    # Get the exact directory where this script is located
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    
+    # Save the file directly in the same directory
+    file_path = os.path.join(script_dir, filename)
+
+    print(f"Generating file '{file_path}'...")
+    print(f"Simulated duration: {duration_sec} seconds.")
+    
+    # Open the file in binary write mode ("wb")
+    with open(file_path, "wb") as f:
+        for tick_counter in range(total_ticks):
+            
+            # Packet A (generated every 5ms, so at each iteration)
+            packet_A = generate_packet_A(tick_counter)
+            f.write(packet_A)
+            count_A += 1
+            
+            # Packet B (generated every 200ms, meaning every 40 ticks)
+            if tick_counter % 40 == 0:
+                packet_B = generate_packet_B(tick_counter)
+                f.write(packet_B)
+                count_B += 1
+                
+    # Print final statistics
+    print("\nGeneration completed successfully!")
+    print("Statistics:")
+    print(f" - Packet A (5ms) generated:  {count_A}")
+    print(f" - Packet B (200ms) generated: {count_B}")
+    print(f"Total packets written to file: {count_A + count_B}")
+
+if __name__ == "__main__":
+    # Execute the generation
+    generate_telemetry_file("tester_bin.bin", 10)

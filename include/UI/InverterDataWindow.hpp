@@ -17,6 +17,8 @@ public:
     
 private:
     void printValue(const std::string& label, const std::string& key, const DbRow& dataMap, const std::string& unit = "");
+    void printColoredValue(const std::string& label, const std::string& key, const DbRow& dataMap, float limitGreen, float limitRed);
+    ImVec4 getColorForThreshold(float value, float limitGreen, float limitRed);
 
     UiManager* m_uiManager;    
     std::map<std::string, std::string> m_latestData;
