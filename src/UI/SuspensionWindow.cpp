@@ -1,11 +1,11 @@
 #include <iostream>
-#include "UI/SuspensionWindow.hpp"
 #include "UI/UIManager.hpp"
+#include "UI/SuspensionWindow.hpp"
 #include "Telemetry/Services/ServiceManager.hpp"
 #include "Telemetry/file_reading/PlaybackManager.hpp"
 
 SuspensionWindow::SuspensionWindow(UiManager* manager) : m_uiManager(manager),
-    m_suspPlot("Potenziometri lineari", { { "front_left_suspension", "Front left" }, { "front_right_suspension", "Front right" }}, 0.0, 100.0)
+    m_suspPlot("Linear potentiometers", { { "front_left_suspension", "Front left" }, { "front_right_suspension", "Front right" }}, 0.0, 100.0)
 {
     const std::vector<std::string> keys_to_plot = {"front_left_suspension", "front_right_suspension"};
     for (const auto& key : keys_to_plot) {
@@ -19,7 +19,6 @@ void SuspensionWindow::onAggregatedDataReceived(const DbRow& dataRow) {
         if (!dataRow.count("timestamp")) return;
         double unix_timestamp = std::stod(dataRow.at("timestamp")); 
 
-        // NUOVO: Rileva i salti temporali (pausa/riavvio o reset del sistema)
         if (m_lastTimestamp >= 0.0 && (unix_timestamp < m_lastTimestamp || unix_timestamp - m_lastTimestamp > 1.5)) {
             for (auto& pair : m_plotData) {
                 pair.second.X.clear();

@@ -1,13 +1,13 @@
+#include <iostream>
 #include "UI/AccBrkWindow.hpp"
 #include "UI/UIManager.hpp"
 #include "Telemetry/Services/ServiceManager.hpp"
 #include "Telemetry/file_reading/PlaybackManager.hpp"
-#include <iostream>
 
 AccBrkWindow::AccBrkWindow(UiManager* manager) : m_uiManager(manager),
-    // Passiamo qui le variabili esatte decise
-    m_accPlot("Acceleratori", {{ "accelerator1", "1" }, { "accelerator2", "2" }, { "accelerator_mapped", "Mapped" }}, 0.0, 100.0),
-    m_brkPlot("Freni", {{ "brake1", "1" }, { "brake2", "2" }}, 0.0, 100.0)
+    // Passing here the exact variables decided
+    m_accPlot("Accelerators", {{ "accelerator1", "1" }, { "accelerator2", "2" }, { "accelerator_mapped", "Mapped" }}, 0.0, 100.0),
+    m_brkPlot("Brakes", {{ "brake1", "1" }, { "brake2", "2" }}, 0.0, 100.0)
 {
     const std::vector<std::string> keys_to_plot = {"accelerator1", "accelerator2", "accelerator_mapped", "brake1", "brake2"};
     for (const auto& key : keys_to_plot) {
@@ -21,7 +21,7 @@ void AccBrkWindow::onAggregatedDataReceived(const DbRow& dataRow) {
         if (!dataRow.count("timestamp")) return;
         double unix_timestamp = std::stod(dataRow.at("timestamp")); 
 
-        // NUOVO: Rileva i salti temporali (pausa/riavvio o reset del sistema)
+        // Detect temporal gaps (pause/restart or system reset)
         if (m_lastTimestamp >= 0.0 && (unix_timestamp < m_lastTimestamp || unix_timestamp - m_lastTimestamp > 1.5)) {
             for (auto& pair : m_plotData) {
                 pair.second.X.clear();
@@ -58,13 +58,13 @@ void AccBrkWindow::draw() {
 
         std::lock_guard<std::mutex> lock(m_dataMutex);
         if (!m_playbackDataLoaded && playbackManager->getTotalRows() > 0) {
-            // Svuotiamo i vecchi dati
+
             for (auto& pair : m_plotData) {
                 pair.second.X.clear();
                 pair.second.Y.clear();
             }
             
-            // Estraiamo tutti i dati del file una sola volta
+            // Extract all data from the file in a single pass
             size_t total = playbackManager->getTotalRows();
             for (size_t i = 0; i < total; ++i) {
                 auto row = playbackManager->getRowAtIndex(i);
@@ -77,14 +77,14 @@ void AccBrkWindow::draw() {
                                 pair.second.Y.push_back(std::stod(row->at(pair.first)));
                             }
                         }
-                    } catch (...) {} // Ignora righe malformate nel file
+                    } catch (...) {} 
                 }
             }
             m_playbackDataLoaded = true;
         }
     } else {
         std::lock_guard<std::mutex> lock(m_dataMutex);
-        m_playbackDataLoaded = false; // Reset per quando si aprirà un file
+        m_playbackDataLoaded = false; // Reset when a file is opened
         if (!m_plotData.empty() && !m_plotData.begin()->second.X.empty()) {
             cursor_time = m_plotData.begin()->second.X.back();
         }

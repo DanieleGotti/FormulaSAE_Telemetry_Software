@@ -6,7 +6,7 @@
 #include "UI/UIManager.hpp"
 
 LogTerminal::LogTerminal(UiManager* manager) : m_uiManager(manager) {
-    // Cattura i blocchi di testo quando lo stream viene flushato e li passa ad addMessage
+    // Catch text blocks when the stream is flushed and pass them to addMessage
     struct RedirectStreamBuf : public std::streambuf {
         RedirectStreamBuf(std::function<void(const std::string&)> callback)
             : m_callback(std::move(callback)) {}
@@ -24,7 +24,7 @@ LogTerminal::LogTerminal(UiManager* manager) : m_uiManager(manager) {
             return c;
         }
         
-        // Quando lo stream viene flushato invia l'intero buffer accumulato
+        // When the stream is flushed, send the entire accumulated buffer
         int sync() override {
             if (!m_buffer.empty()) {
                 m_callback(m_buffer);
@@ -48,7 +48,7 @@ LogTerminal::LogTerminal(UiManager* manager) : m_uiManager(manager) {
     std::cout.rdbuf(m_coutRedirect.get());
     std::cerr.rdbuf(m_cerrRedirect.get());
 
-    std::cout << "INFO [LogTerminal]: LogTerminal inizializzato." << std::endl;
+    std::cout << "INFO [LogTerminal]: LogTerminal initialized." << std::endl;
 }
 
 LogTerminal::~LogTerminal() {
@@ -61,9 +61,9 @@ void LogTerminal::addMessage(const std::string& text_fragment) {
     m_line_buffer += text_fragment;
     size_t pos = 0;
     while ((pos = m_line_buffer.find('\n')) != std::string::npos) {
-        // Estrae la riga completa (fino al '\n')
+        // Extract the complete line (up to '\n')
         std::string line = m_line_buffer.substr(0, pos);
-        // Pulisce l'eventuale '\r' per compatibilità Windows
+        // Clean up any trailing '\r' for Windows compatibility
         if (!line.empty() && line.back() == '\r') {
             line.pop_back();
         }
@@ -88,15 +88,15 @@ void LogTerminal::clear() {
 void LogTerminal::draw() {
     ImGui::SetNextWindowSize(ImVec2(520, 400), ImGuiCond_FirstUseEver);
     ImGui::PushFont(m_uiManager->font_title);
-    ImGui::Begin("Terminale di log");
+    ImGui::Begin("Log terminal");
     ImGui::PopFont();
 
-    if (ImGui::Button("Pulisci")) { clear(); }
+    if (ImGui::Button("Clear")) { clear(); }
     ImGui::SameLine();
     ImGui::Checkbox("Auto-scroll", &m_autoScroll);
     ImGui::Separator();
 
-    ImGui::BeginChild("ScrollingRegion", ImVec2(0, 0), false, ImGuiWindowFlags_HorizontalScrollbar);
+    ImGui::BeginChild("Scrolling region", ImVec2(0, 0), false, ImGuiWindowFlags_HorizontalScrollbar);
     
     std::vector<std::string> messages_copy;
     {
@@ -105,14 +105,14 @@ void LogTerminal::draw() {
     }
 
     for (const auto& message : messages_copy) {
-        if (message.rfind("ERRORE", 0) == 0) {
-            // Colore ERRORE
+        if (message.rfind("ERROR", 0) == 0) {
+            // Color ERROR
             ImGui::TextColored(ImVec4(0.85f, 0.10f, 0.10f, 1.00f), "%s", message.c_str());
-        } else if (message.rfind("ATTENZIONE", 0) == 0) {
-            // Colore ATTENZIONE
+        } else if (message.rfind("WARNING", 0) == 0) {
+            // Color WARNING
             ImGui::TextColored(ImVec4(1.00f, 0.50f, 0.00f, 1.00f), "%s", message.c_str());
-        } else if (message.rfind("REGISTRAZIONE", 0) == 0) {
-            // Colore REGISTRAZIONE
+        } else if (message.rfind("LOGGING", 0) == 0) {
+            // Color LOGGING
             ImGui::TextColored(ImVec4(0.60f, 0.2f, 0.85f, 1.00f), "%s", message.c_str());
         } else {
             ImGui::TextUnformatted(message.c_str());

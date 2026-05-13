@@ -4,7 +4,7 @@
 #include <utility>
 
 #ifdef __APPLE__
-#include <CoreFoundation/CoreFoundation.h> // Per CFBundle
+#include <CoreFoundation/CoreFoundation.h> // For CFBundle
 #endif
 
 #ifdef _WIN32

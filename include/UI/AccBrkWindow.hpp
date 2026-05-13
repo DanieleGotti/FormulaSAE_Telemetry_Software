@@ -5,7 +5,7 @@
 #include <map>
 #include <chrono>
 #include "UIElement.hpp"
-#include "PlotGraph.hpp" // Usa la nuova classe
+#include "PlotGraph.hpp" 
 #include "../Telemetry/data_writing/IAggregatedDataSubscriber.hpp"
 #include "../Telemetry/data_writing/DataAggregator.hpp"
 
@@ -23,10 +23,9 @@ private:
     UiManager* m_uiManager;
     std::mutex m_dataMutex;
     std::map<std::string, PlotLineData> m_plotData;
-    const double MAX_HISTORY_SECONDS = 15.0; // Sufficiente per una finestra di 10s
-    double m_lastTimestamp = -1.0; // NUOVO: traccia i salti temporali
+    const double MAX_HISTORY_SECONDS = 15.0; // Window of 15 seconds for plotting
+    double m_lastTimestamp = -1.0; // Track temporal jumps
     
-    // Istanze gestite in automatico
     PlotGraph m_accPlot;
     PlotGraph m_brkPlot;
     

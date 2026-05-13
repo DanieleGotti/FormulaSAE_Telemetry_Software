@@ -1,10 +1,10 @@
-#include "Telemetry/data_writing/DataAggregator.hpp"
 #include <numeric>
 #include <cmath>
 #include <sstream>
 #include <iomanip>
+#include "Telemetry/data_writing/DataAggregator.hpp"
 
-// Helper per la formattazione univoca a N decimali
+// Helper function for formatting doubles with a fixed number of decimal places
 static std::string formatDouble(double val, int dec) {
     std::ostringstream ss;
     ss.imbue(std::locale::classic()); 
@@ -39,45 +39,43 @@ void DataAggregator::processRow(DbRow row) {
 
     if (m_statsWindowStart < 0.0) m_statsWindowStart = current_ts;
 
-    // Gestione salti temporali all'indietro (reset)
+    // Reset if we receive a timestamp that is before the current window start 
     if (current_ts < m_statsWindowStart) {
         reset();
         m_statsWindowStart = current_ts;
     }
 
-    // Accumula nel buffer corrente
+    // Add data to the current buffer
     for (const auto& sensor : m_targetSensors) {
         if (row.count(sensor)) {
             try { m_currentBuffers[sensor].push_back(std::stod(row.at(sensor))); } catch (...) {}
         }
     }
 
-    // Se sono passati i 3 secondi ESATTI (tumbling window)
+    // If exactly 3 seconds have passed (tumbling window)
     if (current_ts - m_statsWindowStart >= STATS_WINDOW) {
         for (const auto& sensor : m_targetSensors) {
             m_lastPublishedStats[sensor] = calculateStats(m_currentBuffers[sensor]);
-            m_currentBuffers[sensor].clear(); // Svuota il buffer per i prossimi 3 sec
+            m_currentBuffers[sensor].clear(); // Clear the buffer for the next 3 seconds
         }
         
-        // Evita derive temporali, aggiunge esattamente 3 secondi
+        // Avoid temporal drift, add exactly 3 seconds
         m_statsWindowStart += STATS_WINDOW; 
         
-        // Se c'è stato un mega-salto nei dati (es. mancato segnale per 10 secondi), lo riallinea
+        // If there was a large jump in the data (e.g., missing signal for 10 seconds), realign it
         if (current_ts - m_statsWindowStart >= STATS_WINDOW) {
             m_statsWindowStart = current_ts;
         }
     }
 
-    // Scrive i dati formattati nella riga. 
-    // Così per 2.99 secondi Dataset e UI leggono l'ultimo blocco valido, 
-    // allo scoccare dei 3s la stringa si aggiorna con i nuovi calcoli.
+    // Write the formatted data in the row
     for (const auto& sensor : m_targetSensors) {
         if (m_lastPublishedStats.count(sensor)) {
             row[sensor + "_mean"] = formatDouble(m_lastPublishedStats[sensor].mean, 3);
             row[sensor + "_var"]  = formatDouble(m_lastPublishedStats[sensor].variance, 3);
             row[sensor + "_std"]  = formatDouble(m_lastPublishedStats[sensor].stdDev, 3);
         } else {
-            // Se non sono ancora passati i primi 3 secondi dall'avvio
+            // If we haven't passed the first 3 seconds since startup
             row[sensor + "_mean"] = "0.000";
             row[sensor + "_var"]  = "0.000";
             row[sensor + "_std"]  = "0.000";

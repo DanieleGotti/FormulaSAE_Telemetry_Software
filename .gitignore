@@ -1,4 +1,6 @@
 build/
 build_windows/
+release_windows/
 output_data/
-telemetry_tester/__pycache__/
+tester_bin_sd/__pycache__/
+tester_uart/__pycache__/

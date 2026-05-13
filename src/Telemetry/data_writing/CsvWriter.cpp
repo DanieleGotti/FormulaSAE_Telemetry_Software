@@ -30,17 +30,17 @@ bool CsvWriter::createFile(const std::string& directoryPath, const std::vector<s
     
     m_outputFile.open(fullPath, std::ios::out | std::ios::trunc);
     if (!m_outputFile.is_open()) {
-        std::cerr << "ERRORE [CsvWriter]: Impossibile aprire il file per la registrazione." << std::endl;
+        std::cerr << "ERROR [CsvWriter]: Failed to open the file for recording." << std::endl;
         return false;
     }
     
-    // Scrive l'header
+    // Write the header
     for (size_t i = 0; i < m_columnOrder.size(); ++i) {
         m_outputFile << m_columnOrder[i] << (i == m_columnOrder.size() - 1 ? "" : ";");
     }
     m_outputFile << std::endl;
 
-    std::cout << "INFO [CsvWriter]: Registrazione avviata sul file: " << fullPath.string() << "." << std::endl;
+    std::cout << "INFO [CsvWriter]: Recording started on file: " << fullPath.string() << "." << std::endl;
     return true;
 }
 
@@ -53,9 +53,9 @@ void CsvWriter::onAggregatedDataReceived(const DbRow& dataRow) {
         try {
             double current_ts = std::stod(dataRow.at("timestamp"));
             if (m_recordingStartTime < 0.0) {
-                m_recordingStartTime = current_ts; // Salva il primo istante
+                m_recordingStartTime = current_ts; // Save the first timestamp
             }
-            relative_ts = current_ts - m_recordingStartTime; // Sottrae l'offset
+            relative_ts = current_ts - m_recordingStartTime; // Subtract the offset
         } catch(...) {}
     }
 
@@ -63,11 +63,11 @@ void CsvWriter::onAggregatedDataReceived(const DbRow& dataRow) {
     for (size_t i = 0; i < m_columnOrder.size(); ++i) {
         const std::string& col_name = m_columnOrder[i];
         
-        // Se è la colonna timestamp formatta e scrivi il valore ricalcolato (relativo)
+        // If it's the timestamp column, format and write the recalculated relative value
         if (col_name == "timestamp" && has_ts) {
             ss << std::fixed << std::setprecision(3) << relative_ts;
         } 
-        // Altrimenti, per tutti gli altri valori, controlla la mappa e scrivi come prima
+        // Otherwise, for all other values, check the map and write as before
         else if (dataRow.count(col_name)) {
             ss << dataRow.at(col_name);
         }
@@ -88,22 +88,21 @@ void CsvWriter::closeFile() {
 bool CsvWriter::WriteToFile(const std::string& filePath, const std::vector<std::string>& columnOrder, const std::vector<DbRow>& data) {
     std::ofstream outputFile(filePath, std::ios::out | std::ios::trunc);
     if (!outputFile.is_open()) {
-        std::cerr << "ERRORE [CsvWriter]: Impossibile creare il file CSV: " << filePath << "." << std::endl;
+        std::cerr << "ERROR [CsvWriter]: Failed to create CSV file: " << filePath << "." << std::endl;
         return false;
     }
 
-    // Scrive l'header
+    // Write the header
     for (size_t i = 0; i < columnOrder.size(); ++i) {
         outputFile << columnOrder[i] << (i == columnOrder.size() - 1 ? "" : ";");
     }
     outputFile << '\n';
 
-    // Scrive tutte le righe di dati
+    // Write all data rows
     for (const auto& dataRow : data) {
         for (size_t i = 0; i < columnOrder.size(); ++i) {
             const std::string& col_name = columnOrder[i];
             
-            // Qui c'era già il controllo di sicurezza :)
             if (dataRow.count(col_name)) {
                 outputFile << dataRow.at(col_name);
             }
@@ -113,6 +112,6 @@ bool CsvWriter::WriteToFile(const std::string& filePath, const std::vector<std::
         outputFile << '\n';
     }
 
-    std::cout << "INFO [CsvWriter]: File " << filePath << " generato con successo (" << data.size() << " righe)." << std::endl;
+    std::cout << "INFO [CsvWriter]: File " << filePath << " generated successfully (" << data.size() << " rows)." << std::endl;
     return true;
 }

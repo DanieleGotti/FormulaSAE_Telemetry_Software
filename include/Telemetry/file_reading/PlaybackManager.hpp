@@ -9,20 +9,20 @@ class PlaybackManager {
 public:
     PlaybackManager() = default;
 
-    // Metodo per caricare i dati
+    // Method to load data
     void setData(std::vector<DbRow>&& data);
     void clearData();
 
-    // Metodi per la navigazione
+    // Methods for navigation
     void setCurrentIndex(size_t index);
     size_t getCurrentIndex() const;
     size_t getTotalRows() const;
 
-    // Ottiene la riga di dati alla posizione corrente
+    // Gets the data row at the current position
     std::optional<DbRow> getCurrentRow() const;
     std::optional<DbRow> getRowAtIndex(size_t index) const;
 
-    // Ottiene una "finestra" di dati per i grafici
+    // Gets a window of data for the charts
     std::vector<DbRow> getDataWindow(size_t centerIndex, size_t halfWindowSize) const;
 
 private:

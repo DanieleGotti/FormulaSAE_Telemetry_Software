@@ -1,10 +1,10 @@
 #include <iostream>
-#include "Telemetry/Services/ServiceManager.hpp"
 #include "UI/UIManager.hpp"
+#include "Telemetry/Services/ServiceManager.hpp"
 
 int main() {
 
-    std::cout << "INFO [Main]: Avvio in corso." << std::endl;    
+    std::cout << "INFO [Main]: Starting up." << std::endl;    
     ServiceManager::initialize();
 
     {
@@ -13,7 +13,7 @@ int main() {
     } 
     
     ServiceManager::cleanup();
-    std::cout << "INFO [Main]: Chiusura in corso." << std::endl;
+    std::cout << "INFO [Main]: Shutting down." << std::endl;
 
     return 0;
 }

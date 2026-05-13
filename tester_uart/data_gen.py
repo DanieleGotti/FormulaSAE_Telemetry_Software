@@ -107,7 +107,7 @@ def generate_packet_B(timestamp_val: int) -> bytes:
     soc = random.randint(0, 100)
     
     # Generate array of 14 voltages (uint8_t) and 28 temperatures (uint16_t)
-    # FIX: uint8_t max value is 255. 100 = 3.0V, 220 = 4.2V based on (V+200)/100.0 formula
+    # Uint8_t max value is 255. 100 = 3.0V, 220 = 4.2V based on (V+200)/100.0 formula
     voltages = [random.randint(100, 220) for _ in range(14)] 
     temps = [random.randint(200, 600) for _ in range(28)]  # 20.0°C to 60.0°C (scaled by 10)
     

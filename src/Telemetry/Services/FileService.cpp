@@ -1,6 +1,3 @@
-#include "Telemetry/Services/FileService.hpp"
-#include "Telemetry/data_acquisition/PacketParser.hpp"
-#include "Telemetry/data_writing/CsvWriter.hpp"
 #include <fstream>
 #include <iostream>
 #include <algorithm>
@@ -8,6 +5,9 @@
 #include <chrono>
 #include <iomanip>
 #include <sstream>
+#include "Telemetry/Services/FileService.hpp"
+#include "Telemetry/data_acquisition/PacketParser.hpp"
+#include "Telemetry/data_writing/CsvWriter.hpp"
 
 FileService::FileService() = default;
 
@@ -49,7 +49,7 @@ void FileService::loadingLoop() {
     } else if (ext == ".bin") {
         loadBin(filePath);
     } else {
-        std::cerr << "ERRORE[FileService]: Formato file non supportato (" << ext << ")." << std::endl;
+        std::cerr << "ERROR [FileService]: File format not supported (" << ext << ")." << std::endl;
         m_isLoading = false;
         m_isFinished = true;
     }
@@ -58,14 +58,14 @@ void FileService::loadingLoop() {
 void FileService::loadCsv(const std::string& filePath) {
     std::ifstream file(filePath);
     if (!file.is_open()) {
-        std::cerr << "ERRORE [FileService]: Impossibile aprire il file CSV." << std::endl;
+        std::cerr << "ERROR [FileService]: Unable to open CSV file." << std::endl;
         m_isLoading = false;
         m_isFinished = true; 
         return;
     }
 
     std::string line;
-    std::getline(file, line); // Salta l'header
+    std::getline(file, line); // Skip the header
 
     PacketParser parser;
     while (std::getline(file, line)) {
@@ -79,7 +79,7 @@ void FileService::loadCsv(const std::string& filePath) {
         }
     }
 
-    std::cout << "INFO[FileService]: Caricamento CSV completato. " << m_loadedData.size() << " righe lette." << std::endl;
+    std::cout << "INFO [FileService]: CSV loading completed. " << m_loadedData.size() << " rows read." << std::endl;
     m_isFinished = true;
     m_isLoading = false;
 }
@@ -87,7 +87,7 @@ void FileService::loadCsv(const std::string& filePath) {
 void FileService::loadBin(const std::string& filePath) {
     std::ifstream file(filePath, std::ios::binary);
     if (!file.is_open()) {
-        std::cerr << "ERRORE [FileService]: Impossibile aprire il file BIN." << std::endl;
+        std::cerr << "ERROR [FileService]: Unable to open BIN file." << std::endl;
         m_isLoading = false;
         m_isFinished = true;
         return;
@@ -97,7 +97,7 @@ void FileService::loadBin(const std::string& filePath) {
     std::vector<DbRow> rawRows;
     std::vector<uint8_t> buffer;
     
-    // Legge il file a blocchi da 8KB
+    // Read the file in chunks of 8KB
     const size_t CHUNK_SIZE = 8192;
     uint8_t temp[CHUNK_SIZE];
 
@@ -105,19 +105,19 @@ void FileService::loadBin(const std::string& filePath) {
         size_t count = file.gcount();
         buffer.insert(buffer.end(), temp, temp + count);
         
-        // Passa i byte al parser esattamente come nella modalità LIVE
+        // Pass the bytes to the parser exactly as in LIVE mode
         DbRow row;
         while (parser.parseLiveBytes(buffer, row)) {
             rawRows.push_back(row);
         }
     }
 
-    std::cout << "INFO [FileService]: BIN decodificato in " << rawRows.size() << " pacchetti. Calcolo packet lost e varianze in corso..." << std::endl;
+    std::cout << "INFO [FileService]: BIN decoded in " << rawRows.size() << " packets. Calculating packet lost and variances." << std::endl;
 
     std::vector<DbRow> aggregatedRows;
     aggregatedRows.reserve(rawRows.size());
 
-    // Ricicliamo la classe DataAggregator per calcolare tutto offline!
+    // Reuse the DataAggregator class to calculate everything offline
     DataAggregator aggregator([&aggregatedRows](const DbRow& r) {
         aggregatedRows.push_back(r);
     });
@@ -126,7 +126,7 @@ void FileService::loadBin(const std::string& filePath) {
         aggregator.processRow(r);
     }
 
-    // Genera il nome del file CSV in automatico di fianco al .bin
+    // Generate the CSV file name automatically next to the .bin
     auto now = std::chrono::system_clock::now();
     auto in_time_t = std::chrono::system_clock::to_time_t(now);
     std::stringstream ss;
@@ -135,16 +135,16 @@ void FileService::loadBin(const std::string& filePath) {
     
     std::filesystem::path outPath = std::filesystem::path(filePath).parent_path() / outName;
 
-    // Salva il CSV
+    // Save the CSV
     CsvWriter::WriteToFile(outPath.string(), PacketParser::getColumnOrder(), aggregatedRows);
 
-    // Carica il risultato nella UI per fare il playback
+    // Load the result into the UI for playback
     {
         std::lock_guard<std::mutex> lock(m_dataMutex);
         m_loadedData = std::move(aggregatedRows);
     }
 
-    std::cout << "INFO [FileService]: Conversione completata. File generato: " << outPath.string() << std::endl;
+    std::cout << "INFO [FileService]: Conversion completed. File generated: " << outPath.string() << std::endl;
     m_isFinished = true;
     m_isLoading = false;
 }

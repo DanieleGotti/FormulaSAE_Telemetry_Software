@@ -1,11 +1,11 @@
+#include <iostream>
 #include "UI/HallWindow.hpp"
 #include "UI/UIManager.hpp"
 #include "Telemetry/Services/ServiceManager.hpp"
 #include "Telemetry/file_reading/PlaybackManager.hpp"
-#include <iostream>
 
 HallWindow::HallWindow(UiManager* manager) : m_uiManager(manager),
-    m_hallPlot("Sensori effetto Hall", {{ "front_right_velocity", "Front right" }, { "front_left_velocity", "Front left" }, { "rear_left_velocity", "Rear left" }, { "rear_right_velocity", "Rear right" }}, 0.0, 100.0)
+    m_hallPlot("Hall sensors", {{ "front_right_velocity", "Front right" }, { "front_left_velocity", "Front left" }, { "rear_left_velocity", "Rear left" }, { "rear_right_velocity", "Rear right" }}, 0.0, 100.0)
 {
     const std::vector<std::string> keys_to_plot = {"front_right_velocity", "front_left_velocity", "rear_left_velocity", "rear_right_velocity"};
     for (const auto& key : keys_to_plot) {
@@ -19,7 +19,6 @@ void HallWindow::onAggregatedDataReceived(const DbRow& dataRow) {
         if (!dataRow.count("timestamp")) return;
         double unix_timestamp = std::stod(dataRow.at("timestamp")); 
 
-        // NUOVO: Rileva i salti temporali (pausa/riavvio o reset del sistema)
         if (m_lastTimestamp >= 0.0 && (unix_timestamp < m_lastTimestamp || unix_timestamp - m_lastTimestamp > 1.5)) {
             for (auto& pair : m_plotData) {
                 pair.second.X.clear();
@@ -97,7 +96,6 @@ void HallWindow::draw() {
 
     {
         std::lock_guard<std::mutex> lock(m_dataMutex);
-        // Usa -1.0f come da tua implementazione originale per riempire lo spazio
         m_hallPlot.draw(m_plotData, cursor_time, isPlayback, -1.0f);
     }
     ImGui::End();

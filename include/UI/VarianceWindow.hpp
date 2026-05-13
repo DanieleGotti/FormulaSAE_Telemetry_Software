@@ -21,7 +21,7 @@ private:
     std::mutex m_dataMutex;
     DbRow m_latestData;
 
-    // Questa lista deve essere identica a quella del DataAggregator
+    // This ist must be identical to that of the DataAggregator
     const std::vector<std::string> m_targetSensors = {
         "accelerator1", "accelerator2", "brake1", "brake2", "steer"
     };

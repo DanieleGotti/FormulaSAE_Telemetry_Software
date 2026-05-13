@@ -3,15 +3,15 @@
 #include <vector>
 #include <stdexcept>
 #include <algorithm>
-#include "UI/ModulesBatteryWindow.hpp"
 #include "UI/UIManager.hpp"
+#include "UI/ModulesBatteryWindow.hpp"
 #include "Telemetry/Services/ServiceManager.hpp"
 #include "Telemetry/file_reading/PlaybackManager.hpp"
 
-// HELPER: Fa il parsing inverso dalla stringa salvata nel CSV e ricrea la dicitura con l'HEX
+// It formats the EMMA error string by parsing the individual error flags and constructing a hexadecimal representation of the error code
 static std::string formatEmmaError(const std::string& errStr) {
     if (errStr == "EMMA_STATUS_OK") return "(0x0000) EMMA_STATUS_OK";
-    if (errStr == "N/D" || errStr == "--" || errStr.empty()) return errStr;
+    if (errStr == "Null" || errStr == "--" || errStr.empty()) return errStr;
 
     uint16_t hex = 0;
     if (errStr.find("ERR_UNDERVOLTAGE") != std::string::npos) hex |= 0x0001;
@@ -39,9 +39,9 @@ void ModulesBatteryWindow::onAggregatedDataReceived(const DbRow& dataRow) {
 }
 
 ImVec4 ModulesBatteryWindow::getTempColor(float value) {
-    if (value < 50.0f) return ImVec4(0.1f, 0.8f, 0.1f, 1.0f);       // Verde scuro
-    else if (value < 65.0f) return ImVec4(1.0f, 0.5f, 0.0f, 1.0f);  // Arancione
-    else return ImVec4(0.85f, 0.1f, 0.1f, 1.0f);                    // Rosso scuro
+    if (value < 50.0f) return ImVec4(0.1f, 0.8f, 0.1f, 1.0f);       
+    else if (value < 65.0f) return ImVec4(1.0f, 0.5f, 0.0f, 1.0f);  
+    else return ImVec4(0.85f, 0.1f, 0.1f, 1.0f);                    
 }
 
 ImVec4 ModulesBatteryWindow::getVoltageColor(float value) {
@@ -57,11 +57,11 @@ void ModulesBatteryWindow::printValue(const std::string& label, const std::strin
     if (it != dataMap.end()) {
         ImGui::PushFont(m_uiManager->font_body); 
         float text_width = ImGui::CalcTextSize(it->second.c_str()).x;
-        ImGui::SameLine(130.0f - text_width); // Offset ridotto
-        ImGui::Text("%s", it->second.c_str()); // Usa colore di default del tema
+        ImGui::SameLine(130.0f - text_width); 
+        ImGui::Text("%s", it->second.c_str()); 
         ImGui::PopFont();
 
-        ImGui::SameLine(135.0f); // Offset unità
+        ImGui::SameLine(135.0f); 
         ImGui::PushFont(m_uiManager->font_body);
         if (!unit.empty()) {
             ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "[%s]", unit.c_str());
@@ -71,18 +71,18 @@ void ModulesBatteryWindow::printValue(const std::string& label, const std::strin
         ImGui::PopFont();
     } else {
         ImGui::PushFont(m_uiManager->font_body);
-        float text_width = ImGui::CalcTextSize("N/D").x;
+        float text_width = ImGui::CalcTextSize("Null").x;
         ImGui::SameLine(130.0f - text_width);
-        ImGui::Text("N/D");
+        ImGui::Text("Null");
         ImGui::PopFont();
     }
 }
 
-// FUNZIONE SPECIALE PER L'ERRORE EMMA
+// Specific function to print EMMA error with decoding
 void ModulesBatteryWindow::printErrorValue(const std::string& label, const DbRow& dataMap) {
     ImGui::Text("%s:", label.c_str()); 
     
-    ImGui::SameLine(100.0f); // Allineato al testo sopra
+    ImGui::SameLine(100.0f); 
     
     auto it = dataMap.find("emma_error");
     if (it != dataMap.end()) {
@@ -90,13 +90,13 @@ void ModulesBatteryWindow::printErrorValue(const std::string& label, const DbRow
         
         ImGui::PushFont(m_uiManager->font_body);
         if (it->second == "EMMA_STATUS_OK") {
-            ImGui::TextColored(ImVec4(0.1f, 0.8f, 0.1f, 1.0f), "%s", formattedStr.c_str()); // Verde
+            ImGui::TextColored(ImVec4(0.1f, 0.8f, 0.1f, 1.0f), "%s", formattedStr.c_str()); 
         } else {
-            ImGui::TextColored(ImVec4(0.85f, 0.1f, 0.1f, 1.0f), "%s", formattedStr.c_str()); // Rosso
+            ImGui::TextColored(ImVec4(0.85f, 0.1f, 0.1f, 1.0f), "%s", formattedStr.c_str()); 
         }
         ImGui::PopFont();
     } else {
-        ImGui::Text("N/D");
+        ImGui::Text("Null");
     }
 }
 
@@ -132,35 +132,29 @@ void ModulesBatteryWindow::drawModuleCard(int index, const DbRow& dataMap) {
                 valStr = valBuf;
                 hasValidValue = true;
             } catch (...) {
-                valStr = "NaN";
+                valStr = "Null";
             }
         }
 
-        // Calcola la larghezza del testo per il Valore
         ImGui::PushFont(m_uiManager->font_label);
         float valWidth = ImGui::CalcTextSize(valStr.c_str()).x;
         ImGui::PopFont();
 
-        // Calcola la larghezza del testo per l'Unità di misura
         ImGui::PushFont(m_uiManager->font_body);
         float unitWidth = ImGui::CalcTextSize(unitStr.c_str()).x;
         ImGui::PopFont();
 
-        float spacing = 5.0f; // Spazio tra il valore e l'unità di misura
+        float spacing = 5.0f;
         float totalRightWidth = valWidth + spacing + unitWidth;
 
-        // Calcola l'offset relativo al bordo destro della cella (con un piccolo margine di 5.0f)
         float columnWidth = ImGui::GetColumnWidth();
         float offsetX = columnWidth - totalRightWidth - 5.0f;
 
-        // Sicurezza: Evita la sovrapposizione tra la label (es. "Voltage:") e il valore
-        // se l'utente stringe la finestra rendendo la colonna minuscola
         float minOffsetX = ImGui::CalcTextSize(label).x + 10.0f;
         if (offsetX < minOffsetX) {
             offsetX = minOffsetX;
         }
 
-        // --- Stampa Valore ---
         ImGui::SameLine(offsetX);
         ImGui::PushFont(m_uiManager->font_body); 
         if (hasValidValue) {
@@ -170,7 +164,6 @@ void ModulesBatteryWindow::drawModuleCard(int index, const DbRow& dataMap) {
         }
         ImGui::PopFont();
 
-        // --- Stampa Unità di misura ---
         ImGui::SameLine(offsetX + valWidth + spacing); 
         ImGui::PushFont(m_uiManager->font_body);
         ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "%s", unitStr.c_str());
@@ -207,7 +200,6 @@ void ModulesBatteryWindow::draw() {
     }
 
     if (hasData) {
-        // --- HEADER EMMA ---
         ImGui::PushFont(m_uiManager->font_label);
         ImGui::Text("EMMA status");
         ImGui::PopFont();
@@ -222,7 +214,6 @@ void ModulesBatteryWindow::draw() {
         ImGui::Spacing();
         ImGui::Separator();
         
-        // --- DETTAGLIO MODULI ---
         ImGui::PushFont(m_uiManager->font_label);
         ImGui::Text("Modules data");
         ImGui::PopFont();
@@ -234,7 +225,7 @@ void ModulesBatteryWindow::draw() {
         
         if (columns < 1) columns = 1;
         if (columns > 14) columns = 14;
-        if (ImGui::BeginTable("ModulesGrid", columns, ImGuiTableFlags_BordersInner | ImGuiTableFlags_SizingStretchSame)) {
+        if (ImGui::BeginTable("Modules grid", columns, ImGuiTableFlags_BordersInner | ImGuiTableFlags_SizingStretchSame)) {
             for (int i = 1; i <= 14; ++i) {
                 ImGui::TableNextColumn();
                 drawModuleCard(i, dataToDisplay);
@@ -242,7 +233,7 @@ void ModulesBatteryWindow::draw() {
             ImGui::EndTable();
         }
     } else {
-        ImGui::Text("In attesa di dati.");
+        ImGui::Text("Waiting for data.");
     }
 
     ImGui::End();

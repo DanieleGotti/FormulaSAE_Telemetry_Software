@@ -1,7 +1,7 @@
 #include <imgui.h>
 #include <string>
-#include "UI/VarianceWindow.hpp"
 #include "UI/UIManager.hpp"
+#include "UI/VarianceWindow.hpp"
 #include "Telemetry/Services/ServiceManager.hpp"
 #include "Telemetry/file_reading/PlaybackManager.hpp"
 
@@ -34,10 +34,8 @@ void VarianceWindow::draw() {
 
     ImGui::Begin("Sensor statistics (3 s)", nullptr);
 
-    // Usa SizingStretchSame per forzare colonne uguali
-    if (ImGui::BeginTable("StatisticheTable", 4, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_SizingStretchSame)) {
+    if (ImGui::BeginTable("Sensors statistics table", 4, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_SizingStretchSame)) {
         
-        // Ho rimosso il WidthFixed dalla prima colonna. Ora tutte e 4 divideranno lo spazio al 25% esatto.
         ImGui::TableSetupColumn("Sensor"); 
         ImGui::TableSetupColumn("Mean (\u03BC)");
         ImGui::TableSetupColumn("Variance (\u03C3\u00B2)");
@@ -50,7 +48,7 @@ void VarianceWindow::draw() {
                     double val = std::stod(dataToDisplay.at(key));
                     ImGui::Text("%.3f", val);
                 } catch (...) {
-                    ImGui::Text("N/D");
+                    ImGui::Text("Null");
                 }
             } else {
                 ImGui::Text("--");

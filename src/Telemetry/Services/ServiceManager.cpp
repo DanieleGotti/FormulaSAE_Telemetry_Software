@@ -22,8 +22,8 @@ void ServiceManager::initialize() {
     
     m_dataManager = std::make_unique<DataManager>();
     
-    // Inizializza l'Aggregator passandogli una lambda: ogni volta che l'aggregator 
-    // finisce di inserire le varianze, passa la riga finita al DataManager.
+    // Start the DataAggregator with a lambda: every time the aggregator 
+    // finishes inserting the variances, it passes the completed row to the DataManager
     m_dataAggregator = std::make_unique<DataAggregator>([](const DbRow& row) {
         if (m_dataManager) m_dataManager->processData(row);
     });
@@ -33,7 +33,7 @@ void ServiceManager::initialize() {
     m_fileService = std::make_unique<FileService>();         
     m_playbackManager = std::make_unique<PlaybackManager>();                   
 
-    std::cout << "INFO [ServiceManager]: ServiceManager inizializzato." << std::endl;
+    std::cout << "INFO [ServiceManager]: ServiceManager initialized." << std::endl;
 }
 
 std::vector<std::string> ServiceManager::getAllConnectionOptions() {
@@ -81,7 +81,7 @@ bool ServiceManager::startServices() {
             }
             break;
         default:
-            std::cerr << "ERRORE [ServiceManager]: Nessun metodo di acquisizione selezionato." << std::endl;
+            std::cerr << "ERROR [ServiceManager]: No acquisition method selected." << std::endl;
             break;
     }
     return success;
@@ -90,11 +90,11 @@ bool ServiceManager::startServices() {
 void ServiceManager::stopTasks() {
     if (m_serialService && m_serialService->isRunning()) m_serialService->stop();
     if (m_networkService && m_networkService->isRunning()) m_networkService->stop();
-    std::cout << "INFO [ServiceManager]: Tutti i task attivi sono stati fermati." << std::endl;
+    std::cout << "INFO [ServiceManager]: All active tasks have been stopped." << std::endl;
 }
 
 void ServiceManager::resetForNewSession() {
-    std::cout << "INFO [ServiceManager]: Reset della sessione in corso." << std::endl;
+    std::cout << "INFO [ServiceManager]: Reset of the session in progress." << std::endl;
     stopTasks();
     stopLogging();
 
@@ -108,7 +108,7 @@ void ServiceManager::resetForNewSession() {
     m_fileService = std::make_unique<FileService>();
     m_networkService = std::make_unique<NetworkService>();
 
-    std::cout << "INFO [ServiceManager]: Sessione resettata." << std::endl;
+    std::cout << "INFO [ServiceManager]: Session reset." << std::endl;
 }
 
 void ServiceManager::cleanup() {
@@ -118,12 +118,12 @@ void ServiceManager::cleanup() {
     m_playbackManager.reset();
     m_settingsManager.reset();
     m_assetManager.reset();
-    std::cout << "INFO [ServiceManager]: ServiceManager pulito." << std::endl;
+    std::cout << "INFO [ServiceManager]: ServiceManager cleaned up." << std::endl;
 }
 
 bool ServiceManager::startLogging(const std::string& logIdentifier) {
     if (m_method == ACQUISITION_METHOD_FILE) {
-        // Su file la conversione in CSV viene fatta direttamente da UiManager a fine caricamento.
+        // On file, the CSV conversion is done directly by UiManager at the end of loading
         return true; 
     } else {
         std::filesystem::create_directories(logIdentifier);
@@ -132,13 +132,13 @@ bool ServiceManager::startLogging(const std::string& logIdentifier) {
             // Usiamo il getColumnOrder del PacketParser!
             if(m_csvWriter->createFile(logIdentifier, PacketParser::getColumnOrder())) {
                 getDataManager()->addLogSubscriber(m_csvWriter.get());
-                std::cout << "REGISTRAZIONE [ServiceManager]: Generazione .csv avviata." << std::endl;
+                std::cout << "LOGGING [ServiceManager]: CSV generation started." << std::endl;
                 return true;
             }
             m_csvWriter.reset();
         }
     }
-    std::cerr << "ERRORE [ServiceManager]: Avvio registrazione fallito." << std::endl;
+    std::cerr << "ERROR [ServiceManager]: Failed to start logging." << std::endl;
     return false;
 }
 
@@ -147,7 +147,7 @@ void ServiceManager::stopLogging() {
         getDataManager()->removeLogSubscriber(m_csvWriter.get());
         m_csvWriter->stop();
         m_csvWriter.reset();
-        std::cout << "REGISTRAZIONE [ServiceManager]: Registrazione CSV fermata." << std::endl;
+        std::cout << "LOGGING [ServiceManager]: CSV generation stopped." << std::endl;
     }
 }
 

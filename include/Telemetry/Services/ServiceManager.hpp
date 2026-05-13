@@ -25,12 +25,12 @@ public:
     static void initialize();
     static std::vector<std::string> getAllConnectionOptions();
     
-    // I getter necessari
+    // Getters 
     static DataManager* getDataManager();
     static PlaybackManager* getPlaybackManager();
     static FileService* getFileService();
     
-    // Configurazione e avvio
+    // Configuration and startup
     static void setAcquisitionMethod(AcquisitionMethod method);
     static bool configureSerial(const std::string& port, int baudrate);
     static bool configureNetwork(const std::string& ip, int port);
@@ -40,7 +40,7 @@ public:
     static void stopTasks();
     static void cleanup();
     
-    // Registrazione
+    // Logging
     static bool startLogging(const std::string& outputDirectory);
     static void stopLogging();
     static bool isLogging();
@@ -54,13 +54,13 @@ private:
     static std::shared_ptr<IAssetManager> m_assetManager;
     static std::shared_ptr<SettingsManager> m_settingsManager;
     
-    // Servizi principali
+    // Main services
     static std::unique_ptr<SerialService> m_serialService;
     static std::unique_ptr<NetworkService> m_networkService;
     static std::unique_ptr<PlaybackManager> m_playbackManager;
     static std::unique_ptr<FileService> m_fileService;
     
-    // Gestione Dati
+    // Data handling
     static std::unique_ptr<DataAggregator> m_dataAggregator;
     static std::unique_ptr<DataManager> m_dataManager;
     static std::shared_ptr<CsvWriter> m_csvWriter;

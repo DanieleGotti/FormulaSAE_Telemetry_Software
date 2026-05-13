@@ -5,11 +5,11 @@
 
 class DataManager {
 public:
-    // Sottoscrizioni per la UI (limitata a 10 Hz)
+    // Subscription for the UI (limited to 10 Hz)
     void addSubscriber(IAggregatedDataSubscriber* subscriber);
     void removeSubscriber(IAggregatedDataSubscriber* subscriber);
     
-    // Sottoscrizioni per i Log/Dataset (velocità massima 200 Hz)
+    // Subscriptions for Logs/Datasets (maximum speed 200 Hz)
     void addLogSubscriber(IAggregatedDataSubscriber* subscriber);
     void removeLogSubscriber(IAggregatedDataSubscriber* subscriber);
     
@@ -20,6 +20,6 @@ private:
     std::vector<IAggregatedDataSubscriber*> m_logSubscribers;
     std::mutex m_subscriberMutex;
     
-    // Timer per limitare la UI
+    // Timer to limit the UI update rate
     std::chrono::steady_clock::time_point m_lastUiUpdate;
 };

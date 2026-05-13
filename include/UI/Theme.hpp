@@ -1,7 +1,7 @@
 #pragma once
 #include <imgui.h>
 
-// Funzione centralizzata per applicare i temi
+// Centralized function for applying themes
 inline void ApplyTheme(ImGuiStyle& style, bool isDarkTheme)
 {
     style.WindowPadding = ImVec2(8.0f, 8.0f);
@@ -27,7 +27,7 @@ inline void ApplyTheme(ImGuiStyle& style, bool isDarkTheme)
 
     ImVec4* colors = style.Colors;
     if (isDarkTheme) {
-        // Tema scuro
+        // Default dark theme colors
         const ImVec4 bg_main(0.10f, 0.10f, 0.11f, 1.00f);
         const ImVec4 bg_secondary(0.13f, 0.13f, 0.15f, 1.00f);
         const ImVec4 bg_widget(0.18f, 0.18f, 0.20f, 1.00f);
@@ -84,7 +84,7 @@ inline void ApplyTheme(ImGuiStyle& style, bool isDarkTheme)
         colors[ImGuiCol_TextSelectedBg] = accent;
 
     } else {
-        // Tema chiaro
+        // Default light theme colors
         const ImVec4 bg_main(0.94f, 0.94f, 0.94f, 1.00f);
         const ImVec4 bg_secondary(1.00f, 1.00f, 1.00f, 1.00f);
         const ImVec4 bg_widget(0.86f, 0.86f, 0.86f, 1.00f);

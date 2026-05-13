@@ -10,7 +10,7 @@ std::string getResourcesPath() {
     return "";
 }
 
-// Funzione helper per combinare il percorso della risorsa
+// Helper function for combining the resource path
 std::string getResourcePath(const std::string& relativePath) {
     std::string resourcesPath = getResourcesPath();
     if (!resourcesPath.empty()) {

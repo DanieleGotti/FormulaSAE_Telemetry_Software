@@ -46,48 +46,48 @@ private:
     }
 
     std::string getResourcesPath() {
-        std::cout << "DEBUG [AssetManager_MacOS]: Tentativo di ottenere il main bundle." << std::endl;
+        std::cout << "DEBUG [AssetManager_MacOS]: Attempting to get the main bundle." << std::endl;
         CFBundleRef mainBundle = CFBundleGetMainBundle();
         if (mainBundle) {
-            std::cout << "DEBUG [AssetManager_MacOS]: Main bundle ottenuto." << std::endl;
+            std::cout << "DEBUG [AssetManager_MacOS]: Main bundle obtained." << std::endl;
             
-            CFURLRef bundleURL = CFBundleCopyBundleURL(mainBundle); // Ottieni l'URL del bundle
+            CFURLRef bundleURL = CFBundleCopyBundleURL(mainBundle); // Get the bundle's URL
             if (bundleURL) {
-                std::cout << "DEBUG [AssetManager_MacOS]: URL del bundle ottenuto." << std::endl;
-                CFStringRef bundlePathCFString = CFURLCopyFileSystemPath(bundleURL, kCFURLPOSIXPathStyle); // Ottieni il percorso assoluto del bundle
+                std::cout << "DEBUG [AssetManager_MacOS]: Bundle URL obtained." << std::endl;
+                CFStringRef bundlePathCFString = CFURLCopyFileSystemPath(bundleURL, kCFURLPOSIXPathStyle); // Get the absolute path of the bundle
                 
                 if (bundlePathCFString) {
-                    std::cout << "DEBUG [AssetManager_MacOS]: Percorso assoluto del bundle ottenuto." << std::endl;
+                    std::cout << "DEBUG [AssetManager_MacOS]: Absolute path of the bundle obtained." << std::endl;
                     CFIndex length = CFStringGetLength(bundlePathCFString);
                     CFIndex maxSize = CFStringGetMaximumSizeForEncoding(length, kCFStringEncodingUTF8);
                     
                     std::vector<char> buffer(maxSize + 1);
                     if (CFStringGetCString(bundlePathCFString, buffer.data(), buffer.size(), kCFStringEncodingUTF8)) {
                         std::string bundlePath = buffer.data();
-                        std::cout << "DEBUG [AssetManager_MacOS]: Percorso base bundle: " << bundlePath << "." << std::endl;
+                        std::cout << "DEBUG [AssetManager_MacOS]: Absolute path of the bundle: " << bundlePath << "." << std::endl;
                         
                         std::string resourcePath = bundlePath + "/Contents/Resources";
-                        std::cout << "DEBUG [AssetManager_MacOS]: Percorso Resources costruito: " << resourcePath << "." << std::endl;
+                        std::cout << "DEBUG [AssetManager_MacOS]: Resources path constructed: " << resourcePath << "." << std::endl;
                         
                         CFRelease(bundlePathCFString);
                         CFRelease(bundleURL);
                         return resourcePath;
 
                     } else {
-                        std::cerr << "ERRORE [AssetManager_MacOS]: CFStringGetCString (bundle path) fallito." << std::endl;
+                        std::cerr << "ERROR [AssetManager_MacOS]: CFStringGetCString (bundle path) failed." << std::endl;
                     }
                     CFRelease(bundlePathCFString);
                 } else {
-                    std::cerr << "ERRORE [AssetManager_MacOS]: CFURLCopyFileSystemPath (bundle URL) ha restituito NULL." << std::endl;
+                    std::cerr << "ERROR [AssetManager_MacOS]: CFURLCopyFileSystemPath (bundle URL) returned NULL." << std::endl;
                 }
                 CFRelease(bundleURL);
             } else {
-                std::cerr << "ERRORE [AssetManager_MacOS]: CFBundleCopyBundleURL ha restituito NULL." << std::endl;
+                std::cerr << "ERROR [AssetManager_MacOS]: CFBundleCopyBundleURL returned NULL." << std::endl;
             }
         } else {
-            std::cerr << "ERRORE [AssetManager_MacOS]: CFBundleGetMainBundle ha restituito NULL." << std::endl;
+            std::cerr << "ERROR [AssetManager_MacOS]: CFBundleGetMainBundle returned NULL." << std::endl;
         }
-        std::cerr << "ERRORE [AssetManager_MacOS]: Impossibile trovare la directory Resources del bundle (getResourcesPath fallito)." << std::endl;
+        std::cerr << "ERROR [AssetManager_MacOS]: Unable to find the resources directory of the bundle (getResourcesPath failed )." << std::endl;
         return "";
     }
 

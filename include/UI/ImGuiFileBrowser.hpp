@@ -8,7 +8,6 @@ class ImGuiFileBrowser {
 public:
     ImGuiFileBrowser();
 
-    // Disegna la finestra di dialogo
     std::optional<std::string> draw(const std::string& popup_id, bool& is_open);
 
 private:

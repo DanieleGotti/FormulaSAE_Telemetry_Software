@@ -94,7 +94,7 @@ bool SerialDataSource::open(const std::string &resource, int baudRate)
 #if defined (_WIN32) || defined( _WIN64)
     handle = CreateFileA(resource.c_str(), GENERIC_READ | GENERIC_WRITE, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
     if(handle == INVALID_HANDLE_VALUE) {
-        std::cerr << "ERRORE [SerialDataSource]: Impossibile aprire la porta seriale: " << resource.c_str() << "." << std::endl;
+        std::cerr << "ERROR [SerialDataSource]: Failed to open serial port: " << resource.c_str() << "." << std::endl;
         handle = nullptr;
         return false;
     }
@@ -102,7 +102,7 @@ bool SerialDataSource::open(const std::string &resource, int baudRate)
     DCB dcbSerialParams = {0};
     dcbSerialParams.DCBlength = sizeof(dcbSerialParams);
     if(!GetCommState(handle, &dcbSerialParams)) {
-        std::cerr << "ERRORE [SerialDataSource]: Impossibile ottenere i parametri seriali correnti." << std::endl;
+        std::cerr << "ERROR [SerialDataSource]: Failed to get current serial parameters." << std::endl;
         CloseHandle(handle);
         handle = nullptr;
         return false;
@@ -124,7 +124,7 @@ bool SerialDataSource::open(const std::string &resource, int baudRate)
         case 256000: speed = CBR_256000; break;
         case 500000: speed = 500000; break;
         default:
-            std::cerr << "ERRORE [SerialDataSource]: Baud rate non supportato: " << baudRate << "." << std::endl;
+            std::cerr << "ERROR [SerialDataSource]: Baud rate not supported: " << baudRate << "." << std::endl;
             CloseHandle(handle);
             handle = nullptr;
             return false;
@@ -136,27 +136,27 @@ bool SerialDataSource::open(const std::string &resource, int baudRate)
     dcbSerialParams.Parity   = NOPARITY;
 
     if(!SetCommState(handle, &dcbSerialParams)) {
-        std::cerr << "ERRORE [SerialDataSource]: Impossibile impostare i parametri della porta seriale." << std::endl;
+        std::cerr << "ERROR [SerialDataSource]: Failed to set serial port parameters." << std::endl;
         CloseHandle(handle);
         handle = nullptr;
         return false;
     }
 
     COMMTIMEOUTS timeouts = {0};
-    timeouts.ReadIntervalTimeout         = MAXDWORD; // Ritorna immediatamente
+    timeouts.ReadIntervalTimeout         = MAXDWORD; // Returns immediately
     timeouts.ReadTotalTimeoutConstant    = 0;
     timeouts.ReadTotalTimeoutMultiplier  = 0;
     timeouts.WriteTotalTimeoutConstant   = 0;
     timeouts.WriteTotalTimeoutMultiplier = 0;
 
     if(!SetCommTimeouts(handle, &timeouts)) {
-        std::cerr << "ERRORE [SerialDataSource]: Impossibile impostare i timeout della porta seriale." << std::endl;
+        std::cerr << "ERROR [SerialDataSource]: Failed to set serial port timeouts." << std::endl;
         CloseHandle(handle);
         handle = nullptr;
         return false;
     }
 
-    // Svuota i buffer di Windows per evitare vecchi dati e falsi packet lost
+    // Remove any pending data from the input buffer to avoid old data and false packet loss
     PurgeComm(handle, PURGE_RXCLEAR | PURGE_TXCLEAR);
 
     return true;
@@ -166,13 +166,13 @@ bool SerialDataSource::open(const std::string &resource, int baudRate)
     int flags = fcntl(fd, F_GETFL, 0);
     fcntl(fd, F_SETFL, flags | O_NONBLOCK);
     if(fd < 0) {
-        std::cerr << "ERRORE [SerialDataSource]: Impossibile aprire la porta seriale: " << resource << "." << std::endl;
+        std::cerr << "ERROR [SerialDataSource]: Failed to open serial port: " << resource << "." << std::endl;
         return false;
     }
 
     struct termios tty{};
     if(tcgetattr(fd, &tty) != 0) {
-        std::cerr << "ERRORE [SerialDataSource]: Impossibile ottenere i parametri della porta seriale." << std::endl;
+        std::cerr << "ERROR [SerialDataSource]: Failed to get serial port parameters." << std::endl;
         ::close(fd);
         fd = -1;
         return false;
@@ -195,7 +195,7 @@ bool SerialDataSource::open(const std::string &resource, int baudRate)
         case 256000: speed = B256000; break;
         case 500000: speed = B500000; break;
         default:
-            std::cerr << "ERRORE [SerialDataSource]: Baud rate non supportato: " << baudRate << "." << std::endl;
+            std::cerr << "ERROR [SerialDataSource]: Baud rate not supported: " << baudRate << "." << std::endl;
             ::close(fd);
             fd = -1;
             return false;
@@ -212,19 +212,19 @@ bool SerialDataSource::open(const std::string &resource, int baudRate)
     tty.c_cc[VTIME] = 0;            // 0.1 seconds read timeout
 
     tty.c_iflag &= ~(IXON | IXOFF | IXANY); // shut off xon/xoff ctrl
-    tty.c_cflag |= (CLOCAL | CREAD);// ignore modem controls, enable reading
-    tty.c_cflag &= ~(PARENB | PARODD);      // shut off parity
+    tty.c_cflag |= (CLOCAL | CREAD); // ignore modem controls, enable reading
+    tty.c_cflag &= ~(PARENB | PARODD); // shut off parity
     tty.c_cflag &= ~CSTOPB; // 1 stop bit
     tty.c_cflag &= ~CRTSCTS; // no hardware flow control
 
     if(tcsetattr(fd, TCSANOW, &tty) != 0) {
-        std::cerr << "ERRORE [SerialDataSource]: Impossibile impostare i parametri della porta seriale." << std::endl;
+        std::cerr << "ERROR [SerialDataSource]: Failed to set serial port parameters." << std::endl;
         ::close(fd);
         fd = -1;
         return false;
     }
 
-    // Svuota i buffer POSIX per evitare vecchi dati e falsi packet lost
+    // Remove any pending data from the input buffer to avoid old data and false packet loss
     tcflush(fd, TCIOFLUSH);
 
     return true;
@@ -236,12 +236,12 @@ std::vector<uint8_t> SerialDataSource::readPacket()
     std::vector<uint8_t> buffer(1024);
 #if defined (_WIN32) || defined( _WIN64)
     if (!handle) {
-        std::cerr << "ERRORE [SerialDataSource]: Porta seriale non aperta." << std::endl;
+        std::cerr << "ERROR [SerialDataSource]: Serial port not open." << std::endl;
         return {};
     }
     DWORD bytesRead;
     if(!ReadFile(handle, buffer.data(), buffer.size(), &bytesRead, nullptr)) {
-        std::cerr << "ERRORE [SerialDataSource]: Impossibile leggere dalla porta seriale." << std::endl;
+        std::cerr << "ERROR [SerialDataSource]: Failed to read from serial port." << std::endl;
         return {};
     }
     buffer.resize(bytesRead);
@@ -249,12 +249,12 @@ std::vector<uint8_t> SerialDataSource::readPacket()
 #endif
 #if defined(__APPLE__)
     if (fd < 0) {
-        std::cerr << "ERRORE [SerialDataSource]: Porta seriale non aperta." << std::endl;
+        std::cerr << "ERROR [SerialDataSource]: Serial port not open." << std::endl;
         return {};
     }
     ssize_t bytesRead = ::read(fd, buffer.data(), buffer.size());
     if(bytesRead < 0) { 
-        std::cerr << "ERRORE [SerialDataSource]: Impossibile leggere dalla porta seriale." << std::endl;
+        std::cerr << "ERROR [SerialDataSource]: Failed to read from serial port." << std::endl;
         return {};
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }

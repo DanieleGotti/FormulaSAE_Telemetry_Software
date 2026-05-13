@@ -13,7 +13,6 @@ public:
     explicit LogTerminal(UiManager* manager);
     ~LogTerminal() override;
 
-    // No copia e spostamento
     LogTerminal(const LogTerminal&) = delete;
     LogTerminal& operator=(const LogTerminal&) = delete;
 

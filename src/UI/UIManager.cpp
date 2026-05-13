@@ -9,6 +9,7 @@
 #include <cassert>
 #include <utility>
 #include <vector>
+#include <GLFW/glfw3.h>
 #include "UI/UIManager.hpp"
 #include "UI/Theme.hpp"
 #include "UI/SerialDeviceSelection.hpp"
@@ -32,6 +33,7 @@
 #include "Telemetry/data_writing/IAggregatedDataSubscriber.hpp"
 #include "Telemetry/data_writing/DataAggregator.hpp"
 #include "utils/fsUtils.hpp"
+#include "../external/stb_image/stb_image.h"
 
 #ifdef WIN32
 #include "../assets/resources.h" 
@@ -55,7 +57,17 @@ UiManager::UiManager() {
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
-    m_window = glfwCreateWindow(1280, 720, "ERB - Telemetria", NULL, NULL);
+    glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);              
+    glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_TRUE);
+
+    m_window = glfwCreateWindow(500, 500, "ERB - Telemetry Software", NULL, NULL);
+    
+    GLFWmonitor* primary = glfwGetPrimaryMonitor();
+    if (primary) {
+        const GLFWvidmode* mode = glfwGetVideoMode(primary);
+        glfwSetWindowPos((GLFWwindow*)m_window, (mode->width - 500) / 2, (mode->height - 500) / 2);
+    }
+
     glfwMakeContextCurrent((GLFWwindow*)m_window);
     glfwSwapInterval(1);
 
@@ -66,7 +78,13 @@ UiManager::UiManager() {
 
     if (ServiceManager::getSettingsManager()->getFirstAccess()) {
       auto [pFileData, pFileLength] = ServiceManager::getAssetManager()->getDefaultImGuiIniFile();
-      ImGui::LoadIniSettingsFromMemory((const char*)pFileData, pFileLength);
+
+      if (pFileData && pFileLength > 0) {
+            ImGui::LoadIniSettingsFromMemory((const char*)pFileData, pFileLength);
+            std::cout << "INFO [UiManager]: Default ImGui layout applied successfully." << std::endl;
+        } else {
+            std::cerr << "WARNING [UiManager]: Unable to load default layout." << std::endl;
+        }
       ServiceManager::getSettingsManager()->setFirstAccess(false);
     }
 
@@ -77,7 +95,7 @@ UiManager::UiManager() {
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 
     m_logTerminal = std::make_shared<LogTerminal>(this);
-    std::cout << "INFO [UiManager]: UiManager inizializzato." << std::endl;
+    std::cout << "INFO [UiManager]: UiManager initialized." << std::endl;
     io.Fonts->Clear(); 
 
 #ifdef WIN32
@@ -98,8 +116,8 @@ UiManager::UiManager() {
     } else { io.Fonts->AddFontDefault(); }
 
     ImGui::GetIO().FontGlobalScale = ServiceManager::getSettingsManager()->getGlobalFontScale();
-    assert(font_body != nullptr && "ERRORE [UiManager]: Impossibile caricare i font.");
-    std::cout << "INFO [UiManager]: Font caricati." << std::endl;
+    assert(font_body != nullptr && "ERROR [UiManager]: Failed to load fonts.");
+    std::cout << "INFO [UiManager]: Fonts loaded." << std::endl;
 
     m_isDarkTheme = ServiceManager::getSettingsManager()->getDarkMode();
     ApplyTheme(ImGui::GetStyle(), m_isDarkTheme);
@@ -142,7 +160,14 @@ AppState UiManager::getCurrentState() const {
 }
 
 void UiManager::setupInitialState() {
-    m_currentState = AppState::CONFIGURING;
+    if (m_isFirstBoot) {
+        m_currentState = AppState::SPLASH_SCREEN;
+        loadTextureFromMemory("icon.png", &m_splashTextureID, &m_splashWidth, &m_splashHeight);
+        m_splashStartTime = glfwGetTime();
+        m_isFirstBoot = false;
+    } else {
+        m_currentState = AppState::CONFIGURING;
+    }
 
     auto onConnect = [this](const std::string& port, int baudrate) {
         ServiceManager::setAcquisitionMethod(ACQUISITION_METHOD_SERIAL);
@@ -153,7 +178,7 @@ void UiManager::setupInitialState() {
             m_fileSelectionWindow = nullptr;
             transitionToConnectedState(AppState::CONNECTED_LIVE);
         } else {
-            std::cerr << "ERRORE [UiManager]: Connessione live fallita." << std::endl;
+            std::cerr << "ERROR [UiManager]: Live connection failed." << std::endl;
         }
     };
 
@@ -222,25 +247,27 @@ void UiManager::run() {
         ImGui::NewFrame();
         
         ImGui::PushFont(font_body);
-        showDockingSpace();
+        if (m_currentState != AppState::SPLASH_SCREEN) {
+            showDockingSpace(); 
+        }
         draw();
         ImGui::PopFont();
         
         ImGui::Render();
         
-        // --- INIZIO FIX PULIZIA OPENGL ---
-        // Recupera le dimensioni correnti della finestra
         int display_w, display_h;
         glfwGetFramebufferSize((GLFWwindow*)m_window, &display_w, &display_h);
         glViewport(0, 0, display_w, display_h);
         
-        // Scegli il colore di "vernice di fondo" in base al tema
-        ImVec4 clear_color = m_isDarkTheme ? ImVec4(0.1f, 0.1f, 0.1f, 1.0f) : ImVec4(0.9f, 0.9f, 0.9f, 1.0f);
+        ImVec4 clear_color;
+        if (m_currentState == AppState::SPLASH_SCREEN) {
+            clear_color = ImVec4(0.0f, 0.0f, 0.0f, 0.0f); 
+        } else {
+            clear_color = m_isDarkTheme ? ImVec4(0.1f, 0.1f, 0.1f, 1.0f) : ImVec4(0.9f, 0.9f, 0.9f, 1.0f);
+        }
         
-        // Pulisci il buffer hardware della GPU
         glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
         glClear(GL_COLOR_BUFFER_BIT);
-        // --- FINE FIX ---
 
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     
@@ -261,6 +288,44 @@ void UiManager::run() {
 }
 
 void UiManager::draw() {
+
+    if (m_currentState == AppState::SPLASH_SCREEN) {
+        ImGuiViewport* viewport = ImGui::GetMainViewport();
+        ImGui::SetNextWindowPos(viewport->Pos);
+        ImGui::SetNextWindowSize(viewport->Size);
+        ImGui::Begin("Splash screen", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoInputs);
+        
+        if (m_splashTextureID && m_splashWidth > 0) {
+            float scale = 1.0f;
+            if (m_splashWidth > 400) scale = 400.0f / m_splashWidth;
+            
+            ImVec2 img_size(m_splashWidth * scale, m_splashHeight * scale);
+            ImVec2 pos = ImVec2((viewport->Size.x - img_size.x) * 0.5f, (viewport->Size.y - img_size.y) * 0.5f);
+            
+            ImGui::SetCursorPos(pos);
+            ImGui::Image((ImTextureID)(intptr_t)m_splashTextureID, img_size);
+        }
+        ImGui::End();
+
+        // Freeze for 2 seconds
+        if (glfwGetTime() - m_splashStartTime > 4.0) {
+            
+            glfwHideWindow((GLFWwindow*)m_window);
+
+            m_currentState = AppState::CONFIGURING; 
+        
+            glfwSetWindowAttrib((GLFWwindow*)m_window, GLFW_DECORATED, GLFW_TRUE);
+            glfwMaximizeWindow((GLFWwindow*)m_window);
+            glfwShowWindow((GLFWwindow*)m_window);
+
+            if (m_splashTextureID) {
+                glDeleteTextures(1, &m_splashTextureID); 
+                m_splashTextureID = 0;
+            }
+        }
+        return; 
+    }
+
     if (m_logTerminal) {
         m_logTerminal->draw();
     }
@@ -274,8 +339,8 @@ void UiManager::draw() {
             transitionToConnectedState(AppState::CONNECTED_PLAYBACK);
 
         } else {
-            ImGui::Begin("Caricamento in corso.");
-            ImGui::Text("Analisi del file di telemetria. Attendere prego.");
+            ImGui::Begin("Loading in progress");
+            ImGui::Text("Analyzing telemetry file. Please wait.");
             ImGui::End();
         }
     }
@@ -339,7 +404,7 @@ void UiManager::showDockingSpace() {
     ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-    ImGui::Begin("DockSpaceHost", nullptr, window_flags);
+    ImGui::Begin("Dock space host", nullptr, window_flags);
     ImGui::PopStyleVar(3);
 
     ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
@@ -353,16 +418,16 @@ void UiManager::showDockingSpace() {
             }
         }
 
-        if (ImGui::BeginMenu("Opzioni")) {
-            if (ImGui::BeginMenu("Aspetto")) {
+        if (ImGui::BeginMenu("Settings")) {
+            if (ImGui::BeginMenu("Appearance")) {
                 bool isDark = ServiceManager::getSettingsManager()->getDarkMode();
-                if (ImGui::MenuItem(isDark ? "Tema Chiaro" : "Tema Scuro")) {
+                if (ImGui::MenuItem(isDark ? "Light mode" : "Dark mode")) {
                     ServiceManager::getSettingsManager()->setDarkMode(!isDark);
                     m_isDarkTheme = !isDark;
                     ApplyTheme(ImGui::GetStyle(), !isDark);
                 }
                 ImGui::Separator();
-                ImGui::Text("Dimensione Testo");
+                ImGui::Text("Text size");
                 ImGui::SameLine();
                 float fontScale = ServiceManager::getSettingsManager()->getGlobalFontScale();
                 bool changed = false;
@@ -386,7 +451,7 @@ void UiManager::showDockingSpace() {
 }
 
 void UiManager::resetToHome() {
-    std::cout << "INFO [UiManager]: Reset dell'interfaccia verso la schermata Home." << std::endl;
+    std::cout << "INFO [UiManager]: Resetting interface to Home screen." << std::endl;
 
     if (ServiceManager::getDataManager()) {
         if (m_dashboard) ServiceManager::getDataManager()->removeSubscriber(m_dashboard.get());
@@ -424,6 +489,30 @@ void UiManager::resetToHome() {
     setupInitialState();
 }
 
+bool UiManager::loadTextureFromMemory(const char* filename, GLuint* out_texture, int* out_width, int* out_height) {
+    auto [pData, dataSize] = ServiceManager::getAssetManager()->getImage(filename);
+    if (!pData || dataSize == 0) return false;
+
+    int image_width = 0, image_height = 0;
+    unsigned char* image_data = stbi_load_from_memory(
+        reinterpret_cast<const unsigned char*>(pData), dataSize, &image_width, &image_height, nullptr, 4
+    );
+    if (!image_data) return false;
+
+    GLuint image_texture;
+    glGenTextures(1, &image_texture);
+    glBindTexture(GL_TEXTURE_2D, image_texture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width, image_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
+    stbi_image_free(image_data);
+
+    *out_texture = image_texture; 
+    *out_width = image_width; 
+    *out_height = image_height;
+    return true;
+}
+
 
 #if defined(WIN32)
 void UiManager::SetWindowIconFromResource() {
@@ -455,9 +544,9 @@ void UiManager::SetWindowIconFromResource() {
     GetDIBits(memDC, iconInfo.hbmColor, 0, height, pixels.data(), &bmi, DIB_RGB_COLORS);
 
   for (size_t i = 0; i < pixels.size(); i += 4) {
-        unsigned char temp = pixels[i];       // Salva il byte Blu (indice 0)
-        pixels[i] = pixels[i + 2];            // Metti il Rosso (indice 2) al posto del Blu
-        pixels[i + 2] = temp;                 // Metti il Blu al posto del Rosso
+        unsigned char temp = pixels[i];       
+        pixels[i] = pixels[i + 2];            
+        pixels[i + 2] = temp;                 
     }
     
     GLFWimage img{width, height, pixels.data()};

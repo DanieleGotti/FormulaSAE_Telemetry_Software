@@ -24,15 +24,15 @@ public:
 
 private:
     void acquisitionLoop();
-    void processingLoop(); // NUOVO METODO
+    void processingLoop();
     
     SerialConfig m_config;
     bool m_running = false;
     std::unique_ptr<IDataSource> m_dataSource;
-    std::thread m_thread; // Thread di lettura hardware
-    std::thread m_processingThread; // NUOVO: Thread di elaborazione UI/Log
+    std::thread m_thread; // Thread to read hardware data
+    std::thread m_processingThread; // Thread of processing UI/Log
     
-    // NUOVO: Coda sicura per passare i byte grezzi dal thread di lettura a quello di parsing
+    // Thread-safe queue for passing raw bytes from the acquisition thread to the parsing thread
     ThreadSafeQueue<std::vector<uint8_t>> m_queue; 
     
     DataAggregator* m_aggregator;

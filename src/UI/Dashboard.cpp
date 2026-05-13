@@ -17,7 +17,7 @@ void Dashboard::draw() {
     ImGui::Begin("Data management");
 
     if (m_uiManager->getCurrentState() == AppState::CONNECTED_LIVE) {
-        ImGui::BeginChild("ControlPanel", ImVec2(0, 100), true);
+        ImGui::BeginChild("Control panel", ImVec2(0, 100), true);
         ImGui::PushFont(m_uiManager->font_label);
         ImGui::Text("Logging control");
         ImGui::PopFont();
@@ -48,23 +48,23 @@ void Dashboard::draw() {
         dataToDisplay = m_latestData;
     }
 
-    // ESTRAZIONE DATI PACCHETTI PERSI
+    // Extract lost packet counts with default "0" if not present
     std::string lostA = dataToDisplay.count("lost_packets_A") ? dataToDisplay.at("lost_packets_A") : "0";
     std::string lostB = dataToDisplay.count("lost_packets_B") ? dataToDisplay.at("lost_packets_B") : "0";
-    std::string lostTot = dataToDisplay.count("lost_packets_TOT") ? dataToDisplay.at("lost_packets_TOT") : "0";
+    std::string lostTot = dataToDisplay.count("lost_packets_tot") ? dataToDisplay.at("lost_packets_tot") : "0";
 
-    // TABELLA PACCHETTI PERSI
+    // Lost packets table
     ImGui::PushFont(m_uiManager->font_label);
     ImGui::Text("Lost packets");
     ImGui::PopFont();
     ImGui::Separator();
     
-    if (ImGui::BeginTable("LostPacketsTable", 2, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg)) {
+    if (ImGui::BeginTable("Lost packets table", 2, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg)) {
         ImGui::TableSetupColumn("Type"); 
         ImGui::TableSetupColumn("Count");
         ImGui::TableHeadersRow();
 
-        // Riga Tipo A
+        // Type A lost packets
         ImGui::TableNextRow();
         ImGui::TableSetColumnIndex(0);         
         ImGui::TextUnformatted("0xCC (5 ms)");
@@ -73,7 +73,7 @@ void Dashboard::draw() {
         ImGui::TextUnformatted(lostA.c_str());
         ImGui::PopFont();
 
-        // Riga Tipo B
+        // Type B lost packets
         ImGui::TableNextRow();
         ImGui::TableSetColumnIndex(0);         
         ImGui::TextUnformatted("0xEE (200 ms)");
@@ -82,7 +82,7 @@ void Dashboard::draw() {
         ImGui::TextUnformatted(lostB.c_str());
         ImGui::PopFont();
 
-        // Riga Totali
+        // Total row
         ImGui::TableNextRow();
         ImGui::TableSetColumnIndex(0);         
         ImGui::TextUnformatted("Total");
@@ -99,8 +99,8 @@ void Dashboard::draw() {
     ImGui::PopFont();
     ImGui::Separator();
 
-    // TABELLA PRINCIPALE DEI DATI
-    if (ImGui::BeginTable("DataTable", 2, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY)) {
+    // Data table
+    if (ImGui::BeginTable("Data table", 2, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY)) {
         ImGui::TableSetupColumn("Type"); 
         ImGui::TableSetupColumn("Value");
         ImGui::TableHeadersRow();
@@ -108,7 +108,7 @@ void Dashboard::draw() {
         auto columnOrder = PacketParser::getColumnOrder();
         
         for (const auto& label : columnOrder) {
-            // Salta i dati che abbiamo appena mostrato separatamente nella tabella sopra
+            // Skip lost packet counts since we display them separately at the top
             if (label == "lost_packets_A" || label == "lost_packets_B" || label == "lost_packets_tot") continue;
             
             if (dataToDisplay.count(label) == 0) continue; 

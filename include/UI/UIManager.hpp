@@ -22,6 +22,7 @@
 struct ImFont;
 
 enum class AppState {
+    SPLASH_SCREEN,
     CONFIGURING,
     LOADING_FILE,
     CONNECTED_LIVE,
@@ -40,10 +41,10 @@ public:
     AppState getCurrentState() const;
 
     bool m_isDarkTheme = true;
-    ImFont* font_body;    // Testo standard
-    ImFont* font_label;   // Etichette finestre
-    ImFont* font_data;    // Valori numerici importanti
-    ImFont* font_title;   // Titoli 
+    ImFont* font_body;    // Standard text
+    ImFont* font_label;   // Window labels
+    ImFont* font_data;    // Important numeric values
+    ImFont* font_title;   // Titles
 
 private:    
     void draw();
@@ -79,6 +80,14 @@ private:
     std::shared_ptr<LogTerminal> m_logTerminal;
     std::vector<std::unique_ptr<UIElement>> m_uiElements;
     std::vector<UIElement*> m_elementsToRemove;
+
+    // For splash screen
+    bool m_isFirstBoot = true;
+    double m_splashStartTime = 0.0;
+    GLuint m_splashTextureID = 0;
+    int m_splashWidth = 0;
+    int m_splashHeight = 0;
+    bool loadTextureFromMemory(const char* filename, GLuint* out_texture, int* out_width, int* out_height);
 
 #if defined(__APPLE__)
     const char* glsl_version = "#version 150";

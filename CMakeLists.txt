@@ -5,10 +5,10 @@ project(telemetry LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# # Trova Vulkan (dall'SDK installato sul sistema)
-# find_package(Vulkan REQUIRED) # Assicurati di scommentare se lo usi
+# # Find Vulkan (from system installed SDK)
+# find_package(Vulkan REQUIRED) # Uncomment if used in the future
 
-# Aggiungi GLFW come subdir
+# Add GLFW as subdirectory
 add_subdirectory(external/glfw)
 
 # ---- IMGUI ----
@@ -37,11 +37,12 @@ target_link_libraries(imgui PUBLIC glfw)
 
 # Include directories
 include_directories(
-    # ${Vulkan_INCLUDE_DIRS} # Assicurati di scommentare se lo usi
+    # ${Vulkan_INCLUDE_DIRS} # Uncomment if used
     external/glm
     external/glfw/include
 )
 
+# Fetch Jsoncons (JSON library)
 include(FetchContent)
 FetchContent_Declare(
   jsoncons
@@ -56,7 +57,7 @@ FetchContent_MakeAvailable(jsoncons)
 
 include_directories(${CMAKE_SOURCE_DIR}/include)
 
-# Sorgenti
+# Gather source files
 file(GLOB SRC_FILES
     src/*.cpp
     src/Renderer/*.cpp
@@ -71,6 +72,7 @@ file(GLOB SRC_FILES
     src/utils/AssetManager/AssetManagerFactory.cpp
 )
 
+# OS-Specific Asset Managers
 if(WIN32)
     list(APPEND SRC_FILES src/utils/AssetManager/AssetManager_Windows.cpp)
 elseif(APPLE)
@@ -88,20 +90,27 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     jsoncons
 )
 
-# Sezione di configurazione specifica per Windows
+# --- Windows Specific Configuration ---
 if(WIN32)
     target_link_libraries(${PROJECT_NAME} PRIVATE opengl32)
     target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/assets")
     set(APP_ICON_RESOURCE "${CMAKE_CURRENT_SOURCE_DIR}/assets/windows_resources.rc")
     target_sources(${PROJECT_NAME} PRIVATE ${APP_ICON_RESOURCE})
     add_definitions(-DUNICODE -D_UNICODE)
+
+
+    # If building with MinGW (GCC on Windows), statically link standard libraries 
+    # and hide the background console window (-mwindows)
+    if(MINGW)
+        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static -static-libgcc -static-libstdc++ -mwindows")
+    endif()
 endif()
 
+# Hide noisy output in MSVC
 if (MSVC)
     add_compile_options(/nologo)
-    add_compile_options(/FC-) # Usa /FC per path completi, /FC- non è un flag valido
-    
-    # Rimuovi /showIncludes da tutti i tipi di build
+    add_compile_options(/FC-)
+
     string(REPLACE "/showIncludes" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
     string(REPLACE "/showIncludes" "" CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
     string(REPLACE "/showIncludes" "" CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
@@ -109,84 +118,58 @@ if (MSVC)
     string(REPLACE "/showIncludes" "" CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL}")
 endif()
 
-# Sezione di configurazione specifica per macOS
-# (Questa parte deve essere dopo add_executable(${PROJECT_NAME} ${SRC_FILES}))
-
-# (Questa parte deve essere dopo add_executable(${PROJECT_NAME} ${SRC_FILES})
-# e dopo aver impostato MACOSX_BUNDLE TRUE tramite set_target_properties,
-# come suggerito nella mia revisione precedente del tuo CMakeLists.txt completo.)
-
+# --- macOS Specific Configuration ---
 if(APPLE)
-    # Imposta che l'app è un bundle macOS (questo è fondamentale, deve essere presente e TRUE)
+    # Set the app as a macOS Bundle 
     set_target_properties(${PROJECT_NAME} PROPERTIES
         MACOSX_BUNDLE TRUE
     )
 
-    # Specifica il framework OpenGL per macOS
+    # Specify OpenGL framework for macOS
     target_link_libraries(${PROJECT_NAME} PRIVATE "-framework OpenGL")
 
-    # --- Gestione Icona ---
-    # Il nome del file icona dentro il bundle
+    # App Icon handling
     set(MACOSX_BUNDLE_ICON_FILE "macos_icon.icns")
     set_target_properties(${PROJECT_NAME} PROPERTIES
         MACOSX_BUNDLE_ICON_FILE ${MACOSX_BUNDLE_ICON_FILE}
     )
 
-    # Il percorso del file icona sorgente
     set(ICON_SOURCE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/assets/macos_icon.icns")
-    
-    # Imposta la destinazione nel bundle e aggiungilo come "sorgente" al target
     set_source_files_properties(${ICON_SOURCE_PATH} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
     target_sources(${PROJECT_NAME} PRIVATE ${ICON_SOURCE_PATH})
 
-    # --- Gestione Immagini ---
+    # Images handling
     set(IMAGES_SOURCES
         "${CMAKE_CURRENT_SOURCE_DIR}/assets/images/steering_wheel.png"
         "${CMAKE_CURRENT_SOURCE_DIR}/assets/images/logo_erb.png"
+        "${CMAKE_CURRENT_SOURCE_DIR}/assets/images/icon.png"
     )
 
-    # Itera su ogni font per impostare la proprietà e aggiungerlo singolarmente
     foreach(IMAGE_FILE ${IMAGES_SOURCES})
-        # Se vuoi i font in una sottocartella "fonts" dentro Resources:
-        # Estrai solo il nome del file per creare il percorso relativo
         get_filename_component(IMAGE_NAME ${IMAGE_FILE} NAME)
         set_source_files_properties(${IMAGE_FILE} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources/images/")
-        
-        # Aggiungilo come sorgente individuale
         target_sources(${PROJECT_NAME} PRIVATE ${IMAGE_FILE})
     endforeach()
 
 
-    # --- Gestione Font ---
-    # Elenca i file dei font
+    # Fonts handling
     set(FONT_SOURCES
         "${CMAKE_CURRENT_SOURCE_DIR}/assets/fonts/RobotoCondensed-Regular.ttf"
         "${CMAKE_CURRENT_SOURCE_DIR}/assets/fonts/RobotoCondensed-Bold.ttf"
     )
 
-    # Itera su ogni font per impostare la proprietà e aggiungerlo singolarmente
     foreach(FONT_FILE ${FONT_SOURCES})
-        # Se vuoi i font in una sottocartella "fonts" dentro Resources:
-        # Estrai solo il nome del file per creare il percorso relativo
         get_filename_component(FONT_NAME ${FONT_FILE} NAME)
         set_source_files_properties(${FONT_FILE} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources/fonts/")
-        
-        # Aggiungilo come sorgente individuale
         target_sources(${PROJECT_NAME} PRIVATE ${FONT_FILE})
     endforeach()
 
-    # --- Gestione Configurazione ImGui Default ---
+    # Default ImGui Config handling
     set(IMGUI_CONFIG_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/assets/resources/imgui.ini")
     
-    # Imposta la destinazione direttamente nella cartella Resources (senza sottocartelle)
     set_source_files_properties(${IMGUI_CONFIG_SOURCE} PROPERTIES 
         MACOSX_PACKAGE_LOCATION "Resources"
     )
     
-    # Aggiungi il file alle sorgenti del target
     target_sources(${PROJECT_NAME} PRIVATE ${IMGUI_CONFIG_SOURCE})
-
-    # Se avessi altre risorse (immagini, ecc.) potresti creare liste simili
-    # e usare un foreach per gestirle singolarmente.
-
 endif()

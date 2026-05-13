@@ -2,26 +2,26 @@
 #include <string>
 #include <optional>
 #include <algorithm> 
-#include "UI/PlaybackControlsWindow.hpp"
 #include "UI/UIManager.hpp"
+#include "UI/PlaybackControlsWindow.hpp"
 #include "Telemetry/Services/ServiceManager.hpp"
 #include "Telemetry/file_reading/PlaybackManager.hpp"
 
 PlaybackControlsWindow::PlaybackControlsWindow(UiManager* manager) : m_uiManager(manager) {}
 
 void PlaybackControlsWindow::draw() {
-    ImGui::Begin("Controlli Riproduzione");
+    ImGui::Begin("Playback control");
     
     PlaybackManager* playbackManager = ServiceManager::getPlaybackManager();
     if (!playbackManager) {
-        ImGui::Text("PlaybackManager non disponibile.");
+        ImGui::Text("PlaybackManager not available.");
         ImGui::End();
         return;
     }
     
     size_t totalRows = playbackManager->getTotalRows();
     if (totalRows == 0) {
-        ImGui::Text("Nessun dato caricato.");
+        ImGui::Text("No data loaded.");
         ImGui::End();
         return;
     }
@@ -29,7 +29,7 @@ void PlaybackControlsWindow::draw() {
     if (m_uiManager && m_uiManager->font_label) {
         ImGui::PushFont(m_uiManager->font_label);
     }
-    ImGui::Text("Indice temporale");
+    ImGui::Text("Temporal index");
     if (m_uiManager && m_uiManager->font_label) {
         ImGui::PopFont();
     }
@@ -38,13 +38,13 @@ void PlaybackControlsWindow::draw() {
     m_sliderPosition = static_cast<int>(playbackManager->getCurrentIndex());
 
     std::string label = std::to_string(m_sliderPosition + 1) + " / " + std::to_string(totalRows);
-    ImGui::PushItemWidth(-FLT_MIN); // -FLT_MIN è l'idioma per "usa tutto lo spazio disponibile"
+    ImGui::PushItemWidth(-FLT_MIN); // -FLT_MIN to align to the right edge
     bool slider_activated = ImGui::SliderInt("##TimelineSlider", &m_sliderPosition, 0, totalRows > 0 ? totalRows - 1 : 0, label.c_str());
     ImGui::PopItemWidth();
 
     ImGui::Spacing();
 
-    // Recupera prima i dati del timestamp
+    // Get data for timestamp display
     std::string timeStr = "--.---";
     if (auto rowOpt = playbackManager->getRowAtIndex(m_sliderPosition)) {
         if (rowOpt->count("timestamp")) {
@@ -56,7 +56,7 @@ void PlaybackControlsWindow::draw() {
     float spacingWidth = ImGui::GetStyle().ItemSpacing.x;
 
     if (m_uiManager && m_uiManager->font_data) ImGui::PushFont(m_uiManager->font_data);
-    const std::string timeLabel = "Timestamp: " + timeStr + " s"; // Solo il timestamp!
+    const std::string timeLabel = "Timestamp: " + timeStr + " s"; 
     float textWidth = ImGui::CalcTextSize(timeLabel.c_str()).x;
     if (m_uiManager && m_uiManager->font_data) ImGui::PopFont();
 
@@ -78,7 +78,7 @@ void PlaybackControlsWindow::draw() {
 
     ImGui::BeginGroup();
     if (m_uiManager && m_uiManager->font_data) ImGui::PushFont(m_uiManager->font_data);
-    ImGui::TextUnformatted(timeLabel.c_str()); // Togli il text del Giorno
+    ImGui::TextUnformatted(timeLabel.c_str()); 
     if (m_uiManager && m_uiManager->font_data) ImGui::PopFont();
     ImGui::EndGroup();
 
@@ -91,7 +91,6 @@ void PlaybackControlsWindow::draw() {
         }
     }
 
-    // Aggiorna il PlaybackManager se l'indice è cambiato
     if (slider_activated || index_changed_by_buttons) {
         playbackManager->setCurrentIndex(static_cast<size_t>(m_sliderPosition));
     }

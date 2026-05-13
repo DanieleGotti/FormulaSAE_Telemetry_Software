@@ -1,12 +1,11 @@
 #include <imgui.h>
 #include <string>
 #include <algorithm>
-#include "UI/StatusWindow.hpp"
 #include "UI/UIManager.hpp"
+#include "UI/StatusWindow.hpp"
 #include "Telemetry/Services/ServiceManager.hpp"
 #include "Telemetry/file_reading/PlaybackManager.hpp"
 
-// Funzioni helper per ricavare il numero dalla stringa
 static std::string formatInverterFsm(const std::string& stateStr) {
     const char* states[] = {"OFF", "SYSTEM_READY", "DC_CAPACITOR_CHARGE", "DC_OK", 
                             "ENABLE_INVERTER", "ENABLED", "ON", "OK", "ERROR"};
@@ -63,7 +62,6 @@ void StatusWindow::drawLed(const char* label, bool state) {
 }
 
 void StatusWindow::drawBattery(int soc) {
-    // Stessa altezza calcolata per i campi FSM: box_height = ImGui::GetTextLineHeightWithSpacing() * 1.25f;
     float h = ImGui::GetTextLineHeightWithSpacing() * 1.5f; 
     float w = 84.0f;  
     float polo_w = 4.0f;
@@ -71,14 +69,11 @@ void StatusWindow::drawBattery(int soc) {
     ImVec2 p = ImGui::GetCursorScreenPos();
     ImDrawList* draw_list = ImGui::GetWindowDrawList();
 
-    // Colori
     ImU32 outlineColor = m_uiManager->m_isDarkTheme ? IM_COL32(220, 220, 220, 255) : IM_COL32(40, 40, 40, 255);
     
-    // Corpo e polo
     draw_list->AddRect(p, ImVec2(p.x + w, p.y + h), outlineColor, 2.0f, 0, 2.0f);
     draw_list->AddRectFilled(ImVec2(p.x + w, p.y + h * 0.3f), ImVec2(p.x + w + polo_w, p.y + h * 0.7f), outlineColor, 1.0f);
 
-    // Riempimento dinamico
     ImU32 fillColor;
     if (soc > 50) fillColor = IM_COL32(25, 204, 25, 255);        
     else if (soc > 20) fillColor = IM_COL32(255, 128, 0, 255); 
@@ -89,15 +84,13 @@ void StatusWindow::drawBattery(int soc) {
         draw_list->AddRectFilled(ImVec2(p.x + 2.0f, p.y + 2.0f), ImVec2(p.x + 2.0f + fillWidth, p.y + h - 2.0f), fillColor, 1.0f);
     }
 
-    // Dummy per occupare l'ingombro reale nel layout di ImGui
     ImGui::Dummy(ImVec2(w + polo_w, h));
 }
 
 void StatusWindow::draw() {
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8.0f, 8.0f));
     
-    // RIMOSSI I FLAG DI NO-SCROLL: ora se stringi verso l'alto apparirà la scrollbar
-    ImGui::Begin("Pannello stati", nullptr); 
+    ImGui::Begin("Status panel", nullptr); 
     ImGui::PopStyleVar();
 
     bool r2dState = false; 
@@ -144,13 +137,12 @@ void StatusWindow::draw() {
     std::string formattedTs = formatTractiveFsm(tsFsm);
     std::string formattedEcuMode = formatEcuMode(ecuMode);
 
-    if (ImGui::BeginTable("StatusTable", 3, ImGuiTableFlags_BordersInnerV | ImGuiTableFlags_SizingFixedFit)) {
+    if (ImGui::BeginTable("Status table", 3, ImGuiTableFlags_BordersInnerV | ImGuiTableFlags_SizingFixedFit)) {
         
         ImGui::TableSetupColumn("LEDs", ImGuiTableColumnFlags_WidthFixed, 240.0f);
         ImGui::TableSetupColumn("FSMs", ImGuiTableColumnFlags_WidthStretch);
         ImGui::TableSetupColumn("Battery", ImGuiTableColumnFlags_WidthFixed, 160.0f);
 
-        // --- RIGA TITOLI ---
         ImGui::TableNextRow();
         
         ImGui::TableSetColumnIndex(0);
@@ -165,10 +157,8 @@ void StatusWindow::draw() {
         ImGui::PushFont(m_uiManager->font_label); ImGui::Text("State of charge"); ImGui::PopFont();
         ImGui::Separator();
 
-        // --- RIGA CONTENUTI ---
         ImGui::TableNextRow();
 
-        // CELLA 1: LED 
         ImGui::TableSetColumnIndex(0);
         ImGui::Spacing();
         ImGui::BeginGroup();
@@ -176,7 +166,6 @@ void StatusWindow::draw() {
         drawLed("Reset button", resetState); ImGui::SameLine(100.0f); drawLed("TS ON button", tsOnState);
         ImGui::EndGroup();
 
-        // CELLA 2: FSM 
         ImGui::TableSetColumnIndex(1);
         ImGui::Spacing();
         
@@ -185,7 +174,6 @@ void StatusWindow::draw() {
         float box_width = (avail_w - (item_spacing * 3)) / 4.0f;
         if (box_width < 40.0f) box_width = 40.0f; 
         
-        // <-- ALTEZZA RIDOTTA DEI CAMPI NERI (da 1.6f a 1.25f per renderli più snelli)
         float box_height = ImGui::GetTextLineHeightWithSpacing() * 1.5f; 
 
         auto drawFsmBox = [&](const char* title, const char* id, const std::string& text) {
@@ -208,27 +196,23 @@ void StatusWindow::draw() {
         drawFsmBox("Tractive system FSM:", "TsPanel", formattedTs); ImGui::SameLine();
         drawFsmBox("ECU mode:", "EcuModePanel", formattedEcuMode); 
 
-        // CELLA 3: BATTERIA 
         ImGui::TableSetColumnIndex(2);
-        ImGui::Spacing(); // Fondamentale: allinea la partenza al livello delle altre celle
+        ImGui::Spacing(); 
         
         ImGui::BeginGroup();
         
-        // --- 1. TESTO PERCENTUALE (Allineato in Y con i titoli FSM) ---
         char soc_text[16];
         snprintf(soc_text, sizeof(soc_text), "%d%%", currentSoc);
         
-        // Centratura X del testo
         float cell_w = ImGui::GetContentRegionAvail().x;
         float text_w = ImGui::CalcTextSize(soc_text).x;
         ImGui::SetCursorPosX(ImGui::GetCursorPosX() + (cell_w - text_w) * 0.5f);
         
-        ImGui::PushFont(m_uiManager->font_label); // Usa lo stesso font dei titoli Inverter/TS
+        ImGui::PushFont(m_uiManager->font_label); 
         ImGui::Text("%s", soc_text);
         ImGui::PopFont();
-        
-        // --- 2. ICONA BATTERIA (Allineata in Y con i box FSM neri) ---
-        float batt_total_width = 84.0f + 4.0f; // Larghezza base (w) + polo_w
+
+        float batt_total_width = 84.0f + 4.0f; 
         ImGui::SetCursorPosX(ImGui::GetCursorPosX() + (cell_w - batt_total_width) * 0.5f);
         
         drawBattery(currentSoc);

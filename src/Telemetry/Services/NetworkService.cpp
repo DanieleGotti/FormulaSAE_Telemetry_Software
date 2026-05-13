@@ -1,7 +1,7 @@
 #include <iostream>
 #include "Telemetry/Services/NetworkService.hpp"
 
-// DA IMPLEMENTARE
+// TO BE IMPLEMENTED 
 
 bool NetworkService::configure(const NetworkConfig& config) {
     return true;

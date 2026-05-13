@@ -1,11 +1,10 @@
-#include <utils/IAssetManager.hpp>
 #include <windows.h>
 #include <string>
 #include <utility>
 #include <list>
 #include <cstring>
 #include <iostream>
-
+#include <utils/IAssetManager.hpp>
 #include "../../assets/resources.h"
 
 class AssetManager_Windows : public IAssetManager {
@@ -24,11 +23,11 @@ public:
         } else if (name == "RobotoCondensed-Bold.ttf") {
             resourceId = IDR_FONT_BOLD;
         } else {
-            std::cerr << "ERRORE [AssetManager]: Font non trovato nella risorsa: '" << name << "'." <<std::endl;
+            std::cerr << "ERROR [AssetManager]: Font not found in resource: '" << name << "'." <<std::endl;
             return {nullptr, 0};
         }
 
-        std::cout << "INFO [AssetManager]: Caricamento font '" << name << "'." << std::endl;
+        std::cout << "INFO [AssetManager]: Loading font '" << name << "'." << std::endl;
 
         HINSTANCE hInstance = GetModuleHandle(nullptr);
         HRSRC hRes = FindResource(hInstance, MAKEINTRESOURCE(resourceId), RT_RCDATA);
@@ -52,12 +51,14 @@ public:
             resourceId = IDI_ICON_STEER;
         } else if (path == "logo_erb.png") {
             resourceId = IDI_ICON_ERB; 
+        } else if (path == "icon.png") {
+            resourceId = IDI_ICON_LOGO;
         } else {
-            std::cerr << "ERRORE [AssetManager]: Immagine non trovata nella risorsa: '" << path << "'." << std::endl;
+            std::cerr << "ERROR [AssetManager]: Image not found in resource: '" << path << "'." << std::endl;
             return {nullptr, 0};
         }
 
-        std::cout << "INFO [AssetManager]: Caricamento immagine '" << path << "'." << std::endl;
+        std::cout << "INFO [AssetManager]: Loading image '" << path << "'." << std::endl;
 
         HINSTANCE hInstance = GetModuleHandle(nullptr);
         HRSRC hRes = FindResource(hInstance, MAKEINTRESOURCE(resourceId), RT_RCDATA);

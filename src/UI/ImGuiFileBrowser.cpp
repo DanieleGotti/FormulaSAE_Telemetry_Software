@@ -13,7 +13,7 @@
 #include <stdlib.h>
 #endif
 
-// Ricerca intelligente della cartella output_data
+// Smart logic to find a good default path for the file browser
 static std::filesystem::path GetDefaultPath() {
     std::filesystem::path exeDir;
 
@@ -39,7 +39,7 @@ static std::filesystem::path GetDefaultPath() {
         exeDir = std::filesystem::current_path();
     }
 
-    // Cerca la cartella "output_data" salendo di livello 
+    // Find output_data in the current or parent directories 
     std::filesystem::path searchPath = exeDir;
     for (int i = 0; i < 4; ++i) {
         std::filesystem::path target = searchPath / "output_data";
@@ -53,9 +53,9 @@ static std::filesystem::path GetDefaultPath() {
         }
     }
 
-    // Se non la trova la impostiamo accanto all'eseguibile per poi fargliela creare in automatico
+    // If it doesn't find it, we set it next to the executable for automatic creation
     #ifdef __APPLE__
-    // Su Mac, se siamo dentro un bundle (.app/Contents/MacOS), la mettiamo di fianco all'App
+    // On Mac if we are inside a bundle (.app/Contents/MacOS), we place it next to the App
     if (exeDir.string().find(".app/Contents/MacOS") != std::string::npos) {
         return exeDir.parent_path().parent_path().parent_path() / "output_data";
     }
@@ -67,14 +67,13 @@ static std::filesystem::path GetDefaultPath() {
 ImGuiFileBrowser::ImGuiFileBrowser() {
     m_currentPath = GetDefaultPath();
 
-    // Se la cartella non esiste la crea
+    // If the folder doesn't exist, create it
     if (!std::filesystem::exists(m_currentPath)) {
         try {
             std::filesystem::create_directories(m_currentPath);
-            std::cout << "INFO [FileBrowser]: Cartella output_data creata automaticamente in: " << m_currentPath.string() << std::endl;
+            std::cout << "INFO [FileBrowser]: Folder output_data created automatically in: " << m_currentPath.string() << std::endl;
         } catch (const std::exception& e) {
-            std::cerr << "ATTENZIONE [FileBrowser]: Impossibile creare output_data: " << e.what() << std::endl;
-            // Fallback di emergenza sicuro per Mac e Win
+            std::cerr << "WARNING [FileBrowser]: Failed to create output_data folder: " << e.what() << std::endl;
             #ifdef _WIN32
             m_currentPath = "C:\\";
             #else
@@ -96,7 +95,7 @@ void ImGuiFileBrowser::refreshFiles() {
             } else if (entry.is_regular_file()) {
                 std::string extension = entry.path().extension().string();
                 std::transform(extension.begin(), extension.end(), extension.begin(),[](unsigned char c){ return std::tolower(c); });
-                // Mostriamo solo .csv e .bin
+                // Only .csv and .bin
                 if (extension == ".csv" || extension == ".bin") {
                     m_currentFiles.push_back({entry.path().filename().string(), false});
                 }
@@ -107,7 +106,7 @@ void ImGuiFileBrowser::refreshFiles() {
             return a.name < b.name;
         });
     } catch(const std::exception& e) {
-        std::cerr << "ERRORE[FileBrowser]: Impossibile accedere a " << m_currentPath.string() << ". " << e.what() << std::endl;
+        std::cerr << "ERROR [FileBrowser]: Unable to access " << m_currentPath.string() << ". " << e.what() << std::endl;
         if (m_currentPath.has_parent_path()) {
             m_currentPath = m_currentPath.parent_path();
             refreshFiles();
@@ -129,28 +128,28 @@ std::optional<std::string> ImGuiFileBrowser::draw(const std::string& popup_id, b
     if (ImGui::BeginPopupModal(popup_id.c_str(), &is_open, ImGuiWindowFlags_None)) {
         
         if (m_currentPath.has_parent_path()) {
-            if (ImGui::Button("Indietro")) {
+            if (ImGui::Button("Back")) {
                 m_currentPath = m_currentPath.parent_path();
                 refreshFiles();
             }
         } else {
             ImGui::BeginDisabled();
-            ImGui::Button("Indietro");
+            ImGui::Button("Back");
             ImGui::EndDisabled();
         }
 
         ImGui::SameLine();
-        ImGui::Text("Percorso: %s", m_currentPath.string().c_str());
+        ImGui::Text("Path: %s", m_currentPath.string().c_str());
         ImGui::Separator();
 
-        ImGui::BeginChild("FileView", ImVec2(0, -ImGui::GetFrameHeightWithSpacing() * 2));
+        ImGui::BeginChild("File view", ImVec2(0, -ImGui::GetFrameHeightWithSpacing() * 2));
         
         if (m_currentFiles.empty()) {
-            ImGui::TextDisabled("Nessuna cartella o file compatibile trovato.");
+            ImGui::TextDisabled("No compatible folders or files found.");
         }
 
         for (const auto& entry : m_currentFiles) {
-            std::string label = (entry.is_directory ? "[Cartella] " : "[File]    ") + entry.name;
+            std::string label = (entry.is_directory ? "[Folder] " : "[File]    ") + entry.name;
             if (ImGui::Selectable(label.c_str(), (entry.name == m_selectedFile))) {
                 if (entry.is_directory) {
                     m_currentPath /= entry.name;
@@ -175,14 +174,14 @@ std::optional<std::string> ImGuiFileBrowser::draw(const std::string& popup_id, b
         
         ImGui::SameLine(ImGui::GetWindowContentRegionMax().x - 140);
 
-        if (ImGui::Button("Annulla", ImVec2(60, 0))) {
+        if (ImGui::Button("Cancel", ImVec2(60, 0))) {
             is_open = false;
         }
         ImGui::SameLine();
         if (m_selectedFile.empty()) {
             ImGui::BeginDisabled();
         }
-        if (ImGui::Button("Apri", ImVec2(60, 0))) {
+        if (ImGui::Button("Open", ImVec2(60, 0))) {
             result = (m_currentPath / m_selectedFile).string();
             is_open = false;
         }

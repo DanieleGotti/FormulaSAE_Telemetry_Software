@@ -20,6 +20,5 @@ private:
     int m_imgWidth = 0;
     int m_imgHeight = 0;
     
-    // Decidi tu qui la larghezza dell'immagine (in pixel)
     const float TARGET_IMAGE_WIDTH = 250.0f; 
 };

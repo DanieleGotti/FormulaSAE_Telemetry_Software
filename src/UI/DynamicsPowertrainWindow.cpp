@@ -18,14 +18,14 @@ void DynamicsPowertrainWindow::printValue(const std::string& label, const std::s
 
     auto it = dataMap.find(key);
     if (it != dataMap.end()) {
-        ImGui::PushFont(m_uiManager->font_body); // Valore in grassetto
+        ImGui::PushFont(m_uiManager->font_body); 
         float text_width = ImGui::CalcTextSize(it->second.c_str()).x;
-        ImGui::SameLine(190.0f - text_width); // Offset avvicinato
+        ImGui::SameLine(190.0f - text_width); 
         
-        ImGui::Text("%s", it->second.c_str()); // Colore default (si adatta al tema)
+        ImGui::Text("%s", it->second.c_str()); 
         ImGui::PopFont();
 
-        ImGui::SameLine(195.0f); // Offset unità
+        ImGui::SameLine(195.0f); 
         ImGui::PushFont(m_uiManager->font_body); 
         if (!unit.empty()) {
             ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "[%s]", unit.c_str());
@@ -35,9 +35,9 @@ void DynamicsPowertrainWindow::printValue(const std::string& label, const std::s
         ImGui::PopFont();
     } else {
         ImGui::PushFont(m_uiManager->font_body);
-        float text_width = ImGui::CalcTextSize("N/D").x;
+        float text_width = ImGui::CalcTextSize("Null").x;
         ImGui::SameLine(190.0f - text_width);
-        ImGui::Text("N/D");
+        ImGui::Text("Null");
         ImGui::PopFont();
     }
 }
@@ -122,7 +122,7 @@ void DynamicsPowertrainWindow::draw() {
         printValue("Right", "final_torque_target_R", dataToDisplay, "Nm"); 
 
     } else {
-        ImGui::Text("In attesa di dati.");
+        ImGui::Text("Waiting for data.");
     }
 
     ImGui::End();

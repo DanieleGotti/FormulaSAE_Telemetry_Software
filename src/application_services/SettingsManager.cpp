@@ -1,6 +1,6 @@
-#include <application_services/SettingsManager.hpp>
-#include <utils/fsUtils.hpp>
 #include <fstream>
+#include <utils/fsUtils.hpp>
+#include <application_services/SettingsManager.hpp>
 
 #define SETTINGSFILEPATH "settings/settings.json"
 
@@ -60,12 +60,12 @@ bool SettingsManager::parseJsonSettingsFile() {
     try {
         // Read config file
         m_settings = jsoncons::json::parse(file);
-        std::cout << "INFO [SettingsManager]: Opzioni caricate da '" << m_settingsFilePath << "'." << std::endl;
+        std::cout << "INFO [SettingsManager]: Settings loaded from '" << m_settingsFilePath << "'." << std::endl;
         std::cout << jsoncons::pretty_print(m_settings) << std::endl;
         file.close();
         return false;
     } catch(const jsoncons::ser_error &e) {
-        std::cerr << "ERRORE [SettingsManager]: Errore durante il parsing del json. " << std::endl;
+        std::cerr << "ERRORE [SettingsManager]: Error occurred while parsing the JSON. " << std::endl;
         file.close();
         return false;
     }

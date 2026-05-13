@@ -1,10 +1,9 @@
-#include "Telemetry/data_acquisition/PacketParser.hpp"
 #include <sstream>
 #include <iomanip>
 #include <iostream> 
+#include "Telemetry/data_acquisition/PacketParser.hpp"
 
-
-// --- FUNZIONI DI MAPPATURA 
+// Mapping functions to convert raw values into strings for specific fields 
 static std::string getEmmaErrorStr(uint16_t error) {
     if (error == 0) return "EMMA_STATUS_OK";
     
@@ -91,7 +90,7 @@ void PacketParser::populateRowFromA(const TelemetryPacket_t* dataA, const DbRow&
     double time_sec = dataA->timestamp * 0.005;
     row["timestamp"] = formatDouble(time_sec, 3);
     
-    // --- 1. DATI PACCHETTO A (5ms) TUTTI PRESENTI ---
+    // Data from packet 0xCC (5ms) with formatting and string conversion as needed
     row["front_left_velocity"] = formatDouble(dataA->front_left_velocity, 1);
     row["front_right_velocity"] = formatDouble(dataA->front_right_velocity, 1);
     row["rear_left_velocity"] = formatDouble(dataA->rear_left_velocity, 1);
@@ -145,12 +144,12 @@ void PacketParser::populateRowFromA(const TelemetryPacket_t* dataA, const DbRow&
     row["tractive_system_fsm"] = getTractiveFsmStr(dataA->tractive_system_fsm);
     row["ECU_Mode"] = getEcuModeStr(dataA->ECU_Mode);
 
-    // --- 2. DATI PACCHETTO B (200ms) INCOLLATI DALLA CACHE ---
+    // Data from packet 0xEE (200ms) 
     for (const auto& kv : cachedDataB) {
         row[kv.first] = kv.second;
     }
 
-    // --- 3. PACCHETTI PERSI ---
+    // Lost packet calculation
     row["lost_packets_A"] = std::to_string(m_lostA);
     row["lost_packets_B"] = std::to_string(m_lostB);
     row["lost_packets_tot"] = std::to_string(getTotalLost());
@@ -158,12 +157,12 @@ void PacketParser::populateRowFromA(const TelemetryPacket_t* dataA, const DbRow&
 
 void PacketParser::populateRowFromB(const TelemetryPacket_EMMA_t* data) {
     m_lastPacketBData["state_of_charge"] = std::to_string(data->state_of_charge);
-    // Srotoliamo i Volt in 14 colonne
+    // Looking at the Voltages in 14 columns
     for(int i=0; i<14; ++i) {
         float v_real = (static_cast<float>(data->module_voltage[i]) + 200.0f) / 100.0f;
         m_lastPacketBData["VoltageModule" + std::to_string(i+1)] = formatDouble(v_real, 2);
     }
-    // Srotoliamo le Temp in 28 colonne
+    // Looking at the Temperatures in 28 columns
     for(int i=0; i<28; ++i) {
         int mod = (i / 2) + 1;
         int tIdx = (i % 2) + 1;
@@ -176,7 +175,6 @@ bool PacketParser::parseLiveBytes(std::vector<uint8_t>& rxBuffer, DbRow& outRow)
         size_t syncIndex = std::string::npos;
         int packetType = 0; 
         
-        // Controllo Header modificato: 0xCC 0x11 per Type 1, 0xEE 0x11 per Type 2
         for (size_t i = 0; i < rxBuffer.size() - 1; ++i) {
             if (rxBuffer[i] == 0xCC && rxBuffer[i+1] == 0x11 && rxBuffer.size() - i >= sizeof(TelemetryPacket_t)) {
                 syncIndex = i; packetType = 1; break;
@@ -187,11 +185,11 @@ bool PacketParser::parseLiveBytes(std::vector<uint8_t>& rxBuffer, DbRow& outRow)
 
         if (syncIndex == std::string::npos) return false;
         
-        // 1. STAMPA DATI A CASO (Spazzatura prima dell'header)
+        // Trash bytes before the valid packet are discarded with a warning
         if (syncIndex > 0) {
-            // Estrapoliamo il timestamp del pacchetto BUONO (Attuale) a cui ci stiamo sincronizzando
+            // Extract the timestamp of the valid packet (current) to which we are synchronizing
             uint32_t currentTs = 0;
-            std::string pktName = (packetType == 1) ? "A" : "B";
+            std::string pktName = (packetType == 1) ? "0xCC" : "0xEE";
             
             if (packetType == 1) {
                 TelemetryPacket_t* tempA = reinterpret_cast<TelemetryPacket_t*>(rxBuffer.data() + syncIndex);
@@ -201,11 +199,9 @@ bool PacketParser::parseLiveBytes(std::vector<uint8_t>& rxBuffer, DbRow& outRow)
                 currentTs = tempB->timestamp;
             }
 
-            std::cerr << "\n[WARNING] Trovati " << syncIndex 
-                      << " byte di spazzatura prima di sincronizzarsi al pacchetto ATTUALE[" << pktName << " | Timestamp: " << currentTs << "].\n"
-                      << "          -> Questi byte scartati sono il residuo del pacchetto PRECEDENTE "
-                      << "(rotto/frammentato) o rumore di linea.\n"
-                      << "          -> Dati scartati: ";
+            std::cerr << "\n[WARNING] Finded " << syncIndex 
+                      << " bytes of garbage before the current packet [" << pktName << " | Timestamp: " << currentTs << "].\n"
+                      << "Discarded data: ";
             for (size_t k = 0; k < syncIndex; ++k) {
                 std::cerr << std::hex << std::uppercase << std::setw(2) << std::setfill('0') << (int)rxBuffer[k] << " ";
             }
@@ -213,8 +209,6 @@ bool PacketParser::parseLiveBytes(std::vector<uint8_t>& rxBuffer, DbRow& outRow)
             
             rxBuffer.erase(rxBuffer.begin(), rxBuffer.begin() + syncIndex);
         }
-        
-        // ORA IL PACCHETTO È SEMPRE ALL'INDICE 0
 
         if (packetType == 1) { 
             TelemetryPacket_t* dataA = reinterpret_cast<TelemetryPacket_t*>(rxBuffer.data());
@@ -222,7 +216,7 @@ bool PacketParser::parseLiveBytes(std::vector<uint8_t>& rxBuffer, DbRow& outRow)
             
             if (crcA == dataA->crc16) {
                 
-                // --- INIZIO LOOKAHEAD (Gestione Sincronia .BIN) ---
+                // Lookahead to check if the next packet is a valid 0xEE and if so, parse it immediately to have the freshest data for the combined row
                 size_t packetB_start = sizeof(TelemetryPacket_t);
                 
                 if (rxBuffer.size() >= packetB_start + 2) {
@@ -266,7 +260,6 @@ bool PacketParser::parseLiveBytes(std::vector<uint8_t>& rxBuffer, DbRow& outRow)
                 } else if (rxBuffer.size() >= packetB_start && rxBuffer.size() < packetB_start + 2) {
                     return false;
                 }
-                // --- FINE LOOKAHEAD ---
 
                 if (!m_firstA && dataA->timestamp > m_lastTimestampA) {
                     uint32_t diff = dataA->timestamp - m_lastTimestampA;
@@ -282,10 +275,8 @@ bool PacketParser::parseLiveBytes(std::vector<uint8_t>& rxBuffer, DbRow& outRow)
                 return true; 
                 
             } else {
-                std::cerr << "\n[ERROR] Pacchetto A corrotto! (Timestamp letto: " << dataA->timestamp << ") CRC atteso: 0x" 
-                          << std::hex << dataA->crc16 << ", Calcolato: 0x" << crcA 
-                          << std::dec << ".\n          -> Elimino 1 byte di sync per forzare la risincronizzazione del buffer." << std::endl;
-                          
+                std::cerr << "\n[ERROR] Packet 0xCC corrupted (timestamp: " << dataA->timestamp << ") CRC expected: 0x" 
+                          << std::hex << dataA->crc16 << ", CRC calculated: 0x" << crcA << std::dec << ".\n" << std::endl;         
                 rxBuffer.erase(rxBuffer.begin(), rxBuffer.begin() + 1); 
             }
             
@@ -305,10 +296,8 @@ bool PacketParser::parseLiveBytes(std::vector<uint8_t>& rxBuffer, DbRow& outRow)
                 populateRowFromB(data); 
                 rxBuffer.erase(rxBuffer.begin(), rxBuffer.begin() + sizeof(TelemetryPacket_EMMA_t));
             } else {
-                std::cerr << "\n[ERROR] Pacchetto B (EMMA) corrotto! (Timestamp letto: " << data->timestamp << ") CRC atteso: 0x" 
-                          << std::hex << data->crc16 << ", Calcolato: 0x" << crc 
-                          << std::dec << ".\n          -> Elimino 1 byte di sync per forzare la risincronizzazione del buffer." << std::endl;
-                          
+                std::cerr << "\n[ERROR] Packet 0xEE corrupted (timestamp: " << data->timestamp << ") CRC expected: 0x" 
+                          << std::hex << data->crc16 << ", CRC calculated: 0x" << crc << std::dec << ".\n" << std::endl;
                 rxBuffer.erase(rxBuffer.begin(), rxBuffer.begin() + 1);
             }
         }
@@ -329,6 +318,7 @@ bool PacketParser::parseCsvLine(const std::string& line, DbRow& outRow) {
     return idx > 1;
 }
 
+// Dateset column order for CSV output and internal processing 
 std::vector<std::string> PacketParser::getColumnOrder() {
     std::vector<std::string> cols = {
         "timestamp", 
@@ -350,16 +340,14 @@ std::vector<std::string> PacketParser::getColumnOrder() {
         "state_of_charge", 
     };
     
-    // Le 14 tensioni
     for(int i=1; i<=14; ++i) cols.push_back("VoltageModule" + std::to_string(i));
     
-    // Le 28 temperature
     for(int i=1; i<=14; ++i) {
         cols.push_back("Temperature1Module" + std::to_string(i));
         cols.push_back("Temperature2Module" + std::to_string(i));
     }
     
-    // Campi statistici aggiunti dinamicamente dalla varianza (così vengono mostrati nel CSV/Dataset)
+    // Statistics fields added dynamically from variance (so they are shown in CSV/Dataset)
     const std::vector<std::string> targetSensors = {"accelerator1", "accelerator2", "brake1", "brake2", "steer"};
     for (const auto& sensor : targetSensors) {
         cols.push_back(sensor + "_mean"); 

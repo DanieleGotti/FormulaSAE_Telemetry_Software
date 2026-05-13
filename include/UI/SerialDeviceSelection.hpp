@@ -8,9 +8,9 @@ class UiManager;
 
 class SerialDeviceSelection : public UIElement {
 public:
-    // Funzione che accetta porta (stringa) e baudrate (intero)
+    // Function that accepts a port and baudrate
     using ConnectCallback = std::function<void(const std::string&, int)>;
-    // Quando si preme il pulsante "Connetti"
+    // When the "Connect" button is pressed
     explicit SerialDeviceSelection(UiManager* manager, ConnectCallback onConnectCallback);
     void draw() override;
 

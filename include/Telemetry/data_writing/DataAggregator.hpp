@@ -24,14 +24,14 @@ private:
 
     double m_statsWindowStart = -1.0;
     
-    // Buffer per accumulare i dati nei 3 secondi
+    // Buffer for accumulating data over 3 seconds
     std::map<std::string, std::vector<double>> m_currentBuffers;
     
-    // Mantiene l'ultima statistica valida per stamparla in UI e CSV
+    // Mantain last valid statistics for printing in UI and CSV
     std::map<std::string, StatData> m_lastPublishedStats;
 
     const std::vector<std::string> m_targetSensors = {
         "accelerator1", "accelerator2", "brake1", "brake2", "steer"
     };
-    const double STATS_WINDOW = 3.0; // Secondi esatti
+    const double STATS_WINDOW = 3.0; // expected time window for stats calculation in seconds
 };

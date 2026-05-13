@@ -20,7 +20,7 @@ void InverterDataWindow::printValue(const std::string& label, const std::string&
     if (it != dataMap.end()) {
         ImGui::PushFont(m_uiManager->font_body); 
         float text_width = ImGui::CalcTextSize(it->second.c_str()).x;
-        ImGui::SameLine(140.0f - text_width); // Stesso offset di Dynamics per coerenza visiva
+        ImGui::SameLine(140.0f - text_width); 
         
         ImGui::Text("%s", it->second.c_str()); 
         ImGui::PopFont();
@@ -35,17 +35,17 @@ void InverterDataWindow::printValue(const std::string& label, const std::string&
         ImGui::PopFont();
     } else {
         ImGui::PushFont(m_uiManager->font_body);
-        float text_width = ImGui::CalcTextSize("N/D").x;
+        float text_width = ImGui::CalcTextSize("Null").x;
         ImGui::SameLine(140.0f - text_width);
-        ImGui::Text("N/D");
+        ImGui::Text("Null");
         ImGui::PopFont();
     }
 }
 
 ImVec4 InverterDataWindow::getColorForThreshold(float value, float limitGreen, float limitRed) {
-    if (value <= limitGreen) return ImVec4(0.1f, 0.8f, 0.1f, 1.0f);       // Verde scuro
-    else if (value >= limitRed) return ImVec4(0.85f, 0.1f, 0.1f, 1.0f);   // Rosso scuro
-    else return ImVec4(1.0f, 0.5f, 0.0f, 1.0f);                           // Arancione
+    if (value <= limitGreen) return ImVec4(0.1f, 0.8f, 0.1f, 1.0f);       
+    else if (value >= limitRed) return ImVec4(0.85f, 0.1f, 0.1f, 1.0f);   
+    else return ImVec4(1.0f, 0.5f, 0.0f, 1.0f);                           
 }
 
 void InverterDataWindow::printColoredValue(const std::string& label, const std::string& key, const DbRow& dataMap, float limitGreen, float limitRed) {
@@ -60,7 +60,7 @@ void InverterDataWindow::printColoredValue(const std::string& label, const std::
             
             ImGui::PushFont(m_uiManager->font_body);
             float text_width = ImGui::CalcTextSize(strVal.c_str()).x;
-            ImGui::SameLine(140.0f - text_width); // Stesso offset per allineamento UI perfetto
+            ImGui::SameLine(140.0f - text_width); 
             ImGui::TextColored(color, "%s", strVal.c_str());
             ImGui::PopFont();
 
@@ -70,20 +70,20 @@ void InverterDataWindow::printColoredValue(const std::string& label, const std::
             ImGui::PopFont();
             
             if (val >= limitRed && ImGui::IsItemHovered()) {
-                ImGui::SetTooltip("ATTENZIONE: Valore critico");
+                ImGui::SetTooltip("WARNING: critical value.");
             }
         } catch (const std::invalid_argument&) {
             ImGui::PushFont(m_uiManager->font_body);
-            float w = ImGui::CalcTextSize("NaN").x;
+            float w = ImGui::CalcTextSize("Null").x;
             ImGui::SameLine(140.0f - w);
-            ImGui::Text("NaN");
+            ImGui::Text("Null");
             ImGui::PopFont();
         }
     } else {
         ImGui::PushFont(m_uiManager->font_body);
-        float w = ImGui::CalcTextSize("N/D").x;
+        float w = ImGui::CalcTextSize("Null").x;
         ImGui::SameLine(140.0f - w);
-        ImGui::Text("N/D");
+        ImGui::Text("Null");
         ImGui::PopFont();
     }
 }
@@ -141,6 +141,9 @@ void InverterDataWindow::draw() {
 
         printColoredValue("Left", "inv_L_tempMotor", dataToDisplay, 100.0f, 120.0f);
         printColoredValue("Right", "inv_R_tempMotor", dataToDisplay, 100.0f,120.0f);
+
+        ImGui::Spacing();
+        ImGui::Separator();
         
         ImGui::PushFont(m_uiManager->font_label);
         ImGui::Text("Cooling pumps temperature");
@@ -151,7 +154,7 @@ void InverterDataWindow::draw() {
         printColoredValue("Right", "right_coolant_temp", dataToDisplay, 100.0f,120.0f);
         
     } else {
-        ImGui::Text("In attesa di dati.");
+        ImGui::Text("Waiting for data.");
     }
 
     ImGui::End();

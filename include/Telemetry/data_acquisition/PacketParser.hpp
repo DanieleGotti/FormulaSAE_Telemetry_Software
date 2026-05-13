@@ -106,10 +106,10 @@ class PacketParser {
 public:
     PacketParser();
 
-    // LIVE: Estrae i pacchetti dai byte in ingresso. Ritorna true e compila l'outRow se trova un pacchetto da 5ms.
+    // LIVE: extract packets from incoming bytes. Returns true and populates outRow if a 5ms packet is found
     bool parseLiveBytes(std::vector<uint8_t>& rxBuffer, DbRow& outRow);
     
-    // FILE: Converte la riga del CSV in una mappa
+    // FILE: Converts a CSV line into a map
     bool parseCsvLine(const std::string& line, DbRow& outRow);
 
     void resetCounters();
@@ -131,6 +131,6 @@ private:
     bool m_firstA = true;
     bool m_firstB = true;
 
-    // Memoria per incollare le celle del pacchetto 200ms nel pacchetto 5ms
+    // Memory for pasting cells from the 200ms packet into the 5ms packet
     DbRow m_lastPacketBData; 
 };

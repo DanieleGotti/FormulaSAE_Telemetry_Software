@@ -38,7 +38,7 @@ static std::array<ImVec2, 4> GetRotatedQuadPoints(const ImVec2& center, float si
 SteerWindow::SteerWindow(UiManager* manager) : m_uiManager(manager) {
     bool ret = loadTextureFromMemory("steering_wheel.png", &m_wheelTextureID, &m_wheelWidth, &m_wheelHeight);
     if (!ret) {
-        std::cerr << "ERRORE [SteerWindow]: Impossibile caricare l'immagine 'steering_wheel.png'." << std::endl;
+        std::cerr << "ERROR [SteerWindow]: Failed to load image 'steering_wheel.png'." << std::endl;
     }
 }
 
@@ -63,24 +63,23 @@ void SteerWindow::draw() {
     float current_angle = 0.0f;
 
     if (m_uiManager->getCurrentState() == AppState::CONNECTED_PLAYBACK) {
-        // Modalità lettura da file 
+        // Playback mode
         auto playbackManager = ServiceManager::getPlaybackManager();
         if (auto rowOpt = playbackManager->getCurrentRow()) {
             try {
                 current_angle = std::stof(rowOpt->at("steer"));
             } catch (const std::exception& e) {
-                // In caso di errore l'angolo rimane 0.
+                // In case of error, the angle remains 0
             }
         }
     } else {
-        // Modalità live
+        // Live mode
         std::lock_guard<std::mutex> lock(m_dataMutex);
         current_angle = m_steeringAngle;
     }
 
     ImGui::Spacing();
 
-    // Disegna il volante
     if (m_wheelTextureID) {
         ImDrawList* draw_list = ImGui::GetWindowDrawList();
         ImVec2 window_pos = ImGui::GetCursorScreenPos();
@@ -89,10 +88,8 @@ void SteerWindow::draw() {
         float bottom_padding = 30.0f;
         float image_size = std::min(available_space.x, available_space.y - bottom_padding) * 0.9f;
         
-        // Centro l'immagine considerando lo spazio disponibile
         ImVec2 image_center(window_pos.x + available_space.x * 0.5f, window_pos.y + (available_space.y - bottom_padding) * 0.5f);
 
-        // Disegna l'immagine del volante ruotata
         auto vertices = GetRotatedQuadPoints(image_center, image_size, current_angle);
         ImU32 tint_color = m_uiManager->m_isDarkTheme ? IM_COL32(200, 200, 200, 255) : IM_COL32(80, 80, 80, 255);
         draw_list->AddImageQuad(
@@ -102,14 +99,12 @@ void SteerWindow::draw() {
             tint_color
         );
 
-        // Linea fissa in alto che indica il centro
         float fixed_line_length = 15.0f;
         ImVec2 fixed_line_start(image_center.x, window_pos.y);
         ImVec2 fixed_line_end(image_center.x, window_pos.y + fixed_line_length);
         ImU32 fixed_line_color = m_uiManager->m_isDarkTheme ? IM_COL32(200, 200, 200, 255) : IM_COL32(0, 0, 0, 255);
         draw_list->AddLine(fixed_line_start, fixed_line_end, fixed_line_color, 2.0f);
 
-        // Linea rossa che ruota insieme al volante
         float angle_rad = current_angle * PI / 180.0f;
         float start_radius = image_size * 0.35f; 
         float end_radius = image_size * 0.45f;   
@@ -123,14 +118,11 @@ void SteerWindow::draw() {
         );
         draw_list->AddLine(rotating_line_start, rotating_line_end, IM_COL32(255, 0, 0, 255), 3.0f);
 
-        // Valore dell'angolo sotto il volante (Ancorato al fondo assoluto)
         char angle_text[16];
         ImGui::PushFont(m_uiManager->font_body);
         snprintf(angle_text, 16, "%.1f°", current_angle);
         ImVec2 angle_text_size = ImGui::CalcTextSize(angle_text);
         
-        // La X usa image_center per rimanere in asse col volante.
-        // La Y calcola il limite inferiore della finestra e sottrae l'altezza del testo e il margine.
         ImVec2 text_pos(
             image_center.x - angle_text_size.x * 0.5f, 
             window_pos.y + available_space.y - angle_text_size.y - 20.0f
@@ -163,7 +155,7 @@ bool SteerWindow::loadTextureFromFile(const char* filename, GLuint* out_texture,
 bool SteerWindow::loadTextureFromMemory(const char* filename, GLuint* out_texture, int* out_width, int* out_height) {
     auto [pData, dataSize] = ServiceManager::getAssetManager()->getImage(filename);
     if (!pData || dataSize == 0) {
-        std::cerr << "ERRORE [SteerWindow]: Impossibile caricare asset '" << filename << "'." << std::endl;
+        std::cerr << "ERROR [SteerWindow]: Failed to load asset '" << filename << "'." << std::endl;
         return false;
     }
 
@@ -182,6 +174,6 @@ bool SteerWindow::loadTextureFromMemory(const char* filename, GLuint* out_textur
     stbi_image_free(image_data);
 
     *out_texture = image_texture; *out_width = image_width; *out_height = image_height;
-    std::cout << "INFO [SteerWindow]: Immagine '" << filename << "' caricata." << std::endl;
+    std::cout << "INFO [SteerWindow]: Image '" << filename << "' loaded." << std::endl;
     return true;
 }

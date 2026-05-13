@@ -1,5 +1,5 @@
-#include "Telemetry/data_writing/DataManager.hpp"
 #include <algorithm>
+#include "Telemetry/data_writing/DataManager.hpp"
 
 void DataManager::addSubscriber(IAggregatedDataSubscriber* subscriber) {
     std::lock_guard<std::mutex> lock(m_subscriberMutex);
@@ -24,12 +24,12 @@ void DataManager::removeLogSubscriber(IAggregatedDataSubscriber* subscriber) {
 void DataManager::processData(const DbRow& row) {
     std::lock_guard<std::mutex> lock(m_subscriberMutex);
     
-    // 1. Invia immediatamente i dati ai loggers (Dataset/CSV) senza limiti di velocità
+    // Send immediately the data to the loggers (Dataset/CSV) without speed limits
     for (IAggregatedDataSubscriber* sub : m_logSubscribers) {
         if (sub) sub->onAggregatedDataReceived(row);
     }
 
-    // 2. Limita l'aggiornamento della UI a 1 decimo di secondo (10 Hz)
+    // Limit the UI update to 1 tenth of a second (10 Hz)
     auto now = std::chrono::steady_clock::now();
     if (std::chrono::duration_cast<std::chrono::milliseconds>(now - m_lastUiUpdate).count() >= 100) {
         for (IAggregatedDataSubscriber* sub : m_subscribers) {
