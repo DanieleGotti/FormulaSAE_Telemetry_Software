@@ -311,11 +311,19 @@ void UiManager::draw() {
         if (glfwGetTime() - m_splashStartTime > 4.0) {
             
             glfwHideWindow((GLFWwindow*)m_window);
-
             m_currentState = AppState::CONFIGURING; 
         
             glfwSetWindowAttrib((GLFWwindow*)m_window, GLFW_DECORATED, GLFW_TRUE);
+
+#if defined(__APPLE__)
+            // On macOS, maximize doesn't work well with the way we handle the splash screen
+            int xpos, ypos, width, height;
+            glfwGetMonitorWorkarea(glfwGetPrimaryMonitor(), &xpos, &ypos, &width, &height);
+            glfwSetWindowPos((GLFWwindow*)m_window, xpos, ypos);
+            glfwSetWindowSize((GLFWwindow*)m_window, width, height);
+#else
             glfwMaximizeWindow((GLFWwindow*)m_window);
+#endif
             glfwShowWindow((GLFWwindow*)m_window);
 
             if (m_splashTextureID) {

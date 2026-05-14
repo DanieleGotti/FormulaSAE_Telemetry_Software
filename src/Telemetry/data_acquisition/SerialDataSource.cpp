@@ -14,6 +14,8 @@
     #include <termios.h>
     #include <stdio.h>
     #include <regex>
+    #include <sys/ioctl.h>
+    #include <IOKit/serial/ioss.h>
 #endif
 #include <thread>
 
@@ -166,67 +168,44 @@ bool SerialDataSource::open(const std::string &resource, int baudRate)
     int flags = fcntl(fd, F_GETFL, 0);
     fcntl(fd, F_SETFL, flags | O_NONBLOCK);
     if(fd < 0) {
-        std::cerr << "ERROR [SerialDataSource]: Failed to open serial port: " << resource << "." << std::endl;
+        std::cerr << "ERROR [SerialDataSource]: Failed to open serial port." << std::endl;
         return false;
     }
 
     struct termios tty{};
     if(tcgetattr(fd, &tty) != 0) {
         std::cerr << "ERROR [SerialDataSource]: Failed to get serial port parameters." << std::endl;
-        ::close(fd);
-        fd = -1;
+        ::close(fd); fd = -1;
         return false;
     }
 
-    // Map baud rate
-    speed_t speed;
-    switch(baudRate) {
-        case 300: speed = B300; break;
-        case 600: speed = B600; break;
-        case 1200: speed = B1200; break;
-        case 2400: speed = B2400; break;
-        case 4800: speed = B4800; break;
-        case 9600: speed = B9600; break;
-        case 19200: speed = B19200; break;
-        case 38400: speed = B38400; break;
-        case 57600: speed = B57600; break;
-        case 115200: speed = B115200; break;
-        case 128000: speed = B128000; break;
-        case 256000: speed = B256000; break;
-        case 500000: speed = B500000; break;
-        default:
-            std::cerr << "ERROR [SerialDataSource]: Baud rate not supported: " << baudRate << "." << std::endl;
-            ::close(fd);
-            fd = -1;
-            return false;
-    }
-
-    cfsetospeed(&tty, speed);
-    cfsetispeed(&tty, speed);
-
-    tty.c_cflag = (tty.c_cflag & ~CSIZE) | CS8;     // 8-bit chars
-    tty.c_iflag &= ~IGNBRK;         // disable break processing
-    tty.c_lflag = 0;                // no signaling chars, no echo, no canonical processing
-    tty.c_oflag = 0;                // no remapping, no delays
-    tty.c_cc[VMIN]  = 0;            // read blocks until at least 1 char is available
-    tty.c_cc[VTIME] = 0;            // 0.1 seconds read timeout
-
-    tty.c_iflag &= ~(IXON | IXOFF | IXANY); // shut off xon/xoff ctrl
-    tty.c_cflag |= (CLOCAL | CREAD); // ignore modem controls, enable reading
-    tty.c_cflag &= ~(PARENB | PARODD); // shut off parity
-    tty.c_cflag &= ~CSTOPB; // 1 stop bit
-    tty.c_cflag &= ~CRTSCTS; // no hardware flow control
+    // Standard configuration 8N1
+    tty.c_cflag = (tty.c_cflag & ~CSIZE) | CS8;     
+    tty.c_iflag &= ~IGNBRK;         
+    tty.c_lflag = 0;                
+    tty.c_oflag = 0;                
+    tty.c_cc[VMIN]  = 0;            
+    tty.c_cc[VTIME] = 0;            
+    tty.c_iflag &= ~(IXON | IXOFF | IXANY); 
+    tty.c_cflag |= (CLOCAL | CREAD);
+    tty.c_cflag &= ~(PARENB | PARODD);      
+    tty.c_cflag &= ~CSTOPB; 
+    tty.c_cflag &= ~CRTSCTS; 
 
     if(tcsetattr(fd, TCSANOW, &tty) != 0) {
         std::cerr << "ERROR [SerialDataSource]: Failed to set serial port parameters." << std::endl;
-        ::close(fd);
-        fd = -1;
+        ::close(fd); fd = -1;
         return false;
     }
 
-    // Remove any pending data from the input buffer to avoid old data and false packet loss
-    tcflush(fd, TCIOFLUSH);
+    speed_t speed = baudrate;
+    if (ioctl(fd, IOSSIOSPEED, &speed) == -1) {
+        std::cerr << "ERROR [SerialDataSource]: Baud rate not supported by Mac driver: " << baudrate << std::endl;
+        ::close(fd); fd = -1;
+        return false;
+    }
 
+    tcflush(fd, TCIOFLUSH);
     return true;
 #endif
 }
