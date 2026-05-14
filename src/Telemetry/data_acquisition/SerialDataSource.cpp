@@ -198,9 +198,9 @@ bool SerialDataSource::open(const std::string &resource, int baudRate)
         return false;
     }
 
-    speed_t speed = baudrate;
+    speed_t speed = baudRate;
     if (ioctl(fd, IOSSIOSPEED, &speed) == -1) {
-        std::cerr << "ERROR [SerialDataSource]: Baud rate not supported by Mac driver: " << baudrate << std::endl;
+        std::cerr << "ERROR [SerialDataSource]: Baud rate not supported by Mac driver: " << baudRate << std::endl;
         ::close(fd); fd = -1;
         return false;
     }
