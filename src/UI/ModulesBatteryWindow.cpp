@@ -53,51 +53,59 @@ ImVec4 ModulesBatteryWindow::getVoltageColor(float value) {
 void ModulesBatteryWindow::printValue(const std::string& label, const std::string& key, const DbRow& dataMap, const std::string& unit) {
     ImGui::Text("%s:", label.c_str());
 
+    std::string valStr = "Null";
     auto it = dataMap.find(key);
     if (it != dataMap.end()) {
-        ImGui::PushFont(m_uiManager->font_body); 
-        float text_width = ImGui::CalcTextSize(it->second.c_str()).x;
-        ImGui::SameLine(130.0f - text_width); 
-        ImGui::Text("%s", it->second.c_str()); 
-        ImGui::PopFont();
-
-        ImGui::SameLine(135.0f); 
-        ImGui::PushFont(m_uiManager->font_body);
-        if (!unit.empty()) {
-            ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "[%s]", unit.c_str());
-        } else {
-            ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "[-]");
-        }
-        ImGui::PopFont();
-    } else {
-        ImGui::PushFont(m_uiManager->font_body);
-        float text_width = ImGui::CalcTextSize("Null").x;
-        ImGui::SameLine(130.0f - text_width);
-        ImGui::Text("Null");
-        ImGui::PopFont();
+        valStr = it->second;
     }
+
+    std::string unitStr = unit.empty() ? "[-]" : "[" + unit + "]";
+
+    ImGui::PushFont(m_uiManager->font_body);
+    float valWidth = ImGui::CalcTextSize(valStr.c_str()).x;
+    float unitWidth = ImGui::CalcTextSize(unitStr.c_str()).x;
+    ImGui::PopFont();
+
+    float spacing = 5.0f;
+    float rightEdge = ImGui::GetWindowContentRegionMax().x;
+
+    ImGui::SameLine(rightEdge - unitWidth - spacing - valWidth);
+    ImGui::PushFont(m_uiManager->font_body);
+    ImGui::Text("%s", valStr.c_str());
+    ImGui::PopFont();
+
+    ImGui::SameLine(rightEdge - unitWidth);
+    ImGui::PushFont(m_uiManager->font_body);
+    ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "%s", unitStr.c_str());
+    ImGui::PopFont();
 }
 
-// Specific function to print EMMA error with decoding
 void ModulesBatteryWindow::printErrorValue(const std::string& label, const DbRow& dataMap) {
     ImGui::Text("%s:", label.c_str()); 
     
-    ImGui::SameLine(100.0f); 
-    
+    std::string formattedStr = "Null";
+    ImVec4 color = ImGui::GetStyleColorVec4(ImGuiCol_Text);
+
     auto it = dataMap.find("emma_error");
     if (it != dataMap.end()) {
-        std::string formattedStr = formatEmmaError(it->second);
-        
-        ImGui::PushFont(m_uiManager->font_body);
+        formattedStr = formatEmmaError(it->second);
         if (it->second == "EMMA_STATUS_OK") {
-            ImGui::TextColored(ImVec4(0.1f, 0.8f, 0.1f, 1.0f), "%s", formattedStr.c_str()); 
+            color = ImVec4(0.1f, 0.8f, 0.1f, 1.0f);
         } else {
-            ImGui::TextColored(ImVec4(0.85f, 0.1f, 0.1f, 1.0f), "%s", formattedStr.c_str()); 
+            color = ImVec4(0.85f, 0.1f, 0.1f, 1.0f);
         }
-        ImGui::PopFont();
-    } else {
-        ImGui::Text("Null");
     }
+
+    ImGui::PushFont(m_uiManager->font_body);
+    float textWidth = ImGui::CalcTextSize(formattedStr.c_str()).x;
+    ImGui::PopFont();
+
+    float rightEdge = ImGui::GetWindowContentRegionMax().x;
+
+    ImGui::SameLine(rightEdge - textWidth);
+    ImGui::PushFont(m_uiManager->font_body);
+    ImGui::TextColored(color, "%s", formattedStr.c_str());
+    ImGui::PopFont();
 }
 
 void ModulesBatteryWindow::drawModuleCard(int index, const DbRow& dataMap) {

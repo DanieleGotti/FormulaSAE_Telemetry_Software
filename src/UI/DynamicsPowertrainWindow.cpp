@@ -16,30 +16,31 @@ void DynamicsPowertrainWindow::onAggregatedDataReceived(const DbRow& dataRow) {
 void DynamicsPowertrainWindow::printValue(const std::string& label, const std::string& key, const DbRow& dataMap, const std::string& unit) {
     ImGui::Text("%s:", label.c_str());
 
+    std::string valStr = "Null";
     auto it = dataMap.find(key);
     if (it != dataMap.end()) {
-        ImGui::PushFont(m_uiManager->font_body); 
-        float text_width = ImGui::CalcTextSize(it->second.c_str()).x;
-        ImGui::SameLine(190.0f - text_width); 
-        
-        ImGui::Text("%s", it->second.c_str()); 
-        ImGui::PopFont();
-
-        ImGui::SameLine(195.0f); 
-        ImGui::PushFont(m_uiManager->font_body); 
-        if (!unit.empty()) {
-            ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "[%s]", unit.c_str());
-        } else {
-            ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "[-]");
-        }
-        ImGui::PopFont();
-    } else {
-        ImGui::PushFont(m_uiManager->font_body);
-        float text_width = ImGui::CalcTextSize("Null").x;
-        ImGui::SameLine(190.0f - text_width);
-        ImGui::Text("Null");
-        ImGui::PopFont();
+        valStr = it->second;
     }
+
+    std::string unitStr = unit.empty() ? "[-]" : "[" + unit + "]";
+
+    ImGui::PushFont(m_uiManager->font_body);
+    float valWidth = ImGui::CalcTextSize(valStr.c_str()).x;
+    float unitWidth = ImGui::CalcTextSize(unitStr.c_str()).x;
+    ImGui::PopFont();
+
+    float spacing = 5.0f;
+    float rightEdge = ImGui::GetWindowContentRegionMax().x;
+
+    ImGui::SameLine(rightEdge - unitWidth - spacing - valWidth);
+    ImGui::PushFont(m_uiManager->font_body);
+    ImGui::Text("%s", valStr.c_str());
+    ImGui::PopFont();
+
+    ImGui::SameLine(rightEdge - unitWidth);
+    ImGui::PushFont(m_uiManager->font_body);
+    ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "%s", unitStr.c_str());
+    ImGui::PopFont();
 }
 
 void DynamicsPowertrainWindow::draw() {

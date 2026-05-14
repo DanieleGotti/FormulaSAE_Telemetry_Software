@@ -16,76 +16,82 @@ void InverterDataWindow::onAggregatedDataReceived(const DbRow& dataRow) {
 void InverterDataWindow::printValue(const std::string& label, const std::string& key, const DbRow& dataMap, const std::string& unit) {
     ImGui::Text("%s:", label.c_str());
 
+    std::string valStr = "Null";
     auto it = dataMap.find(key);
     if (it != dataMap.end()) {
-        ImGui::PushFont(m_uiManager->font_body); 
-        float text_width = ImGui::CalcTextSize(it->second.c_str()).x;
-        ImGui::SameLine(140.0f - text_width); 
-        
-        ImGui::Text("%s", it->second.c_str()); 
-        ImGui::PopFont();
-
-        ImGui::SameLine(145.0f); 
-        ImGui::PushFont(m_uiManager->font_body); 
-        if (!unit.empty()) {
-            ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "[%s]", unit.c_str());
-        } else {
-            ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "[-]");
-        }
-        ImGui::PopFont();
-    } else {
-        ImGui::PushFont(m_uiManager->font_body);
-        float text_width = ImGui::CalcTextSize("Null").x;
-        ImGui::SameLine(140.0f - text_width);
-        ImGui::Text("Null");
-        ImGui::PopFont();
+        valStr = it->second;
     }
+
+    std::string unitStr = unit.empty() ? "[-]" : "[" + unit + "]";
+
+    ImGui::PushFont(m_uiManager->font_body);
+    float valWidth = ImGui::CalcTextSize(valStr.c_str()).x;
+    float unitWidth = ImGui::CalcTextSize(unitStr.c_str()).x;
+    ImGui::PopFont();
+
+    float spacing = 5.0f;
+    float rightEdge = ImGui::GetWindowContentRegionMax().x;
+
+    ImGui::SameLine(rightEdge - unitWidth - spacing - valWidth);
+    ImGui::PushFont(m_uiManager->font_body);
+    ImGui::Text("%s", valStr.c_str());
+    ImGui::PopFont();
+
+    ImGui::SameLine(rightEdge - unitWidth);
+    ImGui::PushFont(m_uiManager->font_body);
+    ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "%s", unitStr.c_str());
+    ImGui::PopFont();
+}
+
+void InverterDataWindow::printColoredValue(const std::string& label, const std::string& key, const DbRow& dataMap, float limitGreen, float limitRed) {
+    ImGui::Text("%s:", label.c_str());
+
+    std::string valStr = "Null";
+    std::string unitStr = "[°C]";
+    ImVec4 color = ImGui::GetStyleColorVec4(ImGuiCol_Text);
+    bool isValid = false;
+    float val = 0.0f;
+
+    auto it = dataMap.find(key);
+    if (it != dataMap.end()) {
+        valStr = it->second;
+        try {
+            val = std::stof(valStr);
+            color = getColorForThreshold(val, limitGreen, limitRed);
+            isValid = true;
+        } catch (...) {}
+    }
+
+    ImGui::PushFont(m_uiManager->font_body);
+    float valWidth = ImGui::CalcTextSize(valStr.c_str()).x;
+    float unitWidth = ImGui::CalcTextSize(unitStr.c_str()).x;
+    ImGui::PopFont();
+
+    float spacing = 5.0f;
+    float rightEdge = ImGui::GetWindowContentRegionMax().x;
+
+    ImGui::SameLine(rightEdge - unitWidth - spacing - valWidth);
+    ImGui::PushFont(m_uiManager->font_body);
+    if (isValid) {
+        ImGui::TextColored(color, "%s", valStr.c_str());
+        if (val >= limitRed && ImGui::IsItemHovered()) {
+            ImGui::SetTooltip("WARNING: critical value.");
+        }
+    } else {
+        ImGui::Text("%s", valStr.c_str());
+    }
+    ImGui::PopFont();
+
+    ImGui::SameLine(rightEdge - unitWidth);
+    ImGui::PushFont(m_uiManager->font_body);
+    ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "%s", unitStr.c_str());
+    ImGui::PopFont();
 }
 
 ImVec4 InverterDataWindow::getColorForThreshold(float value, float limitGreen, float limitRed) {
     if (value <= limitGreen) return ImVec4(0.1f, 0.8f, 0.1f, 1.0f);       
     else if (value >= limitRed) return ImVec4(0.85f, 0.1f, 0.1f, 1.0f);   
     else return ImVec4(1.0f, 0.5f, 0.0f, 1.0f);                           
-}
-
-void InverterDataWindow::printColoredValue(const std::string& label, const std::string& key, const DbRow& dataMap, float limitGreen, float limitRed) {
-    ImGui::Text("%s:", label.c_str());
-
-    auto it = dataMap.find(key);
-    if (it != dataMap.end()) {
-        std::string strVal = it->second;
-        try {
-            float val = std::stof(strVal);
-            ImVec4 color = getColorForThreshold(val, limitGreen, limitRed);
-            
-            ImGui::PushFont(m_uiManager->font_body);
-            float text_width = ImGui::CalcTextSize(strVal.c_str()).x;
-            ImGui::SameLine(140.0f - text_width); 
-            ImGui::TextColored(color, "%s", strVal.c_str());
-            ImGui::PopFont();
-
-            ImGui::SameLine(145.0f);
-            ImGui::PushFont(m_uiManager->font_body);
-            ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "[°C]");
-            ImGui::PopFont();
-            
-            if (val >= limitRed && ImGui::IsItemHovered()) {
-                ImGui::SetTooltip("WARNING: critical value.");
-            }
-        } catch (const std::invalid_argument&) {
-            ImGui::PushFont(m_uiManager->font_body);
-            float w = ImGui::CalcTextSize("Null").x;
-            ImGui::SameLine(140.0f - w);
-            ImGui::Text("Null");
-            ImGui::PopFont();
-        }
-    } else {
-        ImGui::PushFont(m_uiManager->font_body);
-        float w = ImGui::CalcTextSize("Null").x;
-        ImGui::SameLine(140.0f - w);
-        ImGui::Text("Null");
-        ImGui::PopFont();
-    }
 }
 
 void InverterDataWindow::draw() {
