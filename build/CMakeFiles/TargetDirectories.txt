@@ -21,6 +21,13 @@
 /Users/xtc/dev/telemetry-manager/build/external/glfw/src/CMakeFiles/install.dir
 /Users/xtc/dev/telemetry-manager/build/external/glfw/src/CMakeFiles/install/local.dir
 /Users/xtc/dev/telemetry-manager/build/external/glfw/src/CMakeFiles/install/strip.dir
+/Users/xtc/dev/telemetry-manager/build/external/glfw/docs/CMakeFiles/docs.dir
+/Users/xtc/dev/telemetry-manager/build/external/glfw/docs/CMakeFiles/edit_cache.dir
+/Users/xtc/dev/telemetry-manager/build/external/glfw/docs/CMakeFiles/rebuild_cache.dir
+/Users/xtc/dev/telemetry-manager/build/external/glfw/docs/CMakeFiles/list_install_components.dir
+/Users/xtc/dev/telemetry-manager/build/external/glfw/docs/CMakeFiles/install.dir
+/Users/xtc/dev/telemetry-manager/build/external/glfw/docs/CMakeFiles/install/local.dir
+/Users/xtc/dev/telemetry-manager/build/external/glfw/docs/CMakeFiles/install/strip.dir
 /Users/xtc/dev/telemetry-manager/build/_deps/jsoncons-build/CMakeFiles/edit_cache.dir
 /Users/xtc/dev/telemetry-manager/build/_deps/jsoncons-build/CMakeFiles/rebuild_cache.dir
 /Users/xtc/dev/telemetry-manager/build/_deps/jsoncons-build/CMakeFiles/list_install_components.dir

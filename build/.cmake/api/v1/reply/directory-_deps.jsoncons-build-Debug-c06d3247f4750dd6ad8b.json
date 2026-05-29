@@ -1,0 +1,90 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"install"
+		],
+		"files" : 
+		[
+			"build/_deps/jsoncons-src/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 50,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 74,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 77,
+				"parent" : 0
+			}
+		]
+	},
+	"codemodelVersion" : 
+	{
+		"major" : 2,
+		"minor" : 10
+	},
+	"installers" : 
+	[
+		{
+			"backtrace" : 1,
+			"component" : "Unspecified",
+			"destination" : "include",
+			"paths" : 
+			[
+				"build/_deps/jsoncons-src/include/jsoncons",
+				"build/_deps/jsoncons-src/include/jsoncons_ext"
+			],
+			"type" : "directory"
+		},
+		{
+			"backtrace" : 2,
+			"component" : "Unspecified",
+			"destination" : "lib/cmake/jsoncons",
+			"paths" : 
+			[
+				"build/_deps/jsoncons-build/jsonconsConfig.cmake",
+				"build/_deps/jsoncons-build/jsonconsConfigVersion.cmake"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 3,
+			"component" : "Unspecified",
+			"destination" : "lib/cmake/jsoncons",
+			"exportName" : "jsoncons-targets",
+			"exportTargets" : 
+			[
+				{
+					"id" : "jsoncons::@4579c5fb775c4e86326b",
+					"index" : 3
+				}
+			],
+			"paths" : 
+			[
+				"_deps/jsoncons-build/CMakeFiles/Export/97ed48b5977cabe0115ca2370242eac5/jsonconsTargets.cmake"
+			],
+			"type" : "export"
+		}
+	],
+	"paths" : 
+	{
+		"build" : "_deps/jsoncons-build",
+		"source" : "build/_deps/jsoncons-src"
+	}
+}
