@@ -1,0 +1,3 @@
+/home/samuele/telemetry/build_linux/_deps/jsoncons-subbuild/CMakeFiles/jsoncons-populate.dir
+/home/samuele/telemetry/build_linux/_deps/jsoncons-subbuild/CMakeFiles/edit_cache.dir
+/home/samuele/telemetry/build_linux/_deps/jsoncons-subbuild/CMakeFiles/rebuild_cache.dir

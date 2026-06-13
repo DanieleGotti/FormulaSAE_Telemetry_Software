@@ -1,0 +1,11 @@
+{
+	"InstallScripts" : 
+	[
+		"/home/samuele/telemetry/build_linux/cmake_install.cmake",
+		"/home/samuele/telemetry/build_linux/external/glfw/cmake_install.cmake",
+		"/home/samuele/telemetry/build_linux/external/glfw/src/cmake_install.cmake",
+		"/home/samuele/telemetry/build_linux/external/glfw/docs/cmake_install.cmake",
+		"/home/samuele/telemetry/build_linux/_deps/jsoncons-build/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

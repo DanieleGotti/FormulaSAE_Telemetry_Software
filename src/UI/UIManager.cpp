@@ -50,12 +50,19 @@ public:
 
 
 UiManager::UiManager() {
-    if (!glfwInit()) return;
+    if (!glfwInit()) {
+        std::cerr << "CRITICAL [UiManager]: Failed to initialize GLFW! Are you running via SSH without a DISPLAY?" << std::endl;
+        exit(1);
+    }
 #ifdef __APPLE__
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+#else
+    glsl_version = "#version 120";
+//     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+//     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 #endif
     glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);              
     glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_TRUE);

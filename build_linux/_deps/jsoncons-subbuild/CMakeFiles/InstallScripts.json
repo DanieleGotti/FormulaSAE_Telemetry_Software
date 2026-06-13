@@ -1,0 +1,7 @@
+{
+	"InstallScripts" : 
+	[
+		"/home/samuele/telemetry/build_linux/_deps/jsoncons-subbuild/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

@@ -173,3 +173,22 @@ if(APPLE)
     
     target_sources(${PROJECT_NAME} PRIVATE ${IMGUI_CONFIG_SOURCE})
 endif()
+
+# --- Linux Specific Configuration ---
+if(UNIX AND NOT APPLE)
+  add_compile_options(-march=native -mtune=native)
+  # Find the system's OpenGL libraries (provided by mesa-libGL-devel)
+  find_package(OpenGL REQUIRED)
+
+  # Link OpenGL and math library (often required on Linux)
+  target_link_libraries(${PROJECT_NAME} PRIVATE 
+    OpenGL::GL 
+    m  # Standard C math library, good practice to include
+  )
+  
+  # Copy assets to build directory so the executable can find them
+  # (Since Linux doesn't bundle assets like macOS .app folders)
+  file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/assets" 
+       DESTINATION "${CMAKE_CURRENT_BINARY_DIR}"
+  )
+endif()
