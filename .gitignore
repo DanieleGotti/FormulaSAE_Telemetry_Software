@@ -1,5 +1,11 @@
+build/
+release/
 build_windows/
 release_windows/
+build_macos/
+release_macos/
+build_linux/
+release_linux/
 output_data/
 tester_bin_sd/__pycache__/
 tester_uart/__pycache__/
