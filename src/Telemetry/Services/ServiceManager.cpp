@@ -98,13 +98,21 @@ void ServiceManager::resetForNewSession() {
     stopTasks();
     stopLogging();
 
-    if (m_playbackManager) m_playbackManager->clearData();
+    // Cancel safely any running Playback CSV Export to avoid thread zombies
+    if (m_playbackManager) {
+        m_playbackManager->cancelExport();
+        m_playbackManager->clearData();
+    }
+    
     if (m_dataAggregator) m_dataAggregator->reset();
 
-    // Ricollega i servizi
+    // Re-link services
     if (m_dataAggregator) {
         m_serialService = std::make_unique<SerialService>(m_dataAggregator.get());
     }
+    
+    // Creating a new unique_ptr will automatically destroy the old FileService, 
+    // triggering its destructor which stops and joins any pending load thread.
     m_fileService = std::make_unique<FileService>();
     m_networkService = std::make_unique<NetworkService>();
 
@@ -129,7 +137,6 @@ bool ServiceManager::startLogging(const std::string& logIdentifier) {
         std::filesystem::create_directories(logIdentifier);
         if (!m_csvWriter) {
             m_csvWriter = std::make_shared<CsvWriter>();
-            // Usiamo il getColumnOrder del PacketParser!
             if(m_csvWriter->createFile(logIdentifier, PacketParser::getColumnOrder())) {
                 getDataManager()->addLogSubscriber(m_csvWriter.get());
                 std::cout << "LOGGING [ServiceManager]: CSV generation started." << std::endl;

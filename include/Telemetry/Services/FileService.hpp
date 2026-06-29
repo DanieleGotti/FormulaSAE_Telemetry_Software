@@ -4,7 +4,7 @@
 #include <atomic>
 #include <vector>
 #include <mutex>
-#include "Telemetry/data_writing/DataAggregator.hpp" 
+#include "Telemetry/file_reading/PlaybackManager.hpp" 
 
 struct FileConfig {
     std::string filePath;
@@ -19,7 +19,9 @@ public:
     void startLoading(); 
     bool isLoading() const;
     bool isFinished() const;
-    std::vector<DbRow> getResult();
+    
+    // Now returns the Native Structs
+    std::vector<NativeTelemetryRow> getResult();
     const FileConfig& getConfig() const { return m_config; }
 
 private:
@@ -30,7 +32,9 @@ private:
     FileConfig m_config;
     std::atomic<bool> m_isLoading{false};
     std::atomic<bool> m_isFinished{false};
+    std::atomic<bool> m_cancelRequested{false}; 
     std::thread m_thread;
-    std::vector<DbRow> m_loadedData;
+    
+    std::vector<NativeTelemetryRow> m_loadedData;
     std::mutex m_dataMutex;
 };

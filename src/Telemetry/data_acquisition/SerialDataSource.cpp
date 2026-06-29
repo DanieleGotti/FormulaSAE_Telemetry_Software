@@ -48,24 +48,24 @@ std::vector<std::string> SerialDataSource::getAvailableResources()
 		m_availablePorts.push_back(port_name);
 	}
 #endif
-#if defined (__linux__)
-	namespace fs = std::filesystem;
-    const std::string DEV_PATH = "/dev/serial/by-id";
+#if defined(__linux__)
+    namespace fs = std::filesystem;
     m_availablePorts.clear();
-    try
-    {
-        fs::path p(DEV_PATH);
+    try {
+        const std::string DEV_PATH = "/dev";
         if (!fs::exists(DEV_PATH)) return m_availablePorts;
-        for (fs::directory_entry de: fs::directory_iterator(p))
-        {
-            if (fs::is_symlink(de.symlink_status()))
-            {
-                fs::path symlink_points_at = fs::read_symlink(de);
-                m_availablePorts.push_back(std::string("/dev/")+symlink_points_at.filename().c_str());
+        
+        for (const auto& entry : fs::directory_iterator(DEV_PATH)) {
+            std::string name = entry.path().filename().string();
+            // Match typical Linux serial devices: USB adapters and native UARTs
+            if (name.find("ttyUSB") == 0 || 
+                name.find("ttyACM") == 0 || 
+                name.find("ttyS") == 0 || 
+                name.find("rfcomm") == 0) {
+                m_availablePorts.push_back(entry.path().string());
             }
         }
-    }
-    catch (const fs::filesystem_error &ex) {}
+    } catch (const fs::filesystem_error &ex) {}
 #endif
 #if defined(__APPLE__)
 	namespace fs = std::filesystem;

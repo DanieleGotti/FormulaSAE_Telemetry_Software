@@ -350,12 +350,17 @@ void UiManager::draw() {
         if (fileService && fileService->isFinished()) {
             
             auto loadedData = fileService->getResult();
-            ServiceManager::getPlaybackManager()->setData(std::move(loadedData));
+            std::string originalExt = fileService->getConfig().filePath;
+            originalExt = originalExt.substr(originalExt.find_last_of("."));
+            std::transform(originalExt.begin(), originalExt.end(), originalExt.begin(), ::tolower);
+            
+            // Pass the highly optimized Native data directly to the manager
+            ServiceManager::getPlaybackManager()->setNativeData(std::move(loadedData), originalExt);
             transitionToConnectedState(AppState::CONNECTED_PLAYBACK);
 
         } else {
             ImGui::Begin("Loading in progress");
-            ImGui::Text("Analyzing telemetry file. Please wait.");
+            ImGui::Text("Analyzing telemetry file and calculating multi-threading stats. Please wait.");
             ImGui::End();
         }
     }

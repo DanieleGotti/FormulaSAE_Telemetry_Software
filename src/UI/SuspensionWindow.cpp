@@ -1,23 +1,22 @@
-#include <iostream>
-#include "UI/UIManager.hpp"
 #include "UI/SuspensionWindow.hpp"
-#include "Telemetry/Services/ServiceManager.hpp"
+#include "UI/UIManager.hpp" 
+#include "Telemetry/Services/ServiceManager.hpp" 
 #include "Telemetry/file_reading/PlaybackManager.hpp"
 
 SuspensionWindow::SuspensionWindow(UiManager* manager) : m_uiManager(manager),
-    m_suspPlot("Linear potentiometers", { { "front_left_suspension", "Front left" }, { "front_right_suspension", "Front right" }}, 0.0, 100.0)
-{
-    const std::vector<std::string> keys_to_plot = {"front_left_suspension", "front_right_suspension"};
+    m_suspPlot("Linear potentiometers", { { "front_left_suspension", "Front left" }, { "front_right_suspension", "Front right" }}, 0.0, 100.0) 
+{ 
+    const std::vector<std::string> keys_to_plot = {"front_left_suspension", "front_right_suspension"}; 
     for (const auto& key : keys_to_plot) {
-        m_plotData[key] = PlotLineData();
-    }
+        m_plotData[key] = PlotLineData(); 
+    } 
 }
 
 void SuspensionWindow::onAggregatedDataReceived(const DbRow& dataRow) {
-    std::lock_guard<std::mutex> lock(m_dataMutex);
-    try {
-        if (!dataRow.count("timestamp")) return;
-        double unix_timestamp = std::stod(dataRow.at("timestamp")); 
+    std::lock_guard<std::mutex> lock(m_dataMutex); 
+    try { 
+        if (!dataRow.count("timestamp")) return; 
+        double unix_timestamp = std::stod(dataRow.at("timestamp"));
 
         if (m_lastTimestamp >= 0.0 && (unix_timestamp < m_lastTimestamp || unix_timestamp - m_lastTimestamp > 1.5)) {
             for (auto& pair : m_plotData) {
@@ -41,8 +40,8 @@ void SuspensionWindow::onAggregatedDataReceived(const DbRow& dataRow) {
     } catch (const std::exception& e) {}
 }
 
-void SuspensionWindow::draw() {
-    double cursor_time = 0.0;
+void SuspensionWindow::draw() { 
+    double cursor_time = 0.0; 
     bool isPlayback = m_uiManager->getCurrentState() == AppState::CONNECTED_PLAYBACK;
 
     if (isPlayback) {
@@ -55,25 +54,13 @@ void SuspensionWindow::draw() {
 
         std::lock_guard<std::mutex> lock(m_dataMutex);
         if (!m_playbackDataLoaded && playbackManager->getTotalRows() > 0) {
-            for (auto& pair : m_plotData) {
-                pair.second.X.clear();
-                pair.second.Y.clear();
-            }
             
-            size_t total = playbackManager->getTotalRows();
-            for (size_t i = 0; i < total; ++i) {
-                auto row = playbackManager->getRowAtIndex(i);
-                if (row && row->count("timestamp")) {
-                    try {
-                        double unix_ts = std::stod(row->at("timestamp"));
-                        for (auto& pair : m_plotData) {
-                            if (row->count(pair.first)) {
-                                pair.second.X.push_back(unix_ts);
-                                pair.second.Y.push_back(std::stod(row->at(pair.first)));
-                            }
-                        }
-                    } catch (...) {} 
-                }
+            // Fast DOD extraction for ImPlot
+            std::vector<double> timeline = playbackManager->getPlotTimeline();
+            
+            for (auto& pair : m_plotData) {
+                pair.second.X = timeline;
+                pair.second.Y = playbackManager->getPlotData(pair.first);
             }
             m_playbackDataLoaded = true;
         }
@@ -93,7 +80,7 @@ void SuspensionWindow::draw() {
     ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "[cm]");
     ImGui::PopFont();
     ImGui::Separator();
-    
+
     {
         std::lock_guard<std::mutex> lock(m_dataMutex);
         m_suspPlot.draw(m_plotData, cursor_time, isPlayback, -1.0f);

@@ -3,6 +3,7 @@
 #include <iostream>
 #include <cctype>
 #include <filesystem>
+#include <utils/fsUtils.hpp>
 #include "UI/ImGuiFileBrowser.hpp"
 
 #ifdef _WIN32
@@ -13,55 +14,9 @@
 #include <stdlib.h>
 #endif
 
-// Smart logic to find a good default path for the file browser
 static std::filesystem::path GetDefaultPath() {
-    std::filesystem::path exeDir;
-
-    #ifdef _WIN32
-        char buffer[MAX_PATH];
-        if (GetModuleFileNameA(NULL, buffer, MAX_PATH) != 0) {
-            exeDir = std::filesystem::path(buffer).parent_path();
-        }
-    #elif __APPLE__
-        char buffer[PATH_MAX];
-        uint32_t size = sizeof(buffer);
-        if (_NSGetExecutablePath(buffer, &size) == 0) {
-            char real_path[PATH_MAX];
-            if (realpath(buffer, real_path) != NULL) {
-                exeDir = std::filesystem::path(real_path).parent_path();
-            } else {
-                exeDir = std::filesystem::path(buffer).parent_path();
-            }
-        }
-    #endif
-
-    if (exeDir.empty()) {
-        exeDir = std::filesystem::current_path();
-    }
-
-    // Find output_data in the current or parent directories 
-    std::filesystem::path searchPath = exeDir;
-    for (int i = 0; i < 4; ++i) {
-        std::filesystem::path target = searchPath / "output_data";
-        if (std::filesystem::exists(target) && std::filesystem::is_directory(target)) {
-            return target;
-        }
-        if (searchPath.has_parent_path()) {
-            searchPath = searchPath.parent_path();
-        } else {
-            break;
-        }
-    }
-
-    // If it doesn't find it, we set it next to the executable for automatic creation
-    #ifdef __APPLE__
-    // On Mac if we are inside a bundle (.app/Contents/MacOS), we place it next to the App
-    if (exeDir.string().find(".app/Contents/MacOS") != std::string::npos) {
-        return exeDir.parent_path().parent_path().parent_path() / "output_data";
-    }
-    #endif
-
-    return exeDir / "output_data";
+    // Rely on our OS-agnostic utility to find the executable directory
+    return fsutils::getExecutableDirectory() / "output_data";
 }
 
 ImGuiFileBrowser::ImGuiFileBrowser() {
