@@ -8,13 +8,15 @@
 #if defined (_WIN32) || defined( _WIN64)
     #include <Windows.h>
 #endif
-#if defined(__APPLE__)
+#if defined(__APPLE__) || defined(__linux__)
     #include <unistd.h>
     #include <fcntl.h>
     #include <termios.h>
     #include <stdio.h>
     #include <regex>
     #include <sys/ioctl.h>
+#endif
+#if defined(__APPLE__)
     #include <IOKit/serial/ioss.h>
 #endif
 #include <thread>
@@ -163,14 +165,15 @@ bool SerialDataSource::open(const std::string &resource, int baudRate)
 
     return true;
 #endif
-#if defined(__APPLE__)
+#if defined(__APPLE__) || defined(__linux__)
     fd = ::open(resource.c_str(), O_RDWR | O_NOCTTY | O_SYNC);
-    int flags = fcntl(fd, F_GETFL, 0);
-    fcntl(fd, F_SETFL, flags | O_NONBLOCK);
     if(fd < 0) {
         std::cerr << "ERROR [SerialDataSource]: Failed to open serial port." << std::endl;
         return false;
     }
+    
+    int flags = fcntl(fd, F_GETFL, 0);
+    fcntl(fd, F_SETFL, flags | O_NONBLOCK);
 
     struct termios tty{};
     if(tcgetattr(fd, &tty) != 0) {
@@ -192,6 +195,45 @@ bool SerialDataSource::open(const std::string &resource, int baudRate)
     tty.c_cflag &= ~CSTOPB; 
     tty.c_cflag &= ~CRTSCTS; 
 
+#if defined(__linux__)
+    speed_t speed;
+    switch(baudRate) {
+        case 300: speed = B300; break;
+        case 600: speed = B600; break;
+        case 1200: speed = B1200; break;
+        case 2400: speed = B2400; break;
+        case 4800: speed = B4800; break;
+        case 9600: speed = B9600; break;
+        case 19200: speed = B19200; break;
+        case 38400: speed = B38400; break;
+        case 57600: speed = B57600; break;
+        case 115200: speed = B115200; break;
+        // Wrapping custom/high rates in ifdef to prevent compilation errors 
+        // on Linux environments where non-standard macros aren't available.
+#ifdef B128000
+        case 128000: speed = B128000; break;
+#endif
+#ifdef B256000
+        case 256000: speed = B256000; break;
+#endif
+#ifdef B500000
+        case 500000: speed = B500000; break;
+#endif
+        default:
+            std::cerr << "ERROR [SerialDataSource]: Baud rate not supported on Linux: " << baudRate << std::endl;
+            ::close(fd); fd = -1;
+            return false;
+    }
+    
+    cfsetispeed(&tty, speed);
+    cfsetospeed(&tty, speed);
+
+    if(tcsetattr(fd, TCSANOW, &tty) != 0) {
+        std::cerr << "ERROR [SerialDataSource]: Failed to set serial port parameters." << std::endl;
+        ::close(fd); fd = -1;
+        return false;
+    }
+#elif defined(__APPLE__)
     if(tcsetattr(fd, TCSANOW, &tty) != 0) {
         std::cerr << "ERROR [SerialDataSource]: Failed to set serial port parameters." << std::endl;
         ::close(fd); fd = -1;
@@ -204,6 +246,7 @@ bool SerialDataSource::open(const std::string &resource, int baudRate)
         ::close(fd); fd = -1;
         return false;
     }
+#endif
 
     tcflush(fd, TCIOFLUSH);
     return true;
@@ -226,7 +269,7 @@ std::vector<uint8_t> SerialDataSource::readPacket()
     buffer.resize(bytesRead);
     return buffer;
 #endif
-#if defined(__APPLE__)
+#if defined(__APPLE__) || defined(__linux__)
     if (fd < 0) {
         std::cerr << "ERROR [SerialDataSource]: Serial port not open." << std::endl;
         return {};
@@ -251,7 +294,7 @@ void SerialDataSource::close()
         handle = nullptr;
     }
 #endif
-#if defined(__APPLE__)
+#if defined(__APPLE__) || defined(__linux__)
     if (fd >= 0) {
         ::close(fd);
         fd = -1;
@@ -262,7 +305,7 @@ void SerialDataSource::close()
 std::vector<int> SerialDataSource::supportedBaudRates() const {
 #if defined(_WIN32) || defined(_WIN64)
     return {300, 600, 1200, 2400, 4800, 9600, 19200, 38400, 57600, 115200, 128000, 256000, 500000};
-#elif defined(__APPLE__)
+#elif defined(__APPLE__) || defined(__linux__)
     return {300, 600, 1200, 2400, 4800, 9600, 19200, 38400, 57600, 115200, 128000, 256000, 500000};
 #else
     return {};
