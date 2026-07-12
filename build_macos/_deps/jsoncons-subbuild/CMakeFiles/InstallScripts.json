@@ -1,7 +1,0 @@
-{
-	"InstallScripts" : 
-	[
-		"/Users/xtc/dev/telemetry-manager/build_macos/_deps/jsoncons-subbuild/cmake_install.cmake"
-	],
-	"Parallel" : false
-}
