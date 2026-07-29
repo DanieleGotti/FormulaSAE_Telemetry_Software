@@ -156,6 +156,7 @@ void FileService::loadBin(const std::string& filePath) {
                     if (i % 2 == 0) currentRow.temperatures1[i/2] = lastB.module_temperatures[i] / 10.0f;
                     else currentRow.temperatures2[i/2] = lastB.module_temperatures[i] / 10.0f;
                 }
+                currentRow.online_modules = lastB.online_modules;
             }
 
             rawRows.push_back(currentRow);
@@ -275,7 +276,7 @@ void FileService::loadCsv(const std::string& filePath) {
         }
 
         // Only parse if the row has the expected structure
-        if (colIdx >= 104) { 
+        if (colIdx >= 105) {
             NativeTelemetryRow nat;
             
             nat.timestamp = d_atof(cols[0]);
@@ -316,6 +317,7 @@ void FileService::loadCsv(const std::string& filePath) {
                 if (std::strstr(s, "ERR_BSPD")) err |= 0x0080;
                 if (std::strstr(s, "ERR_DAISY_CHAIN")) err |= 0x0100;
                 if (std::strstr(s, "IMD_AMS_LATCH")) err |= 0x0200;
+                if (std::strstr(s, "EMMA_FINISH_PRECHARGE")) err |= 0x0800;
                 if (std::strstr(s, "ERR_CRITICAL_FAULT")) err |= 0x8000;
                 return err;
             };
@@ -389,15 +391,17 @@ void FileService::loadCsv(const std::string& filePath) {
                 nat.temperatures2[i] = f_atof(cols[60 + (i*2)]);
             }
 
-            nat.acc1_mean = f_atof(cols[87]); nat.acc1_var = f_atof(cols[88]); nat.acc1_std = f_atof(cols[89]);
-            nat.acc2_mean = f_atof(cols[90]); nat.acc2_var = f_atof(cols[91]); nat.acc2_std = f_atof(cols[92]);
-            nat.brk1_mean = f_atof(cols[93]); nat.brk1_var = f_atof(cols[94]); nat.brk1_std = f_atof(cols[95]);
-            nat.brk2_mean = f_atof(cols[96]); nat.brk2_var = f_atof(cols[97]); nat.brk2_std = f_atof(cols[98]);
-            nat.steer_mean = f_atof(cols[99]); nat.steer_var = f_atof(cols[100]); nat.steer_std = f_atof(cols[101]);
+            nat.online_modules = static_cast<uint16_t>(i_atoi(cols[87]));
 
-            nat.lostA = i_atoi(cols[102]);
-            nat.lostB = i_atoi(cols[103]);
-            nat.lostTot = i_atoi(cols[104]);
+            nat.acc1_mean = f_atof(cols[88]); nat.acc1_var = f_atof(cols[89]); nat.acc1_std = f_atof(cols[90]);
+            nat.acc2_mean = f_atof(cols[91]); nat.acc2_var = f_atof(cols[92]); nat.acc2_std = f_atof(cols[93]);
+            nat.brk1_mean = f_atof(cols[94]); nat.brk1_var = f_atof(cols[95]); nat.brk1_std = f_atof(cols[96]);
+            nat.brk2_mean = f_atof(cols[97]); nat.brk2_var = f_atof(cols[98]); nat.brk2_std = f_atof(cols[99]);
+            nat.steer_mean = f_atof(cols[100]); nat.steer_var = f_atof(cols[101]); nat.steer_std = f_atof(cols[102]);
+
+            nat.lostA = i_atoi(cols[103]);
+            nat.lostB = i_atoi(cols[104]);
+            nat.lostTot = i_atoi(cols[105]);
 
             rawRows.push_back(nat);
         }

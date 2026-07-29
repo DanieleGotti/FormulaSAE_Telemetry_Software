@@ -150,7 +150,8 @@ void PlaybackManager::generateCsvFromBin(const std::string& outputPath) {
         
         for (int i = 1; i <= 14; ++i) out << "VoltageModule" << i << ";";
         for (int i = 1; i <= 14; ++i) out << "Temperature1Module" << i << ";Temperature2Module" << i << ";";
-        
+        out << "online_modules;";
+
         out << "accelerator1_mean;accelerator1_var;accelerator1_std;"
             << "accelerator2_mean;accelerator2_var;accelerator2_std;"
             << "brake1_mean;brake1_var;brake1_std;"
@@ -191,6 +192,7 @@ void PlaybackManager::generateCsvFromBin(const std::string& outputPath) {
 
             for (int i = 0; i < 14; ++i) out << std::setprecision(2) << row.voltages[i] << ";";
             for (int i = 0; i < 14; ++i) out << std::setprecision(1) << row.temperatures1[i] << ";" << row.temperatures2[i] << ";";
+            out << row.online_modules << ";";
 
             out << std::setprecision(3)
                 << row.acc1_mean << ";" << row.acc1_var << ";" << row.acc1_std << ";"
@@ -229,6 +231,7 @@ std::string PlaybackManager::getEmmaErrorStr(uint16_t error) {
     if (error & 0x0080) flags.push_back("ERR_BSPD");
     if (error & 0x0100) flags.push_back("ERR_DAISY_CHAIN");
     if (error & 0x0200) flags.push_back("IMD_AMS_LATCH");
+    if (error & 0x0800) flags.push_back("EMMA_FINISH_PRECHARGE");
     if (error & 0x8000) flags.push_back("ERR_CRITICAL_FAULT");
 
     std::string res;
@@ -315,7 +318,9 @@ DbRow PlaybackManager::convertNativeToDbRow(const NativeTelemetryRow& row) const
         out["VoltageModule" + std::to_string(i+1)] = formatDouble(row.voltages[i], 2);
         out["Temperature1Module" + std::to_string(i+1)] = formatDouble(row.temperatures1[i], 1);
         out["Temperature2Module" + std::to_string(i+1)] = formatDouble(row.temperatures2[i], 1);
+        out["OnlineModule" + std::to_string(i+1)] = ((row.online_modules & (1 << i)) != 0) ? "1" : "0";
     }
+    out["online_modules"] = std::to_string(row.online_modules);
 
     out["accelerator1_mean"] = formatDouble(row.acc1_mean, 3); out["accelerator1_var"] = formatDouble(row.acc1_var, 3); out["accelerator1_std"] = formatDouble(row.acc1_std, 3);
     out["accelerator2_mean"] = formatDouble(row.acc2_mean, 3); out["accelerator2_var"] = formatDouble(row.acc2_var, 3); out["accelerator2_std"] = formatDouble(row.acc2_std, 3);

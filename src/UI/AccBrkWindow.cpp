@@ -4,10 +4,10 @@
 #include "Telemetry/file_reading/PlaybackManager.hpp"
 
 AccBrkWindow::AccBrkWindow(UiManager* manager) : m_uiManager(manager), 
-    m_accPlot("Accelerators", {{ "accelerator1", "1" }, { "accelerator2", "2" }, { "accelerator_mapped", "Mapped" }}, 0.0, 100.0), 
+    m_accPlot("Accelerators", {{ "accelerator1", "1" }, { "accelerator2", "2" }}, 0.0, 100.0),
     m_brkPlot("Brakes", {{ "brake1", "1" }, { "brake2", "2" }}, 0.0, 100.0) 
 { 
-    const std::vector<std::string> keys_to_plot = {"accelerator1", "accelerator2", "accelerator_mapped", "brake1", "brake2"}; 
+    const std::vector<std::string> keys_to_plot = {"accelerator1", "accelerator2", "brake1", "brake2"};
     for (const auto& key : keys_to_plot) { 
         m_plotData[key] = PlotLineData(); 
     } 

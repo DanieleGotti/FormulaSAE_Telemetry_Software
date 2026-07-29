@@ -24,6 +24,7 @@ static std::string formatEmmaError(const std::string& errStr) {
     if (errStr.find("ERR_BSPD") != std::string::npos) hex |= 0x0080;
     if (errStr.find("ERR_DAISY_CHAIN") != std::string::npos) hex |= 0x0100;
     if (errStr.find("IMD_AMS_LATCH") != std::string::npos) hex |= 0x0200;
+    if (errStr.find("EMMA_FINISH_PRECHARGE") != std::string::npos) hex |= 0x0800;
     if (errStr.find("ERR_CRITICAL_FAULT") != std::string::npos) hex |= 0x8000;
 
     char buf[32];
@@ -89,7 +90,7 @@ void ModulesBatteryWindow::printErrorValue(const std::string& label, const DbRow
     auto it = dataMap.find("emma_error");
     if (it != dataMap.end()) {
         formattedStr = formatEmmaError(it->second);
-        if (it->second == "EMMA_STATUS_OK") {
+        if (it->second == "EMMA_STATUS_OK" || it->second == "EMMA_FINISH_PRECHARGE") {
             color = ImVec4(0.1f, 0.8f, 0.1f, 1.0f);
         } else {
             color = ImVec4(0.85f, 0.1f, 0.1f, 1.0f);
@@ -113,6 +114,7 @@ void ModulesBatteryWindow::drawModuleCard(int index, const DbRow& dataMap) {
     std::string keyTmp1 = "Temperature1Module" + idxStr;
     std::string keyTmp2 = "Temperature2Module" + idxStr;
     std::string keyTens = "VoltageModule" + idxStr;
+    std::string keyOnline = "OnlineModule" + idxStr;
 
     ImGui::PushID(index);
 
@@ -178,10 +180,38 @@ void ModulesBatteryWindow::drawModuleCard(int index, const DbRow& dataMap) {
         ImGui::PopFont();
     };
     
+    auto drawOnlineDot = [&](const char* label, const std::string& key) {
+        ImGui::Text("%s", label);
+
+        ImVec4 dotColor = ImVec4(0.5f, 0.5f, 0.5f, 1.0f);
+        auto it = dataMap.find(key);
+        if (it != dataMap.end()) {
+            dotColor = (it->second == "1") ? ImVec4(0.1f, 0.8f, 0.1f, 1.0f) : ImVec4(0.85f, 0.1f, 0.1f, 1.0f);
+        }
+
+        float radius = ImGui::GetFontSize() * 0.28f;
+        float diameter = radius * 2.0f;
+
+        float columnWidth = ImGui::GetColumnWidth();
+        float offsetX = columnWidth - diameter - 5.0f;
+
+        float minOffsetX = ImGui::CalcTextSize(label).x + 10.0f;
+        if (offsetX < minOffsetX) {
+            offsetX = minOffsetX;
+        }
+
+        ImGui::SameLine(offsetX);
+        ImVec2 pos = ImGui::GetCursorScreenPos();
+        ImVec2 center(pos.x + radius, pos.y + ImGui::GetTextLineHeight() * 0.5f);
+        ImGui::GetWindowDrawList()->AddCircleFilled(center, radius, ImGui::ColorConvertFloat4ToU32(dotColor), 16);
+        ImGui::Dummy(ImVec2(diameter, ImGui::GetTextLineHeight()));
+    };
+
     ImGui::BeginGroup();
     drawValue("Temperature1:", keyTmp1, true);
     drawValue("Temperature2:", keyTmp2, true);
-    drawValue("Voltage:", keyTens, false); 
+    drawValue("Voltage:", keyTens, false);
+    drawOnlineDot("Online:", keyOnline);
     ImGui::EndGroup();
     
     ImGui::PopID();

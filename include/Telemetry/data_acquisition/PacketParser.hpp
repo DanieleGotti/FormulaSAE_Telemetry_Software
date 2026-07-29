@@ -92,6 +92,7 @@ typedef struct {
     uint8_t state_of_charge; // 0-100
     uint8_t module_voltage[14]; // V ((V+200)/100)
     uint16_t module_temperatures[28]; // °C (/10)
+    uint16_t online_modules; // mask for online modules (1=online, 0=offline)
 
     // --- CRC for corrupted packages ---
     uint16_t crc16; // int calculated

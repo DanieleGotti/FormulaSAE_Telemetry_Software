@@ -46,7 +46,7 @@ def generate_packet_A(timestamp_val: int) -> bytes:
     emma_c = random.uniform(0.0, 250.0)
     emma_v = random.uniform(450.0, 600.0)
     emma_yaw = random.uniform(-1.0, 1.0)
-    emma_error = random.choice([0x0001, 0x0002, 0x0004, 0x0008, 0x0010, 0x0020, 0x0040, 0x0080, 0x0100, 0x0200, 0x8000]) 
+    emma_error = random.choice([0x0001, 0x0002, 0x0004, 0x0008, 0x0010, 0x0020, 0x0040, 0x0080, 0x0100, 0x0200, 0x0800, 0x8000])
 
     mean_vel = random.uniform(0.0, 120.0)
     real_yaw = random.uniform(-50.0, 50.0)
@@ -100,12 +100,16 @@ def generate_packet_B(timestamp_val: int) -> bytes:
     timestamp = timestamp_val
     
     soc = random.randint(0, 100)
-    voltages =[random.randint(100, 220) for _ in range(14)] 
-    temps =[random.randint(200, 600) for _ in range(28)]  
-    
-    fmt = '< BB I B 14B 28H'
-    
-    payload = struct.pack(fmt, startByte1, startByte2, timestamp, soc, *voltages, *temps)
+    voltages =[random.randint(100, 220) for _ in range(14)]
+    temps =[random.randint(200, 600) for _ in range(28)]
+
+    online_modules = 0x3FFF
+    if random.random() < 0.1:
+        online_modules &= ~(1 << random.randint(0, 13)) & 0x3FFF
+
+    fmt = '< BB I B 14B 28H H'
+
+    payload = struct.pack(fmt, startByte1, startByte2, timestamp, soc, *voltages, *temps, online_modules)
     
     crc = calculate_crc16(payload)
     return payload + struct.pack('<H', crc)

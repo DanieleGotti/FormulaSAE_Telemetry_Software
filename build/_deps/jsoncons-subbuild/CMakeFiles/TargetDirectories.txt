@@ -1,3 +1,0 @@
-/Users/xtc/dev/telemetry-manager/build/_deps/jsoncons-subbuild/CMakeFiles/jsoncons-populate.dir
-/Users/xtc/dev/telemetry-manager/build/_deps/jsoncons-subbuild/CMakeFiles/edit_cache.dir
-/Users/xtc/dev/telemetry-manager/build/_deps/jsoncons-subbuild/CMakeFiles/rebuild_cache.dir

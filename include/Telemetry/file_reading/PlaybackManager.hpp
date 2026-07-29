@@ -32,6 +32,7 @@ struct NativeTelemetryRow {
     float voltages[14] = {0};
     float temperatures1[14] = {0};
     float temperatures2[14] = {0};
+    uint16_t online_modules = 0;
     
     // Pre-calculated fast running statistics (3 seconds window)
     float acc1_mean = 0.0f, acc1_var = 0.0f, acc1_std = 0.0f;

@@ -48,7 +48,7 @@ def generate_packet_A(timestamp_val: int) -> bytes:
     emma_c = random.uniform(0.0, 250.0)
     emma_v = random.uniform(450.0, 600.0)
     emma_yaw = random.uniform(-1.0, 1.0)
-    emma_error = random.choice([0x0001, 0x0002, 0x0004, 0x0008, 0x0010, 0x0020, 0x0040, 0x0080, 0x0100, 0x0200, 0x8000]) 
+    emma_error = random.choice([0x0001, 0x0002, 0x0004, 0x0008, 0x0010, 0x0020, 0x0040, 0x0080, 0x0100, 0x0200, 0x0800, 0x8000])
 
     mean_vel = random.uniform(0.0, 120.0)
     real_yaw = random.uniform(-50.0, 50.0)
@@ -108,15 +108,20 @@ def generate_packet_B(timestamp_val: int) -> bytes:
     
     # Generate array of 14 voltages (uint8_t) and 28 temperatures (uint16_t)
     # Uint8_t max value is 255. 100 = 3.0V, 220 = 4.2V based on (V+200)/100.0 formula
-    voltages = [random.randint(100, 220) for _ in range(14)] 
+    voltages = [random.randint(100, 220) for _ in range(14)]
     temps = [random.randint(200, 600) for _ in range(28)]  # 20.0°C to 60.0°C (scaled by 10)
-    
+
+    # Bitmask of the 14 modules: bit set = module online. Occasionally drop one offline
+    online_modules = 0x3FFF
+    if random.random() < 0.1:
+        online_modules &= ~(1 << random.randint(0, 13)) & 0x3FFF
+
     # 3. Format Struct Payload B
-    # < BB I B 14B 28H -> Little Endian, metadata + soc + 14 uint8 + 28 uint16
-    fmt = '< BB I B 14B 28H'
-    
+    # < BB I B 14B 28H H -> Little Endian, metadata + soc + 14 uint8 + 28 uint16 + online mask
+    fmt = '< BB I B 14B 28H H'
+
     # *voltages and *temps "unpack" the lists inserting them into the respective 14B and 28H
-    payload = struct.pack(fmt, startByte1, startByte2, timestamp, soc, *voltages, *temps)
+    payload = struct.pack(fmt, startByte1, startByte2, timestamp, soc, *voltages, *temps, online_modules)
     
     crc = calculate_crc16(payload)
     return payload + struct.pack('<H', crc)

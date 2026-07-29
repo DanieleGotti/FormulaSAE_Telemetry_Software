@@ -18,6 +18,7 @@ static std::string getEmmaErrorStr(uint16_t error) {
     if (error & 0x0080) flags.push_back("ERR_BSPD");
     if (error & 0x0100) flags.push_back("ERR_DAISY_CHAIN");
     if (error & 0x0200) flags.push_back("IMD_AMS_LATCH");
+    if (error & 0x0800) flags.push_back("EMMA_FINISH_PRECHARGE");
     if (error & 0x8000) flags.push_back("ERR_CRITICAL_FAULT");
     
     std::string res;
@@ -168,6 +169,12 @@ void PacketParser::populateRowFromB(const TelemetryPacket_EMMA_t* data) {
         int tIdx = (i % 2) + 1;
         m_lastPacketBData["Temperature" + std::to_string(tIdx) + "Module" + std::to_string(mod)] = formatDouble(data->module_temperatures[i] / 10.0, 1); 
     }
+    // Looking at the online_modules field
+    for(int i=0; i<14; ++i) {
+        bool isOnline = (data->online_modules & (1 << i)) != 0;
+        m_lastPacketBData["OnlineModule" + std::to_string(i+1)] = isOnline ? "1" : "0";
+    }
+    m_lastPacketBData["online_modules"] = std::to_string(data->online_modules);
 }
 
 bool PacketParser::parseLiveBytes(std::vector<uint8_t>& rxBuffer, DbRow& outRow) {
@@ -346,6 +353,7 @@ std::vector<std::string> PacketParser::getColumnOrder() {
         cols.push_back("Temperature1Module" + std::to_string(i));
         cols.push_back("Temperature2Module" + std::to_string(i));
     }
+    cols.push_back("online_modules");
     
     // Statistics fields added dynamically from variance (so they are shown in CSV/Dataset)
     const std::vector<std::string> targetSensors = {"accelerator1", "accelerator2", "brake1", "brake2", "steer"};
