@@ -101,6 +101,9 @@ typedef struct {
 
 using DbRow = std::map<std::string, std::string>;
 
+constexpr float HALL_MS_TO_KMH = 3.6f;
+constexpr float HALL_ECU_SCALE_FIX = 0.1f;
+
 uint16_t Calculate_CRC16(const uint8_t *data, uint16_t length);
 
 class PacketParser {

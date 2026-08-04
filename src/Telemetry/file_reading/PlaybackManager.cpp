@@ -157,6 +157,7 @@ void PlaybackManager::generateCsvFromBin(const std::string& outputPath) {
             << "brake1_mean;brake1_var;brake1_std;"
             << "brake2_mean;brake2_var;brake2_std;"
             << "steer_mean;steer_var;steer_std;"
+            << "speed_max;speed_mean;"
             << "lost_packets_A;lost_packets_B;lost_packets_tot\n";
 
         // Write Hybrid Data: High-speed Numerics + String State Machines to perfectly match Live CSV formatting
@@ -200,6 +201,7 @@ void PlaybackManager::generateCsvFromBin(const std::string& outputPath) {
                 << row.brk1_mean << ";" << row.brk1_var << ";" << row.brk1_std << ";"
                 << row.brk2_mean << ";" << row.brk2_var << ";" << row.brk2_std << ";"
                 << row.steer_mean << ";" << row.steer_var << ";" << row.steer_std << ";"
+                << row.speed_max << ";" << row.speed_mean << ";"
                 << row.lostA << ";" << row.lostB << ";" << row.lostTot << "\n";
         }
 
@@ -327,6 +329,8 @@ DbRow PlaybackManager::convertNativeToDbRow(const NativeTelemetryRow& row) const
     out["brake1_mean"] = formatDouble(row.brk1_mean, 3); out["brake1_var"] = formatDouble(row.brk1_var, 3); out["brake1_std"] = formatDouble(row.brk1_std, 3);
     out["brake2_mean"] = formatDouble(row.brk2_mean, 3); out["brake2_var"] = formatDouble(row.brk2_var, 3); out["brake2_std"] = formatDouble(row.brk2_std, 3);
     out["steer_mean"] = formatDouble(row.steer_mean, 3); out["steer_var"] = formatDouble(row.steer_var, 3); out["steer_std"] = formatDouble(row.steer_std, 3);
+
+    out["speed_max"] = formatDouble(row.speed_max, 3); out["speed_mean"] = formatDouble(row.speed_mean, 3);
 
     out["lost_packets_A"] = std::to_string(row.lostA);
     out["lost_packets_B"] = std::to_string(row.lostB);

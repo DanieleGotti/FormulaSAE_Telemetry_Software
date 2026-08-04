@@ -15,6 +15,34 @@ inline int i_atoi(const char* s) { return s ? std::atoi(s) : 0; }
 
 FileService::FileService() = default;
 
+void FileService::computeSpeedStats(std::vector<NativeTelemetryRow>& rows) {
+    const int WINDOW = 600;
+
+    double sessionMax = 0.0, sessionSum = 0.0;
+    size_t sessionCount = 0;
+
+    for (size_t i = 0; i < rows.size(); i += WINDOW) {
+        if (m_cancelRequested.load()) break;
+
+        size_t end_idx = std::min(i + WINDOW, rows.size());
+
+        for (size_t j = i; j < end_idx; ++j) {
+            double speed = (rows[j].rear_left_velocity + rows[j].rear_right_velocity) * 0.5;
+            if (speed > sessionMax) sessionMax = speed;
+            sessionSum += speed;
+        }
+        sessionCount += (end_idx - i);
+
+        float blockMax = static_cast<float>(sessionMax);
+        float blockMean = static_cast<float>(sessionSum / sessionCount);
+
+        for (size_t j = i; j < end_idx; ++j) {
+            rows[j].speed_max = blockMax;
+            rows[j].speed_mean = blockMean;
+        }
+    }
+}
+
 FileService::~FileService() { 
     // Safely stop background reading if the app is closed to avoid zombies and crashes
     m_cancelRequested.store(true);
@@ -103,10 +131,10 @@ void FileService::loadBin(const std::string& filePath) {
             firstA = false;
 
             currentRow.timestamp = dataA->timestamp * 0.005;
-            currentRow.front_left_velocity = dataA->front_left_velocity;
-            currentRow.front_right_velocity = dataA->front_right_velocity;
-            currentRow.rear_left_velocity = dataA->rear_left_velocity;
-            currentRow.rear_right_velocity = dataA->rear_right_velocity;
+            currentRow.front_left_velocity = dataA->front_left_velocity * HALL_MS_TO_KMH * HALL_ECU_SCALE_FIX;
+            currentRow.front_right_velocity = dataA->front_right_velocity * HALL_MS_TO_KMH * HALL_ECU_SCALE_FIX;
+            currentRow.rear_left_velocity = dataA->rear_left_velocity * HALL_MS_TO_KMH * HALL_ECU_SCALE_FIX;
+            currentRow.rear_right_velocity = dataA->rear_right_velocity * HALL_MS_TO_KMH * HALL_ECU_SCALE_FIX;
             currentRow.front_left_suspension = dataA->front_left_suspension;
             currentRow.front_right_suspension = dataA->front_right_suspension;
             currentRow.accelerator1 = dataA->accelerator1;
@@ -221,6 +249,8 @@ void FileService::loadBin(const std::string& filePath) {
         }
     }
 
+    computeSpeedStats(rawRows);
+
     std::lock_guard<std::mutex> lock(m_dataMutex);
     m_loadedData = std::move(rawRows);
     m_isFinished = true;
@@ -277,6 +307,7 @@ void FileService::loadCsv(const std::string& filePath) {
 
         // Only parse if the row has the expected structure
         if (colIdx >= 105) {
+            const int lostIdx = (colIdx >= 107) ? 105 : 103;
             NativeTelemetryRow nat;
             
             nat.timestamp = d_atof(cols[0]);
@@ -399,9 +430,9 @@ void FileService::loadCsv(const std::string& filePath) {
             nat.brk2_mean = f_atof(cols[97]); nat.brk2_var = f_atof(cols[98]); nat.brk2_std = f_atof(cols[99]);
             nat.steer_mean = f_atof(cols[100]); nat.steer_var = f_atof(cols[101]); nat.steer_std = f_atof(cols[102]);
 
-            nat.lostA = i_atoi(cols[103]);
-            nat.lostB = i_atoi(cols[104]);
-            nat.lostTot = i_atoi(cols[105]);
+            nat.lostA = i_atoi(cols[lostIdx]);
+            nat.lostB = i_atoi(cols[lostIdx + 1]);
+            nat.lostTot = i_atoi(cols[lostIdx + 2]);
 
             rawRows.push_back(nat);
         }
@@ -409,6 +440,8 @@ void FileService::loadCsv(const std::string& filePath) {
         // Advance to next line correctly
         while (p < end && (*p == '\n' || *p == '\r')) p++;
     }
+
+    computeSpeedStats(rawRows);
 
     std::lock_guard<std::mutex> lock(m_dataMutex);
     m_loadedData = std::move(rawRows);

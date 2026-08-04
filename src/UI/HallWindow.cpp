@@ -77,7 +77,7 @@ void HallWindow::draw() {
     ImGui::PushFont(m_uiManager->font_body);
     ImGui::Text("Speed" ); 
     ImGui::SameLine(0.0f, ImGui::CalcTextSize(" ").x);
-    ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "[m/s]");
+    ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "[km/h]");
     ImGui::PopFont();
     ImGui::Separator();
 

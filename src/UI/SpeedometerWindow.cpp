@@ -15,8 +15,8 @@ SpeedometerWindow::SpeedometerWindow(UiManager* manager) : m_uiManager(manager) 
 void SpeedometerWindow::onAggregatedDataReceived(const DbRow& dataRow) {
     std::lock_guard<std::mutex> lock(m_dataMutex);
     try {
-        if (dataRow.count("mean_velocity")) {
-            m_meanVelocity = std::stof(dataRow.at("mean_velocity"));
+        if (dataRow.count("rear_left_velocity") && dataRow.count("rear_right_velocity")) {
+            m_rearWheelsSpeed = (std::stof(dataRow.at("rear_left_velocity")) + std::stof(dataRow.at("rear_right_velocity"))) * 0.5f;
         }
     } catch (const std::exception& e) {}
 }
@@ -30,12 +30,14 @@ void SpeedometerWindow::draw() {
         auto playbackManager = ServiceManager::getPlaybackManager();
         if (auto rowOpt = playbackManager->getCurrentRow()) {
             try {
-                if (rowOpt->count("mean_velocity")) currentSpeed = std::stof(rowOpt->at("mean_velocity"));
+                if (rowOpt->count("rear_left_velocity") && rowOpt->count("rear_right_velocity")) {
+                    currentSpeed = (std::stof(rowOpt->at("rear_left_velocity")) + std::stof(rowOpt->at("rear_right_velocity"))) * 0.5f;
+                }
             } catch (...) {}
         }
     } else {
         std::lock_guard<std::mutex> lock(m_dataMutex);
-        currentSpeed = m_meanVelocity;
+        currentSpeed = m_rearWheelsSpeed;
     }
 
     ImGui::Spacing();
@@ -55,7 +57,7 @@ void SpeedometerWindow::draw() {
     float angle_span  = end_angle - start_angle;
     
     float max_speed = 180.0f;
-    float normalized_speed = std::clamp(currentSpeed * 3.6f/ max_speed, 0.0f, 1.0f);
+    float normalized_speed = std::clamp(currentSpeed / max_speed, 0.0f, 1.0f);
     float current_angle = start_angle + (normalized_speed * angle_span);
 
 
@@ -115,7 +117,7 @@ void SpeedometerWindow::draw() {
 
     char angle_text[16];
     ImGui::PushFont(m_uiManager->font_body);
-    snprintf(angle_text, 16, "%.1f km/h", currentSpeed * 3.6);
+    snprintf(angle_text, 16, "%.1f km/h", currentSpeed);
     ImVec2 angle_text_size = ImGui::CalcTextSize(angle_text);
     
     ImVec2 text_pos(

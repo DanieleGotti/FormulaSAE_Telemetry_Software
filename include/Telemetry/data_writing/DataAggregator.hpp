@@ -20,6 +20,12 @@ private:
     };
     StatData calculateStats(const std::vector<double>& values) const;
 
+    struct SpeedStats {
+        double max = 0.0;
+        double sum = 0.0;
+        size_t count = 0;
+    };
+
     std::function<void(const DbRow&)> m_onRowReadyCallback;
 
     double m_statsWindowStart = -1.0;
@@ -29,6 +35,9 @@ private:
     
     // Mantain last valid statistics for printing in UI and CSV
     std::map<std::string, StatData> m_lastPublishedStats;
+
+    SpeedStats m_currentSpeed;
+    SpeedStats m_sessionSpeed;
 
     const std::vector<std::string> m_targetSensors = {
         "accelerator1", "accelerator2", "brake1", "brake2", "steer"

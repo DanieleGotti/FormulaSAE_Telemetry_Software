@@ -41,6 +41,8 @@ struct NativeTelemetryRow {
     float brk2_mean = 0.0f, brk2_var = 0.0f, brk2_std = 0.0f;
     float steer_mean = 0.0f, steer_var = 0.0f, steer_std = 0.0f;
 
+    float speed_max = 0.0f, speed_mean = 0.0f;
+
     // Lost packets tracking
     uint32_t lostA = 0, lostB = 0, lostTot = 0;
 };

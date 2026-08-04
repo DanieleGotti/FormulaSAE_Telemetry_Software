@@ -92,10 +92,10 @@ void PacketParser::populateRowFromA(const TelemetryPacket_t* dataA, const DbRow&
     row["timestamp"] = formatDouble(time_sec, 3);
     
     // Data from packet 0xCC (5ms) with formatting and string conversion as needed
-    row["front_left_velocity"] = formatDouble(dataA->front_left_velocity, 1);
-    row["front_right_velocity"] = formatDouble(dataA->front_right_velocity, 1);
-    row["rear_left_velocity"] = formatDouble(dataA->rear_left_velocity, 1);
-    row["rear_right_velocity"] = formatDouble(dataA->rear_right_velocity, 1);
+    row["front_left_velocity"] = formatDouble(dataA->front_left_velocity * HALL_MS_TO_KMH * HALL_ECU_SCALE_FIX, 1);
+    row["front_right_velocity"] = formatDouble(dataA->front_right_velocity * HALL_MS_TO_KMH * HALL_ECU_SCALE_FIX, 1);
+    row["rear_left_velocity"] = formatDouble(dataA->rear_left_velocity * HALL_MS_TO_KMH * HALL_ECU_SCALE_FIX, 1);
+    row["rear_right_velocity"] = formatDouble(dataA->rear_right_velocity * HALL_MS_TO_KMH * HALL_ECU_SCALE_FIX, 1);
 
     row["front_left_suspension"] = formatDouble(dataA->front_left_suspension, 1);
     row["front_right_suspension"] = formatDouble(dataA->front_right_suspension, 1);
@@ -358,10 +358,13 @@ std::vector<std::string> PacketParser::getColumnOrder() {
     // Statistics fields added dynamically from variance (so they are shown in CSV/Dataset)
     const std::vector<std::string> targetSensors = {"accelerator1", "accelerator2", "brake1", "brake2", "steer"};
     for (const auto& sensor : targetSensors) {
-        cols.push_back(sensor + "_mean"); 
-        cols.push_back(sensor + "_var"); 
+        cols.push_back(sensor + "_mean");
+        cols.push_back(sensor + "_var");
         cols.push_back(sensor + "_std");
     }
+
+    cols.push_back("speed_max");
+    cols.push_back("speed_mean");
 
     cols.push_back("lost_packets_A");
     cols.push_back("lost_packets_B");   

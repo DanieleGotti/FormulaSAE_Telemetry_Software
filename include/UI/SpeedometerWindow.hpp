@@ -17,5 +17,5 @@ public:
 private:
     UiManager* m_uiManager;
     std::mutex m_dataMutex;
-    float m_meanVelocity = 0.0f;
+    float m_rearWheelsSpeed = 0.0f;
 };

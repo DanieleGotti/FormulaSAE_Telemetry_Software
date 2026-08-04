@@ -76,7 +76,7 @@ void Dashboard::draw() {
             ImGui::EndDisabled();
             ImGui::SameLine();
             if (!playbackManager->canGenerateCsv()) {
-                ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), " (Available only for .bin inputs)");
+                ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "\n(Available only for .bin inputs)");
             }
         }
         ImGui::EndChild();

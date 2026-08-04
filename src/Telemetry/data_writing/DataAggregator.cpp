@@ -19,6 +19,8 @@ void DataAggregator::reset() {
     m_statsWindowStart = -1.0;
     m_currentBuffers.clear();
     m_lastPublishedStats.clear();
+    m_currentSpeed = SpeedStats{};
+    m_sessionSpeed = SpeedStats{};
 }
 
 DataAggregator::StatData DataAggregator::calculateStats(const std::vector<double>& values) const {
@@ -52,13 +54,27 @@ void DataAggregator::processRow(DbRow row) {
         }
     }
 
+    if (row.count("rear_left_velocity") && row.count("rear_right_velocity")) {
+        try {
+            double speed = (std::stod(row.at("rear_left_velocity")) + std::stod(row.at("rear_right_velocity"))) * 0.5;
+            if (speed > m_currentSpeed.max) m_currentSpeed.max = speed;
+            m_currentSpeed.sum += speed;
+            m_currentSpeed.count++;
+        } catch (...) {}
+    }
+
     // If exactly 3 seconds have passed (tumbling window)
     if (current_ts - m_statsWindowStart >= STATS_WINDOW) {
         for (const auto& sensor : m_targetSensors) {
             m_lastPublishedStats[sensor] = calculateStats(m_currentBuffers[sensor]);
             m_currentBuffers[sensor].clear(); // Clear the buffer for the next 3 seconds
         }
-        
+
+        if (m_currentSpeed.max > m_sessionSpeed.max) m_sessionSpeed.max = m_currentSpeed.max;
+        m_sessionSpeed.sum += m_currentSpeed.sum;
+        m_sessionSpeed.count += m_currentSpeed.count;
+        m_currentSpeed = SpeedStats{};
+
         // Avoid temporal drift, add exactly 3 seconds
         m_statsWindowStart += STATS_WINDOW; 
         
@@ -81,6 +97,9 @@ void DataAggregator::processRow(DbRow row) {
             row[sensor + "_std"]  = "0.000";
         }
     }
+
+    row["speed_max"]  = formatDouble(m_sessionSpeed.max, 3);
+    row["speed_mean"] = formatDouble(m_sessionSpeed.count > 0 ? m_sessionSpeed.sum / m_sessionSpeed.count : 0.0, 3);
 
     if (m_onRowReadyCallback) m_onRowReadyCallback(row);
 }
