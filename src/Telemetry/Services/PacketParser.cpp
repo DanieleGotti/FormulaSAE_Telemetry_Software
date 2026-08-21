@@ -145,7 +145,9 @@ void PacketParser::populateRowFromA(const TelemetryPacket_t* dataA, const DbRow&
     row["tractive_system_fsm"] = getTractiveFsmStr(dataA->tractive_system_fsm);
     row["ECU_Mode"] = getEcuModeStr(dataA->ECU_Mode);
 
-    // Data from packet 0xEE (200ms) 
+    row["IMDInsulationValue"] = std::to_string(dataA->IMDInsulationValue);
+
+    // Data from packet 0xEE (200ms)
     for (const auto& kv : cachedDataB) {
         row[kv.first] = kv.second;
     }
@@ -342,9 +344,10 @@ std::vector<std::string> PacketParser::getColumnOrder() {
         "inv_L_torqueCurrent", "inv_L_magnetizingCurrent", "inv_L_tempMotor",
         "inv_R_torqueCurrent", "inv_R_magnetizingCurrent", "inv_R_tempMotor",
         "left_coolant_temp", "right_coolant_temp",
-        "left_inverter_fsm", "right_inverter_fsm", "tractive_system_fsm", 
+        "left_inverter_fsm", "right_inverter_fsm", "tractive_system_fsm",
         "ECU_Mode",
-        "state_of_charge", 
+        "IMDInsulationValue",
+        "state_of_charge",
     };
     
     for(int i=1; i<=14; ++i) cols.push_back("VoltageModule" + std::to_string(i));
@@ -365,6 +368,15 @@ std::vector<std::string> PacketParser::getColumnOrder() {
 
     cols.push_back("speed_max");
     cols.push_back("speed_mean");
+
+    // Session-cumulative max/mean for motor and water pump temperatures
+    const std::vector<std::string> maxMeanSensors = {
+        "inv_L_tempMotor", "inv_R_tempMotor", "left_coolant_temp", "right_coolant_temp"
+    };
+    for (const auto& sensor : maxMeanSensors) {
+        cols.push_back(sensor + "_max");
+        cols.push_back(sensor + "_mean");
+    }
 
     cols.push_back("lost_packets_A");
     cols.push_back("lost_packets_B");   

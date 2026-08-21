@@ -19,8 +19,15 @@ void DataAggregator::reset() {
     m_statsWindowStart = -1.0;
     m_currentBuffers.clear();
     m_lastPublishedStats.clear();
-    m_currentSpeed = SpeedStats{};
-    m_sessionSpeed = SpeedStats{};
+    m_currentAgg.clear();
+    m_sessionAgg.clear();
+}
+
+void DataAggregator::accumulate(const std::string& key, double value) {
+    RunningStats& stats = m_currentAgg[key];
+    if (value > stats.max) stats.max = value;
+    stats.sum += value;
+    stats.count++;
 }
 
 DataAggregator::StatData DataAggregator::calculateStats(const std::vector<double>& values) const {
@@ -54,13 +61,16 @@ void DataAggregator::processRow(DbRow row) {
         }
     }
 
+    // Speed is derived from the two rear wheels, the other channels are read as-is
     if (row.count("rear_left_velocity") && row.count("rear_right_velocity")) {
         try {
-            double speed = (std::stod(row.at("rear_left_velocity")) + std::stod(row.at("rear_right_velocity"))) * 0.5;
-            if (speed > m_currentSpeed.max) m_currentSpeed.max = speed;
-            m_currentSpeed.sum += speed;
-            m_currentSpeed.count++;
+            accumulate("speed", (std::stod(row.at("rear_left_velocity")) + std::stod(row.at("rear_right_velocity"))) * 0.5);
         } catch (...) {}
+    }
+    for (const auto& sensor : m_maxMeanSensors) {
+        if (row.count(sensor)) {
+            try { accumulate(sensor, std::stod(row.at(sensor))); } catch (...) {}
+        }
     }
 
     // If exactly 3 seconds have passed (tumbling window)
@@ -70,10 +80,13 @@ void DataAggregator::processRow(DbRow row) {
             m_currentBuffers[sensor].clear(); // Clear the buffer for the next 3 seconds
         }
 
-        if (m_currentSpeed.max > m_sessionSpeed.max) m_sessionSpeed.max = m_currentSpeed.max;
-        m_sessionSpeed.sum += m_currentSpeed.sum;
-        m_sessionSpeed.count += m_currentSpeed.count;
-        m_currentSpeed = SpeedStats{};
+        for (const auto& entry : m_currentAgg) {
+            RunningStats& session = m_sessionAgg[entry.first];
+            if (entry.second.max > session.max) session.max = entry.second.max;
+            session.sum += entry.second.sum;
+            session.count += entry.second.count;
+        }
+        m_currentAgg.clear();
 
         // Avoid temporal drift, add exactly 3 seconds
         m_statsWindowStart += STATS_WINDOW; 
@@ -98,8 +111,19 @@ void DataAggregator::processRow(DbRow row) {
         }
     }
 
-    row["speed_max"]  = formatDouble(m_sessionSpeed.max, 3);
-    row["speed_mean"] = formatDouble(m_sessionSpeed.count > 0 ? m_sessionSpeed.sum / m_sessionSpeed.count : 0.0, 3);
+    auto writeMaxMean = [&](const std::string& key) {
+        const auto it = m_sessionAgg.find(key);
+        if (it != m_sessionAgg.end() && it->second.count > 0) {
+            row[key + "_max"]  = formatDouble(it->second.max, 3);
+            row[key + "_mean"] = formatDouble(it->second.sum / it->second.count, 3);
+        } else {
+            // No window has been closed yet (first 3 seconds since startup)
+            row[key + "_max"]  = "0.000";
+            row[key + "_mean"] = "0.000";
+        }
+    };
+    writeMaxMean("speed");
+    for (const auto& sensor : m_maxMeanSensors) writeMaxMean(sensor);
 
     if (m_onRowReadyCallback) m_onRowReadyCallback(row);
 }

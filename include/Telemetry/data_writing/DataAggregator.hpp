@@ -2,6 +2,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <limits>
 #include <functional>
 
 using DbRow = std::map<std::string, std::string>;
@@ -20,11 +21,13 @@ private:
     };
     StatData calculateStats(const std::vector<double>& values) const;
 
-    struct SpeedStats {
-        double max = 0.0;
+    // Session-cumulative max/mean accumulator (no rolling window: it spans the whole session)
+    struct RunningStats {
+        double max = std::numeric_limits<double>::lowest();
         double sum = 0.0;
         size_t count = 0;
     };
+    void accumulate(const std::string& key, double value);
 
     std::function<void(const DbRow&)> m_onRowReadyCallback;
 
@@ -36,11 +39,18 @@ private:
     // Mantain last valid statistics for printing in UI and CSV
     std::map<std::string, StatData> m_lastPublishedStats;
 
-    SpeedStats m_currentSpeed;
-    SpeedStats m_sessionSpeed;
+    // Max/mean accumulators: filled every row, folded into the session totals every window
+    std::map<std::string, RunningStats> m_currentAgg;
+    std::map<std::string, RunningStats> m_sessionAgg;
 
     const std::vector<std::string> m_targetSensors = {
         "accelerator1", "accelerator2", "brake1", "brake2", "steer"
+    };
+
+    // Channels published as max/mean only, read straight from the row.
+    // "speed" is handled separately because it is derived from the two rear wheels.
+    const std::vector<std::string> m_maxMeanSensors = {
+        "inv_L_tempMotor", "inv_R_tempMotor", "left_coolant_temp", "right_coolant_temp"
     };
     const double STATS_WINDOW = 3.0; // expected time window for stats calculation in seconds
 };

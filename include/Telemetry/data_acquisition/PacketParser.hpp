@@ -77,6 +77,7 @@ typedef struct {
 
     // --- ECU mode ---
     uint8_t ECU_Mode; // mask
+    uint16_t IMDInsulationValue; //kOhm
 
     // --- CRC for corrupted packages ---
     uint16_t crc16; // int calculated

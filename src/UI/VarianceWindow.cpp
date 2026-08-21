@@ -86,18 +86,26 @@ void VarianceWindow::draw() {
         ImGui::TableSetupColumn("Mean (μ)");
         ImGui::TableHeadersRow();
 
-        ImGui::TableNextRow();
+        auto maxMeanRow = [&](const char* label, const char* unit, const std::string& key) {
+            ImGui::TableNextRow();
 
-        ImGui::TableSetColumnIndex(0);
-        ImGui::TextUnformatted("Speed");
-        ImGui::SameLine(0.0f, ImGui::CalcTextSize(" ").x);
-        ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "[km/h]");
+            ImGui::TableSetColumnIndex(0);
+            ImGui::TextUnformatted(label);
+            ImGui::SameLine(0.0f, ImGui::CalcTextSize(" ").x);
+            ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "%s", unit);
 
-        ImGui::TableSetColumnIndex(1);
-        printStat("speed_max");
+            ImGui::TableSetColumnIndex(1);
+            printStat(key + "_max");
 
-        ImGui::TableSetColumnIndex(2);
-        printStat("speed_mean");
+            ImGui::TableSetColumnIndex(2);
+            printStat(key + "_mean");
+        };
+
+        maxMeanRow("Speed", "[km/h]", "speed");
+        maxMeanRow("Left motor temperature", "[°C]", "inv_L_tempMotor");
+        maxMeanRow("Right motor temperature", "[°C]", "inv_R_tempMotor");
+        maxMeanRow("Left water pump temperature", "[°C]", "left_coolant_temp");
+        maxMeanRow("Right water pump temperature", "[°C]", "right_coolant_temp");
 
         ImGui::EndTable();
     }

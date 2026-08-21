@@ -26,7 +26,8 @@ struct NativeTelemetryRow {
     float inv_R_torqueCurrent = 0.0f, inv_R_magnetizingCurrent = 0.0f, inv_R_tempMotor = 0.0f;
     float left_coolant_temp = 0.0f, right_coolant_temp = 0.0f;
     uint8_t left_inverter_fsm = 0, right_inverter_fsm = 0, tractive_system_fsm = 0, ECU_Mode = 0;
-    
+    uint16_t IMDInsulationValue = 0; // kOhm
+
     // 0xEE (200ms) fields
     uint8_t state_of_charge = 0;
     float voltages[14] = {0};
@@ -41,7 +42,12 @@ struct NativeTelemetryRow {
     float brk2_mean = 0.0f, brk2_var = 0.0f, brk2_std = 0.0f;
     float steer_mean = 0.0f, steer_var = 0.0f, steer_std = 0.0f;
 
+    // Session-cumulative max/mean (same semantics as the live DataAggregator)
     float speed_max = 0.0f, speed_mean = 0.0f;
+    float inv_L_tempMotor_max = 0.0f, inv_L_tempMotor_mean = 0.0f;
+    float inv_R_tempMotor_max = 0.0f, inv_R_tempMotor_mean = 0.0f;
+    float left_coolant_temp_max = 0.0f, left_coolant_temp_mean = 0.0f;
+    float right_coolant_temp_max = 0.0f, right_coolant_temp_mean = 0.0f;
 
     // Lost packets tracking
     uint32_t lostA = 0, lostB = 0, lostTot = 0;

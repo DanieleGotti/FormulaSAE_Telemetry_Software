@@ -28,7 +28,7 @@ private:
     void loadingLoop();
     void loadCsv(const std::string& filePath);
     void loadBin(const std::string& filePath);
-    void computeSpeedStats(std::vector<NativeTelemetryRow>& rows);
+    void computeSessionStats(std::vector<NativeTelemetryRow>& rows);
     
     FileConfig m_config;
     std::atomic<bool> m_isLoading{false};

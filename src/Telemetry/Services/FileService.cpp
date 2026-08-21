@@ -7,6 +7,7 @@
 #include <sstream>
 #include <cstdlib>
 #include <cstring>
+#include <limits>
 
 // Fast C-style parsers to avoid std::string allocations and speed up CSV loading
 inline float f_atof(const char* s) { return s ? static_cast<float>(std::atof(s)) : 0.0f; }
@@ -15,11 +16,21 @@ inline int i_atoi(const char* s) { return s ? std::atoi(s) : 0; }
 
 FileService::FileService() = default;
 
-void FileService::computeSpeedStats(std::vector<NativeTelemetryRow>& rows) {
+// Session-cumulative max/mean, published every 600 rows (3 s at 200 Hz) to mirror the live DataAggregator
+void FileService::computeSessionStats(std::vector<NativeTelemetryRow>& rows) {
     const int WINDOW = 600;
 
-    double sessionMax = 0.0, sessionSum = 0.0;
+    struct Acc {
+        double max = std::numeric_limits<double>::lowest();
+        double sum = 0.0;
+    };
+    Acc speed, motorL, motorR, pumpL, pumpR;
     size_t sessionCount = 0;
+
+    auto feed = [](Acc& acc, double value) {
+        if (value > acc.max) acc.max = value;
+        acc.sum += value;
+    };
 
     for (size_t i = 0; i < rows.size(); i += WINDOW) {
         if (m_cancelRequested.load()) break;
@@ -27,18 +38,25 @@ void FileService::computeSpeedStats(std::vector<NativeTelemetryRow>& rows) {
         size_t end_idx = std::min(i + WINDOW, rows.size());
 
         for (size_t j = i; j < end_idx; ++j) {
-            double speed = (rows[j].rear_left_velocity + rows[j].rear_right_velocity) * 0.5;
-            if (speed > sessionMax) sessionMax = speed;
-            sessionSum += speed;
+            feed(speed,  (rows[j].rear_left_velocity + rows[j].rear_right_velocity) * 0.5);
+            feed(motorL, rows[j].inv_L_tempMotor);
+            feed(motorR, rows[j].inv_R_tempMotor);
+            feed(pumpL,  rows[j].left_coolant_temp);
+            feed(pumpR,  rows[j].right_coolant_temp);
         }
         sessionCount += (end_idx - i);
 
-        float blockMax = static_cast<float>(sessionMax);
-        float blockMean = static_cast<float>(sessionSum / sessionCount);
+        auto publish = [&](const Acc& acc, float& outMax, float& outMean) {
+            outMax  = static_cast<float>(acc.max);
+            outMean = static_cast<float>(acc.sum / sessionCount);
+        };
 
         for (size_t j = i; j < end_idx; ++j) {
-            rows[j].speed_max = blockMax;
-            rows[j].speed_mean = blockMean;
+            publish(speed,  rows[j].speed_max,               rows[j].speed_mean);
+            publish(motorL, rows[j].inv_L_tempMotor_max,     rows[j].inv_L_tempMotor_mean);
+            publish(motorR, rows[j].inv_R_tempMotor_max,     rows[j].inv_R_tempMotor_mean);
+            publish(pumpL,  rows[j].left_coolant_temp_max,   rows[j].left_coolant_temp_mean);
+            publish(pumpR,  rows[j].right_coolant_temp_max,  rows[j].right_coolant_temp_mean);
         }
     }
 }
@@ -174,7 +192,8 @@ void FileService::loadBin(const std::string& filePath) {
             currentRow.right_inverter_fsm = dataA->right_inverter_fsm;
             currentRow.tractive_system_fsm = dataA->tractive_system_fsm;
             currentRow.ECU_Mode = dataA->ECU_Mode;
-            
+            currentRow.IMDInsulationValue = dataA->IMDInsulationValue;
+
             currentRow.lostA = lostA; currentRow.lostB = lostB; currentRow.lostTot = lostA + lostB;
 
             if (hasB) {
@@ -249,7 +268,7 @@ void FileService::loadBin(const std::string& filePath) {
         }
     }
 
-    computeSpeedStats(rawRows);
+    computeSessionStats(rawRows);
 
     std::lock_guard<std::mutex> lock(m_dataMutex);
     m_loadedData = std::move(rawRows);
@@ -281,7 +300,9 @@ void FileService::loadCsv(const std::string& filePath) {
     while (p < end && *p != '\n') p++;
     if (p < end) p++;
 
-    std::vector<const char*> cols(110, nullptr);
+    // Must stay above the widest supported layout (117 columns today), with headroom for new channels
+    const int MAX_COLS = 160;
+    std::vector<const char*> cols(MAX_COLS, nullptr);
 
     while (p < end) {
         if (m_cancelRequested.load()) break; 
@@ -294,7 +315,7 @@ void FileService::loadCsv(const std::string& filePath) {
             if (*p == ';') {
                 *const_cast<char*>(p) = '\0'; 
                 colIdx++;
-                if (colIdx < 110) cols[colIdx] = p + 1;
+                if (colIdx < MAX_COLS) cols[colIdx] = p + 1;
             }
             p++;
         }
@@ -305,9 +326,16 @@ void FileService::loadCsv(const std::string& filePath) {
             p++;
         }
 
-        // Only parse if the row has the expected structure
+        // Only parse if the row has the expected structure.
+        // The dataset layout grew over time, so the format is detected from the column count:
+        //   117 cols -> current  (IMDInsulationValue at 44 + temperature session stats)
+        //   108 cols -> previous (speed session stats, no IMD)
+        //   106 cols -> legacy   (no session stats at all)
+        // Everything after ECU_Mode shifts by one once IMDInsulationValue is present.
         if (colIdx >= 105) {
-            const int lostIdx = (colIdx >= 107) ? 105 : 103;
+            const bool hasImd = (colIdx >= 116);
+            const int s = hasImd ? 1 : 0;
+            const int lostIdx = hasImd ? 114 : ((colIdx >= 107) ? 105 : 103);
             NativeTelemetryRow nat;
             
             nat.timestamp = d_atof(cols[0]);
@@ -414,21 +442,25 @@ void FileService::loadCsv(const std::string& filePath) {
                 else if (std::strstr(cols[43], "TEST")) nat.ECU_Mode = 4;
             }
 
-            nat.state_of_charge = i_atoi(cols[44]);
+            nat.IMDInsulationValue = hasImd ? static_cast<uint16_t>(i_atoi(cols[44])) : 0;
 
-            for(int i=0; i<14; ++i) nat.voltages[i] = f_atof(cols[45+i]);
+            nat.state_of_charge = i_atoi(cols[44 + s]);
+
+            for(int i=0; i<14; ++i) nat.voltages[i] = f_atof(cols[45 + s + i]);
             for(int i=0; i<14; ++i) {
-                nat.temperatures1[i] = f_atof(cols[59 + (i*2)]);
-                nat.temperatures2[i] = f_atof(cols[60 + (i*2)]);
+                nat.temperatures1[i] = f_atof(cols[59 + s + (i*2)]);
+                nat.temperatures2[i] = f_atof(cols[60 + s + (i*2)]);
             }
 
-            nat.online_modules = static_cast<uint16_t>(i_atoi(cols[87]));
+            nat.online_modules = static_cast<uint16_t>(i_atoi(cols[87 + s]));
 
-            nat.acc1_mean = f_atof(cols[88]); nat.acc1_var = f_atof(cols[89]); nat.acc1_std = f_atof(cols[90]);
-            nat.acc2_mean = f_atof(cols[91]); nat.acc2_var = f_atof(cols[92]); nat.acc2_std = f_atof(cols[93]);
-            nat.brk1_mean = f_atof(cols[94]); nat.brk1_var = f_atof(cols[95]); nat.brk1_std = f_atof(cols[96]);
-            nat.brk2_mean = f_atof(cols[97]); nat.brk2_var = f_atof(cols[98]); nat.brk2_std = f_atof(cols[99]);
-            nat.steer_mean = f_atof(cols[100]); nat.steer_var = f_atof(cols[101]); nat.steer_std = f_atof(cols[102]);
+            nat.acc1_mean = f_atof(cols[88 + s]); nat.acc1_var = f_atof(cols[89 + s]); nat.acc1_std = f_atof(cols[90 + s]);
+            nat.acc2_mean = f_atof(cols[91 + s]); nat.acc2_var = f_atof(cols[92 + s]); nat.acc2_std = f_atof(cols[93 + s]);
+            nat.brk1_mean = f_atof(cols[94 + s]); nat.brk1_var = f_atof(cols[95 + s]); nat.brk1_std = f_atof(cols[96 + s]);
+            nat.brk2_mean = f_atof(cols[97 + s]); nat.brk2_var = f_atof(cols[98 + s]); nat.brk2_std = f_atof(cols[99 + s]);
+            nat.steer_mean = f_atof(cols[100 + s]); nat.steer_var = f_atof(cols[101 + s]); nat.steer_std = f_atof(cols[102 + s]);
+
+            // speed/temperature session stats are recomputed by computeSessionStats(), so they are skipped here
 
             nat.lostA = i_atoi(cols[lostIdx]);
             nat.lostB = i_atoi(cols[lostIdx + 1]);
@@ -441,7 +473,7 @@ void FileService::loadCsv(const std::string& filePath) {
         while (p < end && (*p == '\n' || *p == '\r')) p++;
     }
 
-    computeSpeedStats(rawRows);
+    computeSessionStats(rawRows);
 
     std::lock_guard<std::mutex> lock(m_dataMutex);
     m_loadedData = std::move(rawRows);

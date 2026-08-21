@@ -75,8 +75,14 @@ def generate_packet_A(timestamp_val: int) -> bytes:
     ts_fsm = random.randint(0, 9)
     ecu_mode = random.choice([0x01, 0x02, 0x04])
 
-    fmt = '< BB I 4f 2f 2H f 2H f 4B 3f H 11f 6h 2f 4B'
-    
+    # IMD insulation resistance in kOhm. Mostly healthy, occasionally near/below the FSAE limit
+    if random.random() < 0.1:
+        imd_insulation = random.randint(0, 300)
+    else:
+        imd_insulation = random.randint(500, 5000)
+
+    fmt = '< BB I 4f 2f 2H f 2H f 4B 3f H 11f 6h 2f 4B H'
+
     payload = struct.pack(fmt,
         startByte1, startByte2, timestamp,
         fl_v, fr_v, rl_v, rr_v, fl_s, fr_s,
@@ -86,7 +92,8 @@ def generate_packet_A(timestamp_val: int) -> bytes:
         mean_vel, real_yaw, tot_trq, trq_tv_l, trq_tv_r, slip_l, slip_r, trq_red_l, trq_red_r, fin_trq_l, fin_trq_r,
         inv_L_tc, inv_L_mc, inv_L_tm, inv_R_tc, inv_R_mc, inv_R_tm,
         cool_L_tmp, cool_R_tmp,
-        l_inv_fsm, r_inv_fsm, ts_fsm, ecu_mode
+        l_inv_fsm, r_inv_fsm, ts_fsm, ecu_mode,
+        imd_insulation
     )
 
     crc = calculate_crc16(payload)

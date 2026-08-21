@@ -146,7 +146,8 @@ void PlaybackManager::generateCsvFromBin(const std::string& outputPath) {
             << "emma_current;emma_voltage;emma_yaw;emma_error;mean_velocity;real_yaw_rate;total_torque_request;"
             << "torque_tv_L;torque_tv_R;slip_L;slip_R;torque_reduction_L;torque_reduction_R;final_torque_target_L;final_torque_target_R;"
             << "inv_L_torqueCurrent;inv_L_magnetizingCurrent;inv_L_tempMotor;inv_R_torqueCurrent;inv_R_magnetizingCurrent;inv_R_tempMotor;"
-            << "left_coolant_temp;right_coolant_temp;left_inverter_fsm;right_inverter_fsm;tractive_system_fsm;ECU_Mode;state_of_charge;";
+            << "left_coolant_temp;right_coolant_temp;left_inverter_fsm;right_inverter_fsm;tractive_system_fsm;ECU_Mode;"
+            << "IMDInsulationValue;state_of_charge;";
         
         for (int i = 1; i <= 14; ++i) out << "VoltageModule" << i << ";";
         for (int i = 1; i <= 14; ++i) out << "Temperature1Module" << i << ";Temperature2Module" << i << ";";
@@ -158,6 +159,10 @@ void PlaybackManager::generateCsvFromBin(const std::string& outputPath) {
             << "brake2_mean;brake2_var;brake2_std;"
             << "steer_mean;steer_var;steer_std;"
             << "speed_max;speed_mean;"
+            << "inv_L_tempMotor_max;inv_L_tempMotor_mean;"
+            << "inv_R_tempMotor_max;inv_R_tempMotor_mean;"
+            << "left_coolant_temp_max;left_coolant_temp_mean;"
+            << "right_coolant_temp_max;right_coolant_temp_mean;"
             << "lost_packets_A;lost_packets_B;lost_packets_tot\n";
 
         // Write Hybrid Data: High-speed Numerics + String State Machines to perfectly match Live CSV formatting
@@ -189,6 +194,7 @@ void PlaybackManager::generateCsvFromBin(const std::string& outputPath) {
                 << PlaybackManager::getInverterFsmStr(row.right_inverter_fsm) << ";" 
                 << PlaybackManager::getTractiveFsmStr(row.tractive_system_fsm) << ";" 
                 << PlaybackManager::getEcuModeStr(row.ECU_Mode) << ";"
+                << row.IMDInsulationValue << ";"
                 << (int)row.state_of_charge << ";";
 
             for (int i = 0; i < 14; ++i) out << std::setprecision(2) << row.voltages[i] << ";";
@@ -202,6 +208,10 @@ void PlaybackManager::generateCsvFromBin(const std::string& outputPath) {
                 << row.brk2_mean << ";" << row.brk2_var << ";" << row.brk2_std << ";"
                 << row.steer_mean << ";" << row.steer_var << ";" << row.steer_std << ";"
                 << row.speed_max << ";" << row.speed_mean << ";"
+                << row.inv_L_tempMotor_max << ";" << row.inv_L_tempMotor_mean << ";"
+                << row.inv_R_tempMotor_max << ";" << row.inv_R_tempMotor_mean << ";"
+                << row.left_coolant_temp_max << ";" << row.left_coolant_temp_mean << ";"
+                << row.right_coolant_temp_max << ";" << row.right_coolant_temp_mean << ";"
                 << row.lostA << ";" << row.lostB << ";" << row.lostTot << "\n";
         }
 
@@ -314,6 +324,7 @@ DbRow PlaybackManager::convertNativeToDbRow(const NativeTelemetryRow& row) const
     out["right_inverter_fsm"] = getInverterFsmStr(row.right_inverter_fsm);
     out["tractive_system_fsm"] = getTractiveFsmStr(row.tractive_system_fsm);
     out["ECU_Mode"] = getEcuModeStr(row.ECU_Mode);
+    out["IMDInsulationValue"] = std::to_string(row.IMDInsulationValue);
 
     out["state_of_charge"] = std::to_string(row.state_of_charge);
     for(int i=0; i<14; ++i) {
@@ -331,6 +342,10 @@ DbRow PlaybackManager::convertNativeToDbRow(const NativeTelemetryRow& row) const
     out["steer_mean"] = formatDouble(row.steer_mean, 3); out["steer_var"] = formatDouble(row.steer_var, 3); out["steer_std"] = formatDouble(row.steer_std, 3);
 
     out["speed_max"] = formatDouble(row.speed_max, 3); out["speed_mean"] = formatDouble(row.speed_mean, 3);
+    out["inv_L_tempMotor_max"] = formatDouble(row.inv_L_tempMotor_max, 3); out["inv_L_tempMotor_mean"] = formatDouble(row.inv_L_tempMotor_mean, 3);
+    out["inv_R_tempMotor_max"] = formatDouble(row.inv_R_tempMotor_max, 3); out["inv_R_tempMotor_mean"] = formatDouble(row.inv_R_tempMotor_mean, 3);
+    out["left_coolant_temp_max"] = formatDouble(row.left_coolant_temp_max, 3); out["left_coolant_temp_mean"] = formatDouble(row.left_coolant_temp_mean, 3);
+    out["right_coolant_temp_max"] = formatDouble(row.right_coolant_temp_max, 3); out["right_coolant_temp_mean"] = formatDouble(row.right_coolant_temp_mean, 3);
 
     out["lost_packets_A"] = std::to_string(row.lostA);
     out["lost_packets_B"] = std::to_string(row.lostB);
