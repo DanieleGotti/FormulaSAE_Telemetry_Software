@@ -5,6 +5,7 @@
 #include <mutex>
 #include "UIElement.hpp"
 #include "../Telemetry/data_writing/IAggregatedDataSubscriber.hpp"
+#include "../Telemetry/data_acquisition/TelemetrySchema.hpp"
 
 class UiManager;
 
@@ -21,8 +22,6 @@ private:
     std::mutex m_dataMutex;
     DbRow m_latestData;
 
-    // This ist must be identical to that of the DataAggregator
-    const std::vector<std::string> m_targetSensors = {
-        "accelerator1", "accelerator2", "brake1", "brake2", "steer"
-    };
+    // Sourced from the schema, so it can never drift from the DataAggregator
+    const std::vector<std::string>& m_targetSensors = TelemetrySchema::varianceChannels();
 };

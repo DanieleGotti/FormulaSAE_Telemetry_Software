@@ -5,6 +5,26 @@
 #include "Telemetry/Services/ServiceManager.hpp"
 #include "Telemetry/file_reading/PlaybackManager.hpp"
 
+// Friendly label and unit for the statistics rows. Channels not listed here
+// simply show their raw schema name, so nothing breaks when one is added.
+static const std::pair<std::string, std::string>& displayNameFor(const std::string& channel) {
+    static const std::map<std::string, std::pair<std::string, std::string>> names = {
+        { "speed",              { "Speed",                       "[km/h]" } },
+        { "inv_L_tempMotor",    { "Left motor temperature",      "[°C]" } },
+        { "inv_R_tempMotor",    { "Right motor temperature",     "[°C]" } },
+        { "left_coolant_temp",  { "Left water pump temperature", "[°C]" } },
+        { "right_coolant_temp", { "Right water pump temperature","[°C]" } },
+    };
+    static std::map<std::string, std::pair<std::string, std::string>> fallback;
+
+    const auto it = names.find(channel);
+    if (it != names.end()) return it->second;
+
+    auto& entry = fallback[channel];
+    if (entry.first.empty()) entry = { channel, "[-]" };
+    return entry;
+}
+
 VarianceWindow::VarianceWindow(UiManager* manager) : m_uiManager(manager) {}
 
 void VarianceWindow::onAggregatedDataReceived(const DbRow& row) {
@@ -47,20 +67,54 @@ void VarianceWindow::draw() {
         }
     };
 
+    if (ImGui::BeginTable("Speed statistics table", 3, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_SizingStretchSame)) {
+
+        ImGui::TableSetupColumn("Sensor");
+        ImGui::TableSetupColumn("Max");
+        ImGui::TableSetupColumn("Mean (μ)");
+        ImGui::TableHeadersRow();
+
+        // Rows follow the schema, so a channel added there shows up here too
+        for (const auto& channel : TelemetrySchema::maxMeanChannels()) {
+            const auto& display = displayNameFor(channel);
+
+            ImGui::TableNextRow();
+
+            ImGui::TableSetColumnIndex(0);
+            ImGui::TextUnformatted(display.first.c_str());
+            ImGui::SameLine(0.0f, ImGui::CalcTextSize(" ").x);
+            ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "%s", display.second.c_str());
+
+            ImGui::TableSetColumnIndex(1);
+            printStat(channel + "_max");
+
+            ImGui::TableSetColumnIndex(2);
+            printStat(channel + "_mean");
+        }
+
+        ImGui::EndTable();
+    }
+
+    ImGui::Spacing();
+    ImGui::PushFont(m_uiManager->font_label);
+    ImGui::Text("");
+    ImGui::PopFont();
+    ImGui::Separator();
+
     if (ImGui::BeginTable("Sensors statistics table", 4, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_SizingStretchSame)) {
 
         ImGui::TableSetupColumn("Sensor");
-        ImGui::TableSetupColumn("Mean (\u03BC)");
-        ImGui::TableSetupColumn("Variance (\u03C3\u00B2)");
-        ImGui::TableSetupColumn("Standard deviation (\u03C3)");
+        ImGui::TableSetupColumn("Mean (μ)");
+        ImGui::TableSetupColumn("Variance (σ²)");
+        ImGui::TableSetupColumn("Standard deviation (σ)");
         ImGui::TableHeadersRow();
 
         for (const auto& sensor : m_targetSensors) {
             ImGui::TableNextRow();
-            
+
             ImGui::TableSetColumnIndex(0);
             ImGui::TextUnformatted(sensor.c_str());
-            
+
             ImGui::TableSetColumnIndex(1);
             printStat(sensor + "_mean");
 
@@ -73,41 +127,5 @@ void VarianceWindow::draw() {
         ImGui::EndTable();
     }
 
-    ImGui::Spacing();
-    ImGui::PushFont(m_uiManager->font_label);
-    ImGui::Text("");
-    ImGui::PopFont();
-    ImGui::Separator();
-
-    if (ImGui::BeginTable("Speed statistics table", 3, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_SizingStretchSame)) {
-
-        ImGui::TableSetupColumn("Sensor");
-        ImGui::TableSetupColumn("Max");
-        ImGui::TableSetupColumn("Mean (μ)");
-        ImGui::TableHeadersRow();
-
-        auto maxMeanRow = [&](const char* label, const char* unit, const std::string& key) {
-            ImGui::TableNextRow();
-
-            ImGui::TableSetColumnIndex(0);
-            ImGui::TextUnformatted(label);
-            ImGui::SameLine(0.0f, ImGui::CalcTextSize(" ").x);
-            ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "%s", unit);
-
-            ImGui::TableSetColumnIndex(1);
-            printStat(key + "_max");
-
-            ImGui::TableSetColumnIndex(2);
-            printStat(key + "_mean");
-        };
-
-        maxMeanRow("Speed", "[km/h]", "speed");
-        maxMeanRow("Left motor temperature", "[°C]", "inv_L_tempMotor");
-        maxMeanRow("Right motor temperature", "[°C]", "inv_R_tempMotor");
-        maxMeanRow("Left water pump temperature", "[°C]", "left_coolant_temp");
-        maxMeanRow("Right water pump temperature", "[°C]", "right_coolant_temp");
-
-        ImGui::EndTable();
-    }
     ImGui::End();
 }

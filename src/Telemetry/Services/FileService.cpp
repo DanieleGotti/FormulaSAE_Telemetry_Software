@@ -1,100 +1,51 @@
 #include "Telemetry/Services/FileService.hpp"
-#include "Telemetry/data_acquisition/PacketParser.hpp"
+#include "Telemetry/data_acquisition/TelemetrySchema.hpp"
 #include <fstream>
 #include <iostream>
 #include <algorithm>
 #include <cmath>
-#include <sstream>
 #include <cstdlib>
 #include <cstring>
 #include <limits>
-
-// Fast C-style parsers to avoid std::string allocations and speed up CSV loading
-inline float f_atof(const char* s) { return s ? static_cast<float>(std::atof(s)) : 0.0f; }
-inline double d_atof(const char* s) { return s ? std::atof(s) : 0.0; }
-inline int i_atoi(const char* s) { return s ? std::atoi(s) : 0; }
+#include <unordered_map>
 
 FileService::FileService() = default;
 
-// Session-cumulative max/mean, published every 600 rows (3 s at 200 Hz) to mirror the live DataAggregator
-void FileService::computeSessionStats(std::vector<NativeTelemetryRow>& rows) {
-    const int WINDOW = 600;
-
-    struct Acc {
-        double max = std::numeric_limits<double>::lowest();
-        double sum = 0.0;
-    };
-    Acc speed, motorL, motorR, pumpL, pumpR;
-    size_t sessionCount = 0;
-
-    auto feed = [](Acc& acc, double value) {
-        if (value > acc.max) acc.max = value;
-        acc.sum += value;
-    };
-
-    for (size_t i = 0; i < rows.size(); i += WINDOW) {
-        if (m_cancelRequested.load()) break;
-
-        size_t end_idx = std::min(i + WINDOW, rows.size());
-
-        for (size_t j = i; j < end_idx; ++j) {
-            feed(speed,  (rows[j].rear_left_velocity + rows[j].rear_right_velocity) * 0.5);
-            feed(motorL, rows[j].inv_L_tempMotor);
-            feed(motorR, rows[j].inv_R_tempMotor);
-            feed(pumpL,  rows[j].left_coolant_temp);
-            feed(pumpR,  rows[j].right_coolant_temp);
-        }
-        sessionCount += (end_idx - i);
-
-        auto publish = [&](const Acc& acc, float& outMax, float& outMean) {
-            outMax  = static_cast<float>(acc.max);
-            outMean = static_cast<float>(acc.sum / sessionCount);
-        };
-
-        for (size_t j = i; j < end_idx; ++j) {
-            publish(speed,  rows[j].speed_max,               rows[j].speed_mean);
-            publish(motorL, rows[j].inv_L_tempMotor_max,     rows[j].inv_L_tempMotor_mean);
-            publish(motorR, rows[j].inv_R_tempMotor_max,     rows[j].inv_R_tempMotor_mean);
-            publish(pumpL,  rows[j].left_coolant_temp_max,   rows[j].left_coolant_temp_mean);
-            publish(pumpR,  rows[j].right_coolant_temp_max,  rows[j].right_coolant_temp_mean);
-        }
+FileService::~FileService() {
+    // Safely stop background reading if the app is closed to avoid zombies and crashes
+    m_cancelRequested.store(true);
+    if (m_thread.joinable()) {
+        m_thread.join();
     }
 }
 
-FileService::~FileService() { 
-    // Safely stop background reading if the app is closed to avoid zombies and crashes
-    m_cancelRequested.store(true);
-    if (m_thread.joinable()) { 
-        m_thread.join(); 
-    } 
+bool FileService::configure(const FileConfig& config) {
+    if (m_isLoading) return false;
+    m_config = config;
+    return true;
 }
 
-bool FileService::configure(const FileConfig& config) { 
-    if (m_isLoading) return false; 
-    m_config = config; 
-    return true; 
-}
-
-void FileService::startLoading() { 
+void FileService::startLoading() {
     if (m_isLoading || m_isFinished) return;
-    m_isLoading = true; 
+    m_isLoading = true;
     m_cancelRequested.store(false); // Reset token for new load
-    m_thread = std::thread(&FileService::loadingLoop, this); 
+    m_thread = std::thread(&FileService::loadingLoop, this);
 }
 
-bool FileService::isLoading() const { return m_isLoading; } 
+bool FileService::isLoading() const { return m_isLoading; }
 bool FileService::isFinished() const { return m_isFinished; }
 
-std::vector<NativeTelemetryRow> FileService::getResult() { 
-    std::lock_guard<std::mutex> lock(m_dataMutex); 
-    return std::move(m_loadedData); 
+TelemetryDataset FileService::getResult() {
+    std::lock_guard<std::mutex> lock(m_dataMutex);
+    return std::move(m_loadedData);
 }
 
-void FileService::loadingLoop() { 
+void FileService::loadingLoop() {
     std::string filePath = m_config.filePath;
     std::replace(filePath.begin(), filePath.end(), '\\', '/');
 
-    std::string ext = filePath.substr(filePath.find_last_of("."));
+    const size_t dot = filePath.find_last_of(".");
+    std::string ext = (dot == std::string::npos) ? "" : filePath.substr(dot);
     std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
 
     if (ext == ".csv") {
@@ -108,375 +59,484 @@ void FileService::loadingLoop() {
     }
 }
 
-void FileService::loadBin(const std::string& filePath) { 
-    std::ifstream file(filePath, std::ios::binary | std::ios::ate); 
-    if (!file.is_open()) { 
-        std::cerr << "ERROR [FileService]: Unable to open BIN file." << std::endl; 
-        m_isLoading = false; m_isFinished = true; return; 
+//==============================================================================
+//  Column setup
+//==============================================================================
+
+void FileService::prepareColumns(TelemetryDataset& dataset) {
+    dataset.setColumns(TelemetrySchema::columns());
+
+    // Channels that only exist in retired layouts still need a home
+    for (const auto* layouts : { &TelemetrySchema::layoutsA(), &TelemetrySchema::layoutsB() }) {
+        for (const auto& layout : *layouts) {
+            for (const auto& field : layout.fields) {
+                dataset.addColumn({ field.name, field.format, field.decimals });
+            }
+        }
+    }
+}
+
+//==============================================================================
+//  Statistics
+//==============================================================================
+
+void FileService::computeMissingStats(TelemetryDataset& dataset) {
+    const int WINDOW = 600; // 3 s at 200 Hz, matching the live aggregator cadence
+    const size_t rows = dataset.rowCount();
+    if (rows == 0) return;
+
+    // ---- Windowed mean / variance / standard deviation ----
+    struct VarianceTarget { int source; int mean; int var; int std; };
+    std::vector<VarianceTarget> varianceTargets;
+    for (const auto& sensor : TelemetrySchema::varianceChannels()) {
+        const int mean = dataset.indexOf(sensor + "_mean");
+        const int var  = dataset.indexOf(sensor + "_var");
+        const int std  = dataset.indexOf(sensor + "_std");
+        // Skip channels the source already provided
+        if (dataset.isPresent(mean) && dataset.isPresent(var) && dataset.isPresent(std)) continue;
+        // ...and channels this recording never carried, so they stay blank
+        // instead of showing a fabricated 0.000
+        const int source = dataset.indexOf(sensor);
+        if (!dataset.isPresent(source)) continue;
+        varianceTargets.push_back({ source, mean, var, std });
     }
 
-    size_t fileSize = file.tellg();
+    // ---- Session-cumulative max / mean ----
+    struct MaxMeanTarget { int sourceA; int sourceB; int max; int mean; double runMax; double runSum; };
+    std::vector<MaxMeanTarget> maxMeanTargets;
+    for (const auto& channel : TelemetrySchema::maxMeanChannels()) {
+        const int max  = dataset.indexOf(channel + "_max");
+        const int mean = dataset.indexOf(channel + "_mean");
+        if (dataset.isPresent(max) && dataset.isPresent(mean)) continue;
+
+        MaxMeanTarget target{};
+        target.max = max;
+        target.mean = mean;
+        target.runMax = std::numeric_limits<double>::lowest();
+        target.runSum = 0.0;
+        if (channel == "speed") {
+            // Vehicle speed is the average of the two rear wheels
+            target.sourceA = dataset.indexOf("rear_left_velocity");
+            target.sourceB = dataset.indexOf("rear_right_velocity");
+            if (!dataset.isPresent(target.sourceA) || !dataset.isPresent(target.sourceB)) continue;
+        } else {
+            target.sourceA = dataset.indexOf(channel);
+            target.sourceB = -1;
+            if (!dataset.isPresent(target.sourceA)) continue;
+        }
+        maxMeanTargets.push_back(target);
+    }
+
+    // ---- Distance travelled, integrated from the speedometer ----
+    // Skipped when the source already carries it, so a bin -> csv -> bin round
+    // trip reproduces the very same numbers instead of re-deriving them
+    const int idxMeters   = dataset.indexOf("meters");
+    const int idxRearLeft = dataset.indexOf("rear_left_velocity");
+    const int idxRearRight= dataset.indexOf("rear_right_velocity");
+    const bool computeMeters = !dataset.isPresent(idxMeters)
+                            && dataset.isPresent(idxRearLeft)
+                            && dataset.isPresent(idxRearRight);
+
+    if (computeMeters) {
+        // The live aggregator integrates the velocities as they appear in the
+        // dataset, that is rounded to the precision the schema declares for
+        // them. Quantising here too makes a replayed file report exactly the
+        // same distance the driver saw on track.
+        const double quantum = std::pow(10.0, dataset.definition(idxRearLeft).decimals);
+        // nearbyint honours the active FP rounding mode, the same one printf
+        // uses when the live path renders the value, so ties land the same way
+        auto canonical = [quantum](double v) { return std::nearbyint(v * quantum) / quantum; };
+
+        double distance = 0.0;
+        double previousTs = -1.0;
+        for (size_t r = 0; r < rows; ++r) {
+            const double timestamp = dataset.timestamp(r);
+            const double speed_kmh = (canonical(dataset.value(r, idxRearLeft))
+                                    + canonical(dataset.value(r, idxRearRight))) * 0.5;
+
+            // Same rule as the live aggregator: a long gap means lost samples
+            if (previousTs >= 0.0) {
+                const double dt = timestamp - previousTs;
+                if (dt > 0.0 && dt <= TelemetrySchema::MAX_DISTANCE_GAP_S) {
+                    distance += speed_kmh * TelemetrySchema::KMH_TO_MS * dt;
+                }
+            }
+            previousTs = timestamp;
+            dataset.setValue(r, idxMeters, distance);
+        }
+        dataset.markPresent(idxMeters);
+    }
+
+    if (varianceTargets.empty() && maxMeanTargets.empty()) return;
+
+    size_t sessionCount = 0;
+
+    for (size_t start = 0; start < rows; start += WINDOW) {
+        if (m_cancelRequested.load()) return;
+
+        const size_t end = std::min(start + static_cast<size_t>(WINDOW), rows);
+        const size_t count = end - start;
+
+        // Variance is computed per block with a single pass over the data
+        for (auto& target : varianceTargets) {
+            double sum = 0.0, sumSquares = 0.0;
+            for (size_t r = start; r < end; ++r) {
+                const double v = dataset.value(r, target.source);
+                sum += v;
+                sumSquares += v * v;
+            }
+            const double mean = sum / count;
+            double variance = (sumSquares / count) - (mean * mean);
+            if (variance < 0.0) variance = 0.0;
+            const double stdDev = std::sqrt(variance);
+
+            for (size_t r = start; r < end; ++r) {
+                dataset.setValue(r, target.mean, mean);
+                dataset.setValue(r, target.var, variance);
+                dataset.setValue(r, target.std, stdDev);
+            }
+        }
+
+        for (auto& target : maxMeanTargets) {
+            for (size_t r = start; r < end; ++r) {
+                double v = dataset.value(r, target.sourceA);
+                if (target.sourceB >= 0) v = (v + dataset.value(r, target.sourceB)) * 0.5;
+                if (v > target.runMax) target.runMax = v;
+                target.runSum += v;
+            }
+        }
+        sessionCount += count;
+
+        for (const auto& target : maxMeanTargets) {
+            const double mean = target.runSum / sessionCount;
+            for (size_t r = start; r < end; ++r) {
+                dataset.setValue(r, target.max, target.runMax);
+                dataset.setValue(r, target.mean, mean);
+            }
+        }
+    }
+
+    for (const auto& target : varianceTargets) {
+        dataset.markPresent(target.mean);
+        dataset.markPresent(target.var);
+        dataset.markPresent(target.std);
+    }
+    for (const auto& target : maxMeanTargets) {
+        dataset.markPresent(target.max);
+        dataset.markPresent(target.mean);
+    }
+}
+
+//==============================================================================
+//  Binary loading
+//==============================================================================
+
+void FileService::loadBin(const std::string& filePath) {
+    std::ifstream file(filePath, std::ios::binary | std::ios::ate);
+    if (!file.is_open()) {
+        std::cerr << "ERROR [FileService]: Unable to open BIN file." << std::endl;
+        m_isLoading = false; m_isFinished = true; return;
+    }
+
+    const size_t fileSize = static_cast<size_t>(file.tellg());
     file.seekg(0, std::ios::beg);
     std::vector<uint8_t> buffer(fileSize);
     file.read(reinterpret_cast<char*>(buffer.data()), fileSize);
 
-    std::vector<NativeTelemetryRow> rawRows;
-    rawRows.reserve(fileSize / sizeof(TelemetryPacket_t)); 
+    TelemetryDataset dataset;
+    prepareColumns(dataset);
 
-    NativeTelemetryRow currentRow = {};
-    TelemetryPacket_EMMA_t lastB = {};
+    const auto& layoutsA = TelemetrySchema::layoutsA();
+    const auto& layoutsB = TelemetrySchema::layoutsB();
+
+    // Resolved once per layout so the hot loop only does memcpy + scaling
+    std::unordered_map<const PacketLayout*, std::vector<int>> columnCache;
+    auto columnsFor = [&](const PacketLayout& layout) -> const std::vector<int>& {
+        auto it = columnCache.find(&layout);
+        if (it != columnCache.end()) return it->second;
+        std::vector<int> indices;
+        indices.reserve(layout.fields.size());
+        for (const auto& field : layout.fields) indices.push_back(dataset.indexOf(field.name));
+        return columnCache.emplace(&layout, std::move(indices)).first->second;
+    };
+
+    const int idxLostA   = dataset.indexOf("lost_packets_A");
+    const int idxLostB   = dataset.indexOf("lost_packets_B");
+    const int idxLostTot = dataset.indexOf("lost_packets_tot");
+
+    dataset.reserveRows(fileSize / (layoutsA.front().payloadSize ? layoutsA.front().payloadSize : 1));
+
+    // Latest battery values, replayed into every fast row
+    std::vector<std::pair<int, double>> lastB;
     bool hasB = false;
 
     uint32_t lastTimestampA = 0, lastTimestampB = 0;
     uint32_t lostA = 0, lostB = 0;
     bool firstA = true, firstB = true;
 
+    int lockedA = 0, lockedB = 0;
+    const PacketLayout* usedA = nullptr;
+    const PacketLayout* usedB = nullptr;
+
+    auto tryMatch = [](const std::vector<PacketLayout>& layouts, int& locked,
+                       const uint8_t* data, size_t available) -> const PacketLayout* {
+        if (locked >= 0 && locked < static_cast<int>(layouts.size()) &&
+            TelemetrySchema::matches(layouts[locked], data, available)) {
+            return &layouts[locked];
+        }
+        for (size_t i = 0; i < layouts.size(); ++i) {
+            if (static_cast<int>(i) == locked) continue;
+            if (TelemetrySchema::matches(layouts[i], data, available)) {
+                locked = static_cast<int>(i);
+                return &layouts[i];
+            }
+        }
+        return nullptr;
+    };
+
     size_t cursor = 0;
-    while (cursor + 4 < buffer.size()) {
+    size_t skipped = 0;
+    while (cursor + 2 <= buffer.size()) {
         if (m_cancelRequested.load()) {
             std::cout << "WARNING [FileService]: BIN loading aborted by user." << std::endl;
-            break; 
+            break;
         }
 
-        if (buffer[cursor] == 0xCC && buffer[cursor+1] == 0x11 && cursor + sizeof(TelemetryPacket_t) <= buffer.size()) {
-            const TelemetryPacket_t* dataA = reinterpret_cast<const TelemetryPacket_t*>(&buffer[cursor]);
-            
-            if (!firstA && dataA->timestamp > lastTimestampA) {
-                uint32_t diff = dataA->timestamp - lastTimestampA;
-                if (diff > 1 && diff < 5000) lostA += (diff - 1);
-            }
-            lastTimestampA = dataA->timestamp;
-            firstA = false;
+        const uint8_t* at = buffer.data() + cursor;
+        const size_t available = buffer.size() - cursor;
 
-            currentRow.timestamp = dataA->timestamp * 0.005;
-            currentRow.front_left_velocity = dataA->front_left_velocity * HALL_MS_TO_KMH * HALL_ECU_SCALE_FIX;
-            currentRow.front_right_velocity = dataA->front_right_velocity * HALL_MS_TO_KMH * HALL_ECU_SCALE_FIX;
-            currentRow.rear_left_velocity = dataA->rear_left_velocity * HALL_MS_TO_KMH * HALL_ECU_SCALE_FIX;
-            currentRow.rear_right_velocity = dataA->rear_right_velocity * HALL_MS_TO_KMH * HALL_ECU_SCALE_FIX;
-            currentRow.front_left_suspension = dataA->front_left_suspension;
-            currentRow.front_right_suspension = dataA->front_right_suspension;
-            currentRow.accelerator1 = dataA->accelerator1;
-            currentRow.accelerator2 = dataA->accelerator2;
-            currentRow.accelerator_mapped = dataA->accelerator_mapped;
-            currentRow.brake1 = dataA->brake1;
-            currentRow.brake2 = dataA->brake2;
-            currentRow.steer = dataA->steer;
-            currentRow.sdc = dataA->sdc;
-            currentRow.ready_to_drive_button = dataA->ready_to_drive_button;
-            currentRow.ecu_reset_button = dataA->ecu_reset_button;
-            currentRow.tractive_system_on_button = dataA->tractive_system_on_button;
-            currentRow.emma_current = dataA->emma_current;
-            currentRow.emma_voltage = dataA->emma_voltage;
-            currentRow.emma_yaw = dataA->emma_yaw;
-            currentRow.emma_error = dataA->emma_error;
-            currentRow.mean_velocity = dataA->mean_velocity;
-            currentRow.real_yaw_rate = dataA->real_yaw_rate;
-            currentRow.total_torque_request = dataA->total_torque_request;
-            currentRow.torque_tv_L = dataA->torque_tv_L;
-            currentRow.torque_tv_R = dataA->torque_tv_R;
-            currentRow.slip_L = dataA->slip_L;
-            currentRow.slip_R = dataA->slip_R;
-            currentRow.torque_reduction_L = dataA->torque_reduction_L;
-            currentRow.torque_reduction_R = dataA->torque_reduction_R;
-            currentRow.final_torque_target_L = dataA->final_torque_target_L;
-            currentRow.final_torque_target_R = dataA->final_torque_target_R;
-            currentRow.inv_L_torqueCurrent = dataA->inv_L_torqueCurrent / 10.0f;
-            currentRow.inv_L_magnetizingCurrent = dataA->inv_L_magnetizingCurrent / 10.0f;
-            currentRow.inv_L_tempMotor = dataA->inv_L_tempMotor / 10.0f;
-            currentRow.inv_R_torqueCurrent = dataA->inv_R_torqueCurrent / 10.0f;
-            currentRow.inv_R_magnetizingCurrent = dataA->inv_R_magnetizingCurrent / 10.0f;
-            currentRow.inv_R_tempMotor = dataA->inv_R_tempMotor / 10.0f;
-            currentRow.left_coolant_temp = dataA->left_coolant_temp;
-            currentRow.right_coolant_temp = dataA->right_coolant_temp;
-            currentRow.left_inverter_fsm = dataA->left_inverter_fsm;
-            currentRow.right_inverter_fsm = dataA->right_inverter_fsm;
-            currentRow.tractive_system_fsm = dataA->tractive_system_fsm;
-            currentRow.ECU_Mode = dataA->ECU_Mode;
-            currentRow.IMDInsulationValue = dataA->IMDInsulationValue;
+        // Decodes a battery packet into the carry-forward cache
+        auto decodeB = [&](const uint8_t* data, size_t room) -> const PacketLayout* {
+            const PacketLayout* layout = tryMatch(layoutsB, lockedB, data, room);
+            if (!layout) return nullptr;
+            if (!usedB) usedB = layout;
 
-            currentRow.lostA = lostA; currentRow.lostB = lostB; currentRow.lostTot = lostA + lostB;
-
-            if (hasB) {
-                currentRow.state_of_charge = lastB.state_of_charge;
-                for(int i=0; i<14; ++i) currentRow.voltages[i] = (static_cast<float>(lastB.module_voltage[i]) + 200.0f) / 100.0f;
-                for(int i=0; i<28; ++i) {
-                    if (i % 2 == 0) currentRow.temperatures1[i/2] = lastB.module_temperatures[i] / 10.0f;
-                    else currentRow.temperatures2[i/2] = lastB.module_temperatures[i] / 10.0f;
-                }
-                currentRow.online_modules = lastB.online_modules;
-            }
-
-            rawRows.push_back(currentRow);
-            cursor += sizeof(TelemetryPacket_t);
-        } 
-        else if (buffer[cursor] == 0xEE && buffer[cursor+1] == 0x11 && cursor + sizeof(TelemetryPacket_EMMA_t) <= buffer.size()) {
-            const TelemetryPacket_EMMA_t* dataB = reinterpret_cast<const TelemetryPacket_EMMA_t*>(&buffer[cursor]);
-            
-            if (!firstB && dataB->timestamp > lastTimestampB) {
-                uint32_t diff = dataB->timestamp - lastTimestampB;
+            uint32_t ts = 0; std::memcpy(&ts, data + 2, 4);
+            if (!firstB && ts > lastTimestampB) {
+                const uint32_t diff = ts - lastTimestampB;
                 if (diff > 40 && diff < 100000) lostB += (diff / 40) - 1;
             }
-            lastTimestampB = dataB->timestamp;
+            lastTimestampB = ts;
             firstB = false;
 
-            lastB = *dataB;
+            const std::vector<int>& indices = columnsFor(*layout);
+            lastB.clear();
+            lastB.reserve(layout->fields.size());
+            for (size_t i = 0; i < layout->fields.size(); ++i) {
+                lastB.emplace_back(indices[i],
+                                   TelemetrySchema::readField(data, layout->fieldOffset(i), layout->fields[i]));
+            }
             hasB = true;
-            cursor += sizeof(TelemetryPacket_EMMA_t);
-        }
-        else {
-            cursor++;
-        }
-    }
-
-    const int WINDOW = 600; 
-    for (size_t i = 0; i < rawRows.size(); i += WINDOW) {
-        if (m_cancelRequested.load()) break; 
-        
-        size_t end_idx = std::min(i + WINDOW, rawRows.size());
-        size_t count = end_idx - i;
-        
-        double s_a1=0, sq_a1=0, s_a2=0, sq_a2=0, s_b1=0, sq_b1=0, s_b2=0, sq_b2=0, s_st=0, sq_st=0;
-
-        for(size_t j = i; j < end_idx; ++j) {
-            s_a1 += rawRows[j].accelerator1; sq_a1 += rawRows[j].accelerator1 * rawRows[j].accelerator1;
-            s_a2 += rawRows[j].accelerator2; sq_a2 += rawRows[j].accelerator2 * rawRows[j].accelerator2;
-            s_b1 += rawRows[j].brake1;       sq_b1 += rawRows[j].brake1 * rawRows[j].brake1;
-            s_b2 += rawRows[j].brake2;       sq_b2 += rawRows[j].brake2 * rawRows[j].brake2;
-            s_st += rawRows[j].steer;        sq_st += rawRows[j].steer * rawRows[j].steer;
-        }
-
-        auto calc_stats = [&](double sum, double sq, float& m, float& v, float& s) {
-            double mean = sum / count;
-            double var = (sq / count) - (mean * mean);
-            if (var < 0) var = 0;
-            m = static_cast<float>(mean); v = static_cast<float>(var); s = static_cast<float>(std::sqrt(var));
+            return layout;
         };
 
-        float m1,v1,s1, m2,v2,s2, m3,v3,s3, m4,v4,s4, m5,v5,s5;
-        calc_stats(s_a1, sq_a1, m1, v1, s1);
-        calc_stats(s_a2, sq_a2, m2, v2, s2);
-        calc_stats(s_b1, sq_b1, m3, v3, s3);
-        calc_stats(s_b2, sq_b2, m4, v4, s4);
-        calc_stats(s_st, sq_st, m5, v5, s5);
+        if (at[0] == 0xCC && at[1] == 0x11) {
+            const PacketLayout* layout = tryMatch(layoutsA, lockedA, at, available);
+            if (layout) {
+                if (!usedA) { usedA = layout; }
+                size_t consumed = layout->payloadSize;
 
-        for(size_t j = i; j < end_idx; ++j) {
-            rawRows[j].acc1_mean = m1; rawRows[j].acc1_var = v1; rawRows[j].acc1_std = s1;
-            rawRows[j].acc2_mean = m2; rawRows[j].acc2_var = v2; rawRows[j].acc2_std = s2;
-            rawRows[j].brk1_mean = m3; rawRows[j].brk1_var = v3; rawRows[j].brk1_std = s3;
-            rawRows[j].brk2_mean = m4; rawRows[j].brk2_var = v4; rawRows[j].brk2_std = s4;
-            rawRows[j].steer_mean = m5; rawRows[j].steer_var = v5; rawRows[j].steer_std = s5;
+                // Same lookahead the live parser performs: when a battery packet
+                // follows immediately, merge it into THIS row instead of the next
+                // one, so a file replays exactly what was seen live
+                if (available >= consumed + 2 && at[consumed] == 0xEE && at[consumed + 1] == 0x11) {
+                    if (const PacketLayout* layoutB = decodeB(at + consumed, available - consumed)) {
+                        consumed += layoutB->payloadSize;
+                    }
+                }
+
+                uint32_t ts = 0; std::memcpy(&ts, at + 2, 4);
+                if (!firstA && ts > lastTimestampA) {
+                    const uint32_t diff = ts - lastTimestampA;
+                    if (diff > 1 && diff < 5000) lostA += (diff - 1);
+                }
+                lastTimestampA = ts;
+                firstA = false;
+
+                const size_t row = dataset.pushRow();
+                dataset.setTimestamp(row, ts * 0.005);
+
+                float* cells = dataset.rowData(row);
+                const std::vector<int>& indices = columnsFor(*layout);
+                for (size_t i = 0; i < layout->fields.size(); ++i) {
+                    const int column = indices[i];
+                    if (column < 0) continue;
+                    cells[column] = static_cast<float>(
+                        TelemetrySchema::readField(at, layout->fieldOffset(i), layout->fields[i]));
+                }
+                for (const auto& entry : lastB) {
+                    if (entry.first >= 0) cells[entry.first] = static_cast<float>(entry.second);
+                }
+
+                if (idxLostA >= 0)   cells[idxLostA]   = static_cast<float>(lostA);
+                if (idxLostB >= 0)   cells[idxLostB]   = static_cast<float>(lostB);
+                if (idxLostTot >= 0) cells[idxLostTot] = static_cast<float>(lostA + lostB);
+
+                cursor += consumed;
+                continue;
+            }
+        } else if (at[0] == 0xEE && at[1] == 0x11) {
+            if (const PacketLayout* layout = decodeB(at, available)) {
+                cursor += layout->payloadSize;
+                continue;
+            }
         }
+        ++cursor;
+        ++skipped;
     }
 
-    computeSessionStats(rawRows);
+    // Flag which channels this recording actually carried
+    dataset.markPresent(dataset.indexOf("timestamp"));
+    dataset.markPresent(idxLostA);
+    dataset.markPresent(idxLostB);
+    dataset.markPresent(idxLostTot);
+    if (usedA) for (const auto& field : usedA->fields) dataset.markPresent(dataset.indexOf(field.name));
+    if (usedB && hasB) for (const auto& field : usedB->fields) dataset.markPresent(dataset.indexOf(field.name));
+
+    std::cout << "INFO [FileService]: BIN decoded with layout "
+              << (usedA ? usedA->versionTag : "none") << " / "
+              << (usedB ? usedB->versionTag : "none")
+              << " - " << dataset.rowCount() << " rows";
+    if (skipped) std::cout << ", " << skipped << " stray bytes skipped";
+    std::cout << "." << std::endl;
+
+    computeMissingStats(dataset);
 
     std::lock_guard<std::mutex> lock(m_dataMutex);
-    m_loadedData = std::move(rawRows);
+    m_loadedData = std::move(dataset);
     m_isFinished = true;
     m_isLoading = false;
 }
 
-// ULTRA-FAST Zero-Allocation CSV Parser. Avoids any std::string creation.
-void FileService::loadCsv(const std::string& filePath) { 
-    std::ifstream file(filePath, std::ios::binary | std::ios::ate); 
-    if (!file.is_open()) { 
-        m_isLoading = false; m_isFinished = true; return; 
+//==============================================================================
+//  CSV loading, matched by column name so any past export stays readable
+//==============================================================================
+
+void FileService::loadCsv(const std::string& filePath) {
+    std::ifstream file(filePath, std::ios::binary | std::ios::ate);
+    if (!file.is_open()) {
+        std::cerr << "ERROR [FileService]: Unable to open CSV file." << std::endl;
+        m_isLoading = false; m_isFinished = true; return;
     }
 
-    size_t fileSize = file.tellg();
+    const size_t fileSize = static_cast<size_t>(file.tellg());
     file.seekg(0, std::ios::beg);
-    
+
     std::vector<char> buffer(fileSize + 1);
     file.read(buffer.data(), fileSize);
-    buffer[fileSize] = '\0'; // Ensure null-termination
+    buffer[fileSize] = '\0';
 
-    std::vector<NativeTelemetryRow> rawRows;
-    rawRows.reserve(fileSize / 300); // Prevent reallocation to avoid crashes
+    TelemetryDataset dataset;
+    prepareColumns(dataset);
 
-    const char* p = buffer.data();
-    const char* end = p + fileSize;
+    char* p = buffer.data();
+    char* const end = p + fileSize;
 
-    // Skip the header line
-    while (p < end && *p != '\n') p++;
-    if (p < end) p++;
+    // ---- Header: map every column of the file onto a dataset slot ----
+    std::vector<std::string> headerNames;
+    {
+        char* lineStart = p;
+        while (p < end && *p != '\n' && *p != '\r') ++p;
+        std::string header(lineStart, static_cast<size_t>(p - lineStart));
+        while (p < end && (*p == '\n' || *p == '\r')) ++p;
 
-    // Must stay above the widest supported layout (117 columns today), with headroom for new channels
-    const int MAX_COLS = 160;
-    std::vector<const char*> cols(MAX_COLS, nullptr);
+        size_t from = 0;
+        while (from <= header.size()) {
+            const size_t sep = header.find(';', from);
+            const size_t upto = (sep == std::string::npos) ? header.size() : sep;
+            std::string name = header.substr(from, upto - from);
+            // Trim stray whitespace and a possible UTF-8 BOM on the first column
+            while (!name.empty() && (name.back() == ' ' || name.back() == '\t')) name.pop_back();
+            size_t begin = 0;
+            while (begin < name.size() && (name[begin] == ' ' || name[begin] == '\t')) ++begin;
+            if (headerNames.empty() && name.size() >= begin + 3 &&
+                static_cast<unsigned char>(name[begin]) == 0xEF) begin += 3;
+            headerNames.push_back(name.substr(begin));
 
-    while (p < end) {
-        if (m_cancelRequested.load()) break; 
-
-        int colIdx = 0;
-        cols[0] = p;
-        
-        // Inline tokenization: replace ';' with '\0' to use fast std::atof on pointers
-        while (p < end && *p != '\n' && *p != '\r') {
-            if (*p == ';') {
-                *const_cast<char*>(p) = '\0'; 
-                colIdx++;
-                if (colIdx < MAX_COLS) cols[colIdx] = p + 1;
-            }
-            p++;
+            if (sep == std::string::npos) break;
+            from = sep + 1;
         }
-        
-        // Fix: Ensure the very last token is also null-terminated! (Fixes lost packets issue)
-        if (p < end) {
-            *const_cast<char*>(p) = '\0';
-            p++;
-        }
-
-        // Only parse if the row has the expected structure.
-        // The dataset layout grew over time, so the format is detected from the column count:
-        //   117 cols -> current  (IMDInsulationValue at 44 + temperature session stats)
-        //   108 cols -> previous (speed session stats, no IMD)
-        //   106 cols -> legacy   (no session stats at all)
-        // Everything after ECU_Mode shifts by one once IMDInsulationValue is present.
-        if (colIdx >= 105) {
-            const bool hasImd = (colIdx >= 116);
-            const int s = hasImd ? 1 : 0;
-            const int lostIdx = hasImd ? 114 : ((colIdx >= 107) ? 105 : 103);
-            NativeTelemetryRow nat;
-            
-            nat.timestamp = d_atof(cols[0]);
-            nat.front_left_velocity = f_atof(cols[1]);
-            nat.front_right_velocity = f_atof(cols[2]);
-            nat.rear_left_velocity = f_atof(cols[3]);
-            nat.rear_right_velocity = f_atof(cols[4]);
-            nat.front_left_suspension = f_atof(cols[5]);
-            nat.front_right_suspension = f_atof(cols[6]);
-            nat.accelerator1 = f_atof(cols[7]);
-            nat.accelerator2 = f_atof(cols[8]);
-            nat.accelerator_mapped = f_atof(cols[9]);
-            nat.brake1 = f_atof(cols[10]);
-            nat.brake2 = f_atof(cols[11]);
-            nat.steer = f_atof(cols[12]);
-            
-            nat.sdc = i_atoi(cols[13]);
-            nat.ready_to_drive_button = i_atoi(cols[14]);
-            nat.ecu_reset_button = i_atoi(cols[15]);
-            nat.tractive_system_on_button = i_atoi(cols[16]);
-            
-            nat.emma_current = f_atof(cols[17]);
-            nat.emma_voltage = f_atof(cols[18]);
-            nat.emma_yaw = f_atof(cols[19]);
-            
-            // Fix: Parse the string mask back into bits properly (Live CSV uses Text)
-            auto parseEmmaError = [](const char* s) -> uint16_t {
-                if (!s) return 0;
-                if (std::strstr(s, "EMMA_STATUS_OK")) return 0;
-                uint16_t err = 0;
-                if (std::strstr(s, "ERR_UNDERVOLTAGE")) err |= 0x0001;
-                if (std::strstr(s, "ERR_OVERVOLTAGE")) err |= 0x0002;
-                if (std::strstr(s, "ERR_OVERTEMP_CELL")) err |= 0x0004;
-                if (std::strstr(s, "ERR_UNDERTEMP_CELL")) err |= 0x0008;
-                if (std::strstr(s, "ERR_OVERTEMP_PCB")) err |= 0x0010;
-                if (std::strstr(s, "ERR_UNDERTEMP_PCB")) err |= 0x0020;
-                if (std::strstr(s, "ERR_CELL_MISMATCH")) err |= 0x0040;
-                if (std::strstr(s, "ERR_BSPD")) err |= 0x0080;
-                if (std::strstr(s, "ERR_DAISY_CHAIN")) err |= 0x0100;
-                if (std::strstr(s, "IMD_AMS_LATCH")) err |= 0x0200;
-                if (std::strstr(s, "EMMA_FINISH_PRECHARGE")) err |= 0x0800;
-                if (std::strstr(s, "ERR_CRITICAL_FAULT")) err |= 0x8000;
-                return err;
-            };
-            nat.emma_error = parseEmmaError(cols[20]);
-
-            nat.mean_velocity = f_atof(cols[21]);
-            nat.real_yaw_rate = f_atof(cols[22]);
-            nat.total_torque_request = f_atof(cols[23]);
-            nat.torque_tv_L = f_atof(cols[24]);
-            nat.torque_tv_R = f_atof(cols[25]);
-            nat.slip_L = f_atof(cols[26]);
-            nat.slip_R = f_atof(cols[27]);
-            nat.torque_reduction_L = f_atof(cols[28]);
-            nat.torque_reduction_R = f_atof(cols[29]);
-            nat.final_torque_target_L = f_atof(cols[30]);
-            nat.final_torque_target_R = f_atof(cols[31]);
-            
-            nat.inv_L_torqueCurrent = f_atof(cols[32]);
-            nat.inv_L_magnetizingCurrent = f_atof(cols[33]);
-            nat.inv_L_tempMotor = f_atof(cols[34]);
-            nat.inv_R_torqueCurrent = f_atof(cols[35]);
-            nat.inv_R_magnetizingCurrent = f_atof(cols[36]);
-            nat.inv_R_tempMotor = f_atof(cols[37]);
-            
-            nat.left_coolant_temp = f_atof(cols[38]);
-            nat.right_coolant_temp = f_atof(cols[39]);
-
-            auto parseFsm = [](const char* s) -> uint8_t {
-                if (!s) return 0;
-                if (std::strstr(s, "SYSTEM_READY")) return 1;
-                if (std::strstr(s, "DC_CAPACITOR_CHARGE")) return 2;
-                if (std::strstr(s, "DC_OK")) return 3;
-                if (std::strstr(s, "ENABLE_INVERTER")) return 4;
-                if (std::strstr(s, "ENABLED")) return 5;
-                if (std::strstr(s, "ON")) return 6;
-                if (std::strstr(s, "OK")) return 7;
-                if (std::strstr(s, "ERROR")) return 8;
-                return 0; // OFF
-            };
-
-            auto parseTsFsm = [](const char* s) -> uint8_t {
-                if (!s) return 0;
-                if (std::strstr(s, "START_LIGHT_TEST")) return 1;
-                if (std::strstr(s, "WAIT_LIGHT_TEST")) return 2;
-                if (std::strstr(s, "POWER_OFF")) return 3;
-                if (std::strstr(s, "TS_WAIT_ACTIVATION")) return 4;
-                if (std::strstr(s, "TS_WAIT_PRECHARGE")) return 5;
-                if (std::strstr(s, "TS_ACTIVE")) return 6;
-                if (std::strstr(s, "R2D_WAIT")) return 7;
-                if (std::strstr(s, "R2D_ACTIVE")) return 8;
-                if (std::strstr(s, "ERROR_STATE")) return 9;
-                return 0; // ENTRY_STATE
-            };
-
-            nat.left_inverter_fsm = parseFsm(cols[40]);
-            nat.right_inverter_fsm = parseFsm(cols[41]);
-            nat.tractive_system_fsm = parseTsFsm(cols[42]);
-            
-            nat.ECU_Mode = 0;
-            if (cols[43]) {
-                if (std::strstr(cols[43], "ENDURANCE")) nat.ECU_Mode = 1;
-                else if (std::strstr(cols[43], "ACCELERATION")) nat.ECU_Mode = 2;
-                else if (std::strstr(cols[43], "TEST")) nat.ECU_Mode = 4;
-            }
-
-            nat.IMDInsulationValue = hasImd ? static_cast<uint16_t>(i_atoi(cols[44])) : 0;
-
-            nat.state_of_charge = i_atoi(cols[44 + s]);
-
-            for(int i=0; i<14; ++i) nat.voltages[i] = f_atof(cols[45 + s + i]);
-            for(int i=0; i<14; ++i) {
-                nat.temperatures1[i] = f_atof(cols[59 + s + (i*2)]);
-                nat.temperatures2[i] = f_atof(cols[60 + s + (i*2)]);
-            }
-
-            nat.online_modules = static_cast<uint16_t>(i_atoi(cols[87 + s]));
-
-            nat.acc1_mean = f_atof(cols[88 + s]); nat.acc1_var = f_atof(cols[89 + s]); nat.acc1_std = f_atof(cols[90 + s]);
-            nat.acc2_mean = f_atof(cols[91 + s]); nat.acc2_var = f_atof(cols[92 + s]); nat.acc2_std = f_atof(cols[93 + s]);
-            nat.brk1_mean = f_atof(cols[94 + s]); nat.brk1_var = f_atof(cols[95 + s]); nat.brk1_std = f_atof(cols[96 + s]);
-            nat.brk2_mean = f_atof(cols[97 + s]); nat.brk2_var = f_atof(cols[98 + s]); nat.brk2_std = f_atof(cols[99 + s]);
-            nat.steer_mean = f_atof(cols[100 + s]); nat.steer_var = f_atof(cols[101 + s]); nat.steer_std = f_atof(cols[102 + s]);
-
-            // speed/temperature session stats are recomputed by computeSessionStats(), so they are skipped here
-
-            nat.lostA = i_atoi(cols[lostIdx]);
-            nat.lostB = i_atoi(cols[lostIdx + 1]);
-            nat.lostTot = i_atoi(cols[lostIdx + 2]);
-
-            rawRows.push_back(nat);
-        }
-
-        // Advance to next line correctly
-        while (p < end && (*p == '\n' || *p == '\r')) p++;
     }
 
-    computeSessionStats(rawRows);
+    if (headerNames.size() < 2) {
+        std::cerr << "ERROR [FileService]: CSV header not recognised." << std::endl;
+        m_isLoading = false; m_isFinished = true; return;
+    }
+
+    std::vector<int> columnOf(headerNames.size(), -1);
+    int mapped = 0, unknown = 0;
+    for (size_t i = 0; i < headerNames.size(); ++i) {
+        if (headerNames[i].empty()) continue;
+        int index = dataset.indexOf(headerNames[i]);
+        if (index < 0) {
+            // A channel this build does not know about: keep it rather than drop it
+            index = dataset.addColumn({ headerNames[i], ValueFormat::Number, 3 });
+            ++unknown;
+        }
+        columnOf[i] = index;
+        dataset.markPresent(index);
+        ++mapped;
+    }
+
+    // The overwhelming majority of columns are plain numbers: resolving that
+    // once per file lets the row loop call atof directly instead of dispatching
+    std::vector<ValueFormat> formatOf(headerNames.size(), ValueFormat::Number);
+    std::vector<uint8_t> isNumeric(headerNames.size(), 1);
+    for (size_t i = 0; i < headerNames.size(); ++i) {
+        if (columnOf[i] >= 0) {
+            formatOf[i] = dataset.definition(columnOf[i]).format;
+            isNumeric[i] = (formatOf[i] == ValueFormat::Number) ? 1 : 0;
+        }
+    }
+
+    dataset.reserveRows(fileSize / 300);
+    const int timestampColumn = dataset.indexOf("timestamp");
+    const size_t columnCount = headerNames.size();
+    std::vector<char*> tokens(columnCount, nullptr);
+
+    while (p < end) {
+        if (m_cancelRequested.load()) break;
+
+        size_t tokenIndex = 0;
+        tokens[0] = p;
+
+        // Tokenize in place: no std::string is built for the values
+        while (p < end && *p != '\n' && *p != '\r') {
+            if (*p == ';') {
+                *p = '\0';
+                ++tokenIndex;
+                if (tokenIndex < columnCount) tokens[tokenIndex] = p + 1;
+            }
+            ++p;
+        }
+        if (p < end) { *p = '\0'; ++p; }
+
+        // A row is usable as long as it carries a timestamp and some data
+        if (tokenIndex >= 1) {
+            const size_t row = dataset.pushRow();
+            float* cells = dataset.rowData(row);
+            for (size_t i = 0; i <= tokenIndex && i < columnCount; ++i) {
+                const int column = columnOf[i];
+                if (column < 0 || !tokens[i]) continue;
+                const double value = isNumeric[i] ? std::atof(tokens[i])
+                                                  : TelemetrySchema::parseValue(formatOf[i], tokens[i]);
+                if (column == timestampColumn) dataset.setTimestamp(row, value);
+                else cells[column] = static_cast<float>(value);
+            }
+        }
+
+        while (p < end && (*p == '\n' || *p == '\r')) ++p;
+    }
+
+    std::cout << "INFO [FileService]: CSV decoded - " << dataset.rowCount() << " rows, "
+              << mapped << " columns matched";
+    if (unknown) std::cout << " (" << unknown << " unknown kept as-is)";
+    std::cout << "." << std::endl;
+
+    computeMissingStats(dataset);
 
     std::lock_guard<std::mutex> lock(m_dataMutex);
-    m_loadedData = std::move(rawRows);
+    m_loadedData = std::move(dataset);
     m_isFinished = true;
     m_isLoading = false;
 }

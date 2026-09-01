@@ -4,8 +4,7 @@
 #include <vector>
 #include <limits>
 #include <functional>
-
-using DbRow = std::map<std::string, std::string>;
+#include "Telemetry/data_acquisition/TelemetrySchema.hpp"
 
 class DataAggregator {
 public:
@@ -43,14 +42,12 @@ private:
     std::map<std::string, RunningStats> m_currentAgg;
     std::map<std::string, RunningStats> m_sessionAgg;
 
-    const std::vector<std::string> m_targetSensors = {
-        "accelerator1", "accelerator2", "brake1", "brake2", "steer"
-    };
+    // Distance travelled, integrated sample by sample from the speedometer
+    double m_distanceMeters = 0.0;
+    double m_lastDistanceTs = -1.0;
 
-    // Channels published as max/mean only, read straight from the row.
-    // "speed" is handled separately because it is derived from the two rear wheels.
-    const std::vector<std::string> m_maxMeanSensors = {
-        "inv_L_tempMotor", "inv_R_tempMotor", "left_coolant_temp", "right_coolant_temp"
-    };
+    // Both lists come from the schema so that adding a channel there is enough
+    const std::vector<std::string>& m_targetSensors = TelemetrySchema::varianceChannels();
+    const std::vector<std::string>& m_maxMeanSensors = TelemetrySchema::maxMeanChannels();
     const double STATS_WINDOW = 3.0; // expected time window for stats calculation in seconds
 };

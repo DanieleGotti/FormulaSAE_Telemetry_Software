@@ -26,6 +26,7 @@
 #include "UI/SpeedometerWindow.hpp"
 #include "UI/DynamicsPowertrainWindow.hpp"
 #include "UI/InverterDataWindow.hpp"
+#include "UI/TemperatureWindow.hpp"
 #include "UI/CreditsWindow.hpp"
 #include "Telemetry/Services/ServiceManager.hpp"
 #include "Telemetry/Services/FileService.hpp"
@@ -148,6 +149,7 @@ UiManager::~UiManager() {
         if (m_speedometerWindow) ServiceManager::getDataManager()->removeSubscriber(m_speedometerWindow.get());
         if (m_dynamicsWindow) ServiceManager::getDataManager()->removeSubscriber(m_dynamicsWindow.get());
         if (m_inverterWindow) ServiceManager::getDataManager()->removeSubscriber(m_inverterWindow.get());
+        if (m_temperatureWindow) ServiceManager::getDataManager()->removeSubscriber(m_temperatureWindow.get());
     }
     
     ImGui_ImplOpenGL3_Shutdown();
@@ -227,6 +229,7 @@ void UiManager::transitionToConnectedState(AppState connectedState) {
     m_speedometerWindow = std::make_shared<SpeedometerWindow>(this);
     m_dynamicsWindow = std::make_shared<DynamicsPowertrainWindow>(this);
     m_inverterWindow = std::make_shared<InverterDataWindow>(this);
+    m_temperatureWindow = std::make_shared<TemperatureWindow>(this);
 
     if (connectedState == AppState::CONNECTED_LIVE) {
         auto dataManager = ServiceManager::getDataManager();
@@ -241,6 +244,7 @@ void UiManager::transitionToConnectedState(AppState connectedState) {
         dataManager->addSubscriber(m_speedometerWindow.get());
         dataManager->addSubscriber(m_dynamicsWindow.get());
         dataManager->addSubscriber(m_inverterWindow.get());
+        dataManager->addSubscriber(m_temperatureWindow.get());
     } else if (connectedState == AppState::CONNECTED_PLAYBACK) {
         m_playbackControls = std::make_shared<PlaybackControlsWindow>(this);
     }
@@ -354,8 +358,8 @@ void UiManager::draw() {
             originalExt = originalExt.substr(originalExt.find_last_of("."));
             std::transform(originalExt.begin(), originalExt.end(), originalExt.begin(), ::tolower);
             
-            // Pass the highly optimized Native data directly to the manager
-            ServiceManager::getPlaybackManager()->setNativeData(std::move(loadedData), originalExt);
+            // Pass the highly optimized dataset directly to the manager
+            ServiceManager::getPlaybackManager()->setDataset(std::move(loadedData), originalExt);
             transitionToConnectedState(AppState::CONNECTED_PLAYBACK);
 
         } else {
@@ -381,6 +385,7 @@ void UiManager::draw() {
         if (m_speedometerWindow) m_speedometerWindow->draw();
         if (m_dynamicsWindow) m_dynamicsWindow->draw();
         if (m_inverterWindow) m_inverterWindow->draw();
+        if (m_temperatureWindow) m_temperatureWindow->draw();
     }
 
     if (m_currentState == AppState::CONNECTED_PLAYBACK) {
@@ -485,6 +490,7 @@ void UiManager::resetToHome() {
         if (m_speedometerWindow) ServiceManager::getDataManager()->removeSubscriber(m_speedometerWindow.get());
         if (m_dynamicsWindow) ServiceManager::getDataManager()->removeSubscriber(m_dynamicsWindow.get());
         if (m_inverterWindow) ServiceManager::getDataManager()->removeSubscriber(m_inverterWindow.get());
+        if (m_temperatureWindow) ServiceManager::getDataManager()->removeSubscriber(m_temperatureWindow.get());
     }
 
     ServiceManager::resetForNewSession();
@@ -501,6 +507,7 @@ void UiManager::resetToHome() {
     m_speedometerWindow.reset();
     m_dynamicsWindow.reset();
     m_inverterWindow.reset();
+    m_temperatureWindow.reset();
 
     m_uiElements.clear();
     m_serialSelectionWindow = nullptr;

@@ -21,6 +21,8 @@ void DataAggregator::reset() {
     m_lastPublishedStats.clear();
     m_currentAgg.clear();
     m_sessionAgg.clear();
+    m_distanceMeters = 0.0;
+    m_lastDistanceTs = -1.0;
 }
 
 void DataAggregator::accumulate(const std::string& key, double value) {
@@ -64,11 +66,24 @@ void DataAggregator::processRow(DbRow row) {
     // Speed is derived from the two rear wheels, the other channels are read as-is
     if (row.count("rear_left_velocity") && row.count("rear_right_velocity")) {
         try {
-            accumulate("speed", (std::stod(row.at("rear_left_velocity")) + std::stod(row.at("rear_right_velocity"))) * 0.5);
+            const double speed_kmh = (std::stod(row.at("rear_left_velocity")) + std::stod(row.at("rear_right_velocity"))) * 0.5;
+            accumulate("speed", speed_kmh);
+
+            // Distance is the speedometer reading integrated over the elapsed
+            // time. A gap longer than the threshold means samples were lost,
+            // not that the car crawled, so that interval is not integrated.
+            if (m_lastDistanceTs >= 0.0) {
+                const double dt = current_ts - m_lastDistanceTs;
+                if (dt > 0.0 && dt <= TelemetrySchema::MAX_DISTANCE_GAP_S) {
+                    m_distanceMeters += speed_kmh * TelemetrySchema::KMH_TO_MS * dt;
+                }
+            }
+            m_lastDistanceTs = current_ts;
         } catch (...) {}
     }
     for (const auto& sensor : m_maxMeanSensors) {
-        if (row.count(sensor)) {
+        // "speed" has no column of its own, it was accumulated just above
+        if (sensor != "speed" && row.count(sensor)) {
             try { accumulate(sensor, std::stod(row.at(sensor))); } catch (...) {}
         }
     }
@@ -122,8 +137,9 @@ void DataAggregator::processRow(DbRow row) {
             row[key + "_mean"] = "0.000";
         }
     };
-    writeMaxMean("speed");
     for (const auto& sensor : m_maxMeanSensors) writeMaxMean(sensor);
+
+    row["meters"] = formatDouble(m_distanceMeters, 1);
 
     if (m_onRowReadyCallback) m_onRowReadyCallback(row);
 }

@@ -1,6 +1,9 @@
-#include <imgui.h> 
+#include <imgui.h>
 #include <iostream>
 #include <chrono>
+#include <algorithm>
+#include <vector>
+#include <string>
 #include <utils/fsUtils.hpp>
 #include "UI/UIManager.hpp" 
 #include "UI/Dashboard.hpp" 
@@ -51,13 +54,16 @@ void Dashboard::draw() {
         ImGui::Separator();
         
         auto playbackManager = ServiceManager::getPlaybackManager();
-        
+
         // Disable button if not a BIN file OR if already exporting
-        bool isExporting = playbackManager->isExportingCsv();
-        if (!playbackManager->canGenerateCsv() || isExporting) {
+        const bool canExport = playbackManager->canGenerateCsv();
+        const bool isExporting = playbackManager->isExportingCsv();
+        const bool disabled = !canExport || isExporting;
+
+        if (disabled) {
             ImGui::BeginDisabled();
         }
-        
+
         if (ImGui::Button(isExporting ? "Exporting... Please wait" : "Generate High-Res CSV (.csv)")) {
             std::filesystem::create_directories(outputDir);
             
@@ -72,12 +78,13 @@ void Dashboard::draw() {
             playbackManager->generateCsvFromBin(outPath);
         }
         
-        if (!playbackManager->canGenerateCsv() || isExporting) {
+        if (disabled) {
             ImGui::EndDisabled();
-            ImGui::SameLine();
-            if (!playbackManager->canGenerateCsv()) {
-                ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "\n(Available only for .bin inputs)");
-            }
+        }
+
+        // Hint sits on its own line underneath the button
+        if (!canExport) {
+            ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "(Available only for .bin inputs)");
         }
         ImGui::EndChild();
     }
@@ -150,25 +157,40 @@ void Dashboard::draw() {
         ImGui::TableSetupColumn("Value");
         ImGui::TableHeadersRow();
 
-        auto columnOrder = PacketParser::getColumnOrder();
-        
-        for (const auto& label : columnOrder) {
-            // Skip lost packet counts since we display them separately at the top
-            if (label == "lost_packets_A" || label == "lost_packets_B" || label == "lost_packets_tot") continue;
-            
-            if (dataToDisplay.count(label) == 0) continue; 
-            
-            const std::string& value = dataToDisplay.at(label);
+        // Rebuilt once: the schema order never changes while the app is running
+        static const std::vector<std::string> columnOrder = PacketParser::getColumnOrder();
 
+        auto drawRow = [&](const std::string& label, const std::string& value) {
             ImGui::TableNextRow();
-            ImGui::TableSetColumnIndex(0);         
+            ImGui::TableSetColumnIndex(0);
             ImGui::TextUnformatted(label.c_str());
-            
+
             ImGui::TableSetColumnIndex(1);
-            std::string displayValue = value;
-            ImGui::PushFont(m_uiManager->font_data); 
-            ImGui::TextUnformatted(displayValue.c_str());
+            ImGui::PushFont(m_uiManager->font_data);
+            ImGui::TextUnformatted(value.c_str());
             ImGui::PopFont();
+        };
+
+        auto isHidden = [](const std::string& label) {
+            // Lost packet counts have their own table above, and the per-module
+            // online flags are drawn by the battery window
+            return label == "lost_packets_A" || label == "lost_packets_B" || label == "lost_packets_tot"
+                || label.rfind("OnlineModule", 0) == 0;
+        };
+
+        for (const auto& label : columnOrder) {
+            if (isHidden(label)) continue;
+            const auto it = dataToDisplay.find(label);
+            if (it == dataToDisplay.end()) continue;
+            drawRow(label, it->second);
+        }
+
+        // Channels this build does not know about (recording from another
+        // firmware version) are listed after the known ones instead of vanishing
+        for (const auto& entry : dataToDisplay) {
+            if (isHidden(entry.first)) continue;
+            if (std::find(columnOrder.begin(), columnOrder.end(), entry.first) != columnOrder.end()) continue;
+            drawRow(entry.first, entry.second);
         }
         ImGui::EndTable();
     }

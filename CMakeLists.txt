@@ -58,7 +58,9 @@ FetchContent_MakeAvailable(jsoncons)
 include_directories(${CMAKE_SOURCE_DIR}/include)
 
 # Gather source files
-file(GLOB SRC_FILES
+# CONFIGURE_DEPENDS makes the build re-scan these folders, so a newly added
+# source file is picked up without having to re-run cmake by hand
+file(GLOB SRC_FILES CONFIGURE_DEPENDS
     src/*.cpp
     src/Renderer/*.cpp
     src/UI/*.cpp
