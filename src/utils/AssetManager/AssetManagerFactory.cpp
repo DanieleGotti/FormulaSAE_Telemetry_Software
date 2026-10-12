@@ -1,3 +1,10 @@
+/**
+ * @file AssetManagerFactory.cpp
+ * @brief Picks at compile time the IAssetManager implementation for the current OS.
+ *
+ * @note The platform .cpp is included here directly (the classes are fully
+ *       defined in their own files, with inline methods).
+ */
 #include <utils/AssetManagerFactory.hpp>
 
 #ifdef _WIN32
@@ -16,6 +23,6 @@ std::shared_ptr<IAssetManager> CreateAssetManager() {
 #elif defined(__linux__) || defined(__unix__)
   return std::make_shared<AssetManager_Linux>();
 #else
-  return nullptr; // Fallback to prevent undefined behavior
+  return nullptr; // unsupported platform: avoids undefined behavior
 #endif
 }

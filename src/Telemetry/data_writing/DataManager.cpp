@@ -1,3 +1,7 @@
+/**
+ * @file DataManager.cpp
+ * @brief Implementation of the live row distribution (see DataManager.hpp).
+ */
 #include <algorithm>
 #include "Telemetry/data_writing/DataManager.hpp"
 
@@ -24,12 +28,12 @@ void DataManager::removeLogSubscriber(IAggregatedDataSubscriber* subscriber) {
 void DataManager::processData(const DbRow& row) {
     std::lock_guard<std::mutex> lock(m_subscriberMutex);
     
-    // Send immediately the data to the loggers (Dataset/CSV) without speed limits
+    // Loggers (dataset/CSV) get every row immediately, with no rate limit
     for (IAggregatedDataSubscriber* sub : m_logSubscribers) {
         if (sub) sub->onAggregatedDataReceived(row);
     }
 
-    // Limit the UI update to 1 tenth of a second (10 Hz)
+    // The UI is updated at most every tenth of a second (10 Hz)
     auto now = std::chrono::steady_clock::now();
     if (std::chrono::duration_cast<std::chrono::milliseconds>(now - m_lastUiUpdate).count() >= 100) {
         for (IAggregatedDataSubscriber* sub : m_subscribers) {

@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+"""Thread sending simulated telemetry packets over a serial port, with the same cadence as the ECU.
+
+Cadence: one A packet every 5 ms and, every 40 ticks (200 ms), one B packet
+right after the A packet. Requires pyserial (`pip install pyserial`).
+"""
 import serial
 import serial.tools.list_ports
 import threading
@@ -7,6 +12,12 @@ import sys
 from data_gen import generate_packet_A, generate_packet_B
 
 class SerialSender:
+    """Handles port opening, the sending thread and closing.
+
+    Optional callbacks (called from the sending thread, NOT from the GUI thread):
+        on_error(message) -> opening or writing error
+        on_stop()         -> sending finished
+    """
     def __init__(self):
         self.serial_port = None
         self._is_running = False
@@ -16,10 +27,10 @@ class SerialSender:
 
     @staticmethod
     def list_ports():
-        """Lists available serial ports across different operating systems."""
+        """Lists the available serial ports across different operating systems."""
         ports =[]
         if sys.platform.startswith('win'):
-            # Windows fallback approach
+            # Windows: tries to open COM1..COM256 and keeps the ones that open
             for i in range(1, 257):
                 port_name = f'COM{i}'
                 try:
@@ -29,13 +40,13 @@ class SerialSender:
                 except (OSError, serial.SerialException):
                     pass
         else:
-            # POSIX systems
+            # POSIX systems: list provided by pyserial
             available_ports = serial.tools.list_ports.comports()
             ports = [port.device for port in available_ports]
         return ports
 
     def start(self, port_name, baudrate=256000):
-        """Starts the transmission thread."""
+        """Opens the port and starts the sending thread. Returns True if started."""
         if self._is_running:
             return
 
@@ -52,7 +63,7 @@ class SerialSender:
             return False
 
     def stop(self):
-        """Stops the transmission gracefully."""
+        """Stops the transmission gracefully and closes the port."""
         if not self._is_running:
             return
             
@@ -70,26 +81,27 @@ class SerialSender:
             self.on_stop()
 
     def _sending_loop(self):        
-        interval = 0.005  # Exactly 5 milliseconds
+        """Thread body: sends the packets at 5 ms intervals, as precisely as possible."""
+        interval = 0.005  # exactly 5 milliseconds
         next_time = time.perf_counter() + interval
-        tick_counter = 0  # 1 tick = 5ms
+        tick_counter = 0  # 1 tick = 5 ms (it becomes the packet timestamp)
 
         while self._is_running:
             try:
-                # Packet A — always sent, every 5ms
+                # Packet A: always sent, every 5 ms
                 data_A = generate_packet_A(tick_counter)
                 self.serial_port.write(data_A)
 
-                # Packet B — sent every 40 ticks (200ms)
+                # Packet B: sent every 40 ticks (200 ms)
                 if tick_counter % 40 == 0:
                     data_B = generate_packet_B(tick_counter)
                     self.serial_port.write(data_B)
 
-                # Precise synchronization to 5ms intervals
+                # Precise synchronisation to 5 ms intervals
                 now = time.perf_counter()
                 sleep_time = next_time - now
                 
-                # Active wait for extreme precision (sleep only if we have plenty of time)
+                # sleep only when there is enough margin, then busy-wait for maximum precision
                 if sleep_time > 0.002:
                     time.sleep(sleep_time - 0.001)
                 while time.perf_counter() < next_time:

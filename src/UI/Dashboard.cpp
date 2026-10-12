@@ -1,3 +1,7 @@
+/**
+ * @file Dashboard.cpp
+ * @brief Implementation of the "Data management" window (see Dashboard.hpp).
+ */
 #include <imgui.h>
 #include <iostream>
 #include <chrono>
@@ -21,9 +25,10 @@ void Dashboard::onAggregatedDataReceived(const DbRow& dataRow) {
 void Dashboard::draw() { 
     ImGui::Begin("Data management");
 
-    // Safe, cross-platform path mapping to user documents/config folders
+    // Cross-platform output folder: <executable folder>/output_data
     std::filesystem::path outputDir = fsutils::getExecutableDirectory() / "output_data";
 
+    // ---- Live: CSV logging control ----
     if (m_uiManager->getCurrentState() == AppState::CONNECTED_LIVE) {
         ImGui::BeginChild("Control panel", ImVec2(0, 100), true);
         ImGui::PushFont(m_uiManager->font_label);
@@ -46,6 +51,7 @@ void Dashboard::draw() {
         ImGui::EndChild();
     }
     
+    // ---- Playback: high-resolution CSV export ----
     if (m_uiManager->getCurrentState() == AppState::CONNECTED_PLAYBACK) {
         ImGui::BeginChild("Export tools", ImVec2(0, 100), true);
         ImGui::PushFont(m_uiManager->font_label);
@@ -55,7 +61,7 @@ void Dashboard::draw() {
         
         auto playbackManager = ServiceManager::getPlaybackManager();
 
-        // Disable button if not a BIN file OR if already exporting
+        // Button disabled if the source is not a .bin OR an export is already running
         const bool canExport = playbackManager->canGenerateCsv();
         const bool isExporting = playbackManager->isExportingCsv();
         const bool disabled = !canExport || isExporting;
@@ -67,6 +73,7 @@ void Dashboard::draw() {
         if (ImGui::Button(isExporting ? "Exporting... Please wait" : "Generate High-Res CSV (.csv)")) {
             std::filesystem::create_directories(outputDir);
             
+            // File name: exported_telemetry_YYYYMMDD_hhmmss.csv
             auto now = std::chrono::system_clock::now();
             auto in_time_t = std::chrono::system_clock::to_time_t(now);
             std::stringstream ss;
@@ -74,7 +81,7 @@ void Dashboard::draw() {
             
             std::string outPath = (outputDir / ("exported_telemetry_" + ss.str() + ".csv")).string();
             
-            // Runs safely on a detached background thread!
+            // The export runs on a background thread
             playbackManager->generateCsvFromBin(outPath);
         }
         
@@ -82,17 +89,18 @@ void Dashboard::draw() {
             ImGui::EndDisabled();
         }
 
-        // Hint sits on its own line underneath the button
+        // Hint on its own line under the button
         if (!canExport) {
             ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "(Available only for .bin inputs)");
         }
         ImGui::EndChild();
     }
 
+    // ---- Row to show: current playback row or latest live row ----
     DbRow dataToDisplay;
     if (m_uiManager->getCurrentState() == AppState::CONNECTED_PLAYBACK) {
         auto playbackManager = ServiceManager::getPlaybackManager();
-        if (auto row = playbackManager->getCurrentRow()) { // JIT Row creation
+        if (auto row = playbackManager->getCurrentRow()) { // row generated on the fly
             dataToDisplay = *row;
         }
     } else {
@@ -100,12 +108,12 @@ void Dashboard::draw() {
         dataToDisplay = m_latestData;
     }
 
-    // Extraction logic stays untouched
+    // Lost packet counters ("0" when missing)
     std::string lostA = dataToDisplay.count("lost_packets_A") ? dataToDisplay.at("lost_packets_A") : "0";
     std::string lostB = dataToDisplay.count("lost_packets_B") ? dataToDisplay.at("lost_packets_B") : "0";
     std::string lostTot = dataToDisplay.count("lost_packets_tot") ? dataToDisplay.at("lost_packets_tot") : "0";
 
-    // Lost packets table
+    // ---- Lost packets table ----
     ImGui::PushFont(m_uiManager->font_label);
     ImGui::Text("Lost packets");
     ImGui::PopFont();
@@ -116,7 +124,7 @@ void Dashboard::draw() {
         ImGui::TableSetupColumn("Count");
         ImGui::TableHeadersRow();
 
-        // Type A lost packets
+        // Lost A packets
         ImGui::TableNextRow();
         ImGui::TableSetColumnIndex(0);         
         ImGui::TextUnformatted("0xCC (5 ms)");
@@ -125,7 +133,7 @@ void Dashboard::draw() {
         ImGui::TextUnformatted(lostA.c_str());
         ImGui::PopFont();
 
-        // Type B lost packets
+        // Lost B packets
         ImGui::TableNextRow();
         ImGui::TableSetColumnIndex(0);         
         ImGui::TextUnformatted("0xEE (200 ms)");
@@ -134,7 +142,7 @@ void Dashboard::draw() {
         ImGui::TextUnformatted(lostB.c_str());
         ImGui::PopFont();
 
-        // Total row
+        // Total
         ImGui::TableNextRow();
         ImGui::TableSetColumnIndex(0);         
         ImGui::TextUnformatted("Total");
@@ -151,13 +159,13 @@ void Dashboard::draw() {
     ImGui::PopFont();
     ImGui::Separator();
 
-    // Data table
+    // ---- Table of all the values ----
     if (ImGui::BeginTable("Data table", 2, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY)) {
         ImGui::TableSetupColumn("Type"); 
         ImGui::TableSetupColumn("Value");
         ImGui::TableHeadersRow();
 
-        // Rebuilt once: the schema order never changes while the app is running
+        // Computed once: the schema order never changes while the app is running
         static const std::vector<std::string> columnOrder = PacketParser::getColumnOrder();
 
         auto drawRow = [&](const std::string& label, const std::string& value) {
@@ -173,11 +181,12 @@ void Dashboard::draw() {
 
         auto isHidden = [](const std::string& label) {
             // Lost packet counts have their own table above, and the per-module
-            // online flags are drawn by the battery window
+            // OnlineModuleN flags are drawn by the battery window
             return label == "lost_packets_A" || label == "lost_packets_B" || label == "lost_packets_tot"
                 || label.rfind("OnlineModule", 0) == 0;
         };
 
+        // Known columns first, in schema order
         for (const auto& label : columnOrder) {
             if (isHidden(label)) continue;
             const auto it = dataToDisplay.find(label);
@@ -185,8 +194,8 @@ void Dashboard::draw() {
             drawRow(label, it->second);
         }
 
-        // Channels this build does not know about (recording from another
-        // firmware version) are listed after the known ones instead of vanishing
+        // Then the channels this build does not know about (recording from another
+        // firmware), listed after the known ones instead of vanishing
         for (const auto& entry : dataToDisplay) {
             if (isHidden(entry.first)) continue;
             if (std::find(columnOrder.begin(), columnOrder.end(), entry.first) != columnOrder.end()) continue;

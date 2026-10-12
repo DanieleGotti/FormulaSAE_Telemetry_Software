@@ -1,3 +1,15 @@
+/**
+ * @file FileService.cpp
+ * @brief Implementation of .bin/.csv file loading (see FileService.hpp).
+ *
+ * @details
+ * The code is optimised for large files (tens of MB): the file is read into
+ * memory with a single read, the CSV is tokenized in place without creating
+ * strings and values go straight into the contiguous TelemetryDataset buffer.
+ * The decoding rules (and, as far as possible, the statistics rules) MUST stay
+ * aligned with PacketParser and DataAggregator, otherwise a replayed file would
+ * show different values from the ones seen live.
+ */
 #include "Telemetry/Services/FileService.hpp"
 #include "Telemetry/data_acquisition/TelemetrySchema.hpp"
 #include <fstream>
@@ -12,7 +24,7 @@
 FileService::FileService() = default;
 
 FileService::~FileService() {
-    // Safely stop background reading if the app is closed to avoid zombies and crashes
+    // Safely stop background reading if the app is closed, avoiding orphan threads and crashes
     m_cancelRequested.store(true);
     if (m_thread.joinable()) {
         m_thread.join();
@@ -28,7 +40,7 @@ bool FileService::configure(const FileConfig& config) {
 void FileService::startLoading() {
     if (m_isLoading || m_isFinished) return;
     m_isLoading = true;
-    m_cancelRequested.store(false); // Reset token for new load
+    m_cancelRequested.store(false); // reset the cancellation request for the new load
     m_thread = std::thread(&FileService::loadingLoop, this);
 }
 
@@ -41,6 +53,7 @@ TelemetryDataset FileService::getResult() {
 }
 
 void FileService::loadingLoop() {
+    // Normalise path separators and get the lowercase extension
     std::string filePath = m_config.filePath;
     std::replace(filePath.begin(), filePath.end(), '\\', '/');
 
@@ -66,7 +79,7 @@ void FileService::loadingLoop() {
 void FileService::prepareColumns(TelemetryDataset& dataset) {
     dataset.setColumns(TelemetrySchema::columns());
 
-    // Channels that only exist in retired layouts still need a home
+    // Channels that only exist in retired layouts still need a column
     for (const auto* layouts : { &TelemetrySchema::layoutsA(), &TelemetrySchema::layoutsB() }) {
         for (const auto& layout : *layouts) {
             for (const auto& field : layout.fields) {
@@ -81,7 +94,7 @@ void FileService::prepareColumns(TelemetryDataset& dataset) {
 //==============================================================================
 
 void FileService::computeMissingStats(TelemetryDataset& dataset) {
-    const int WINDOW = 600; // 3 s at 200 Hz, matching the live aggregator cadence
+    const int WINDOW = 600; // 3 s at 200 Hz, the same cadence as the live aggregator
     const size_t rows = dataset.rowCount();
     if (rows == 0) return;
 
@@ -171,13 +184,16 @@ void FileService::computeMissingStats(TelemetryDataset& dataset) {
 
     size_t sessionCount = 0;
 
+    // Scan in blocks of WINDOW rows ("tumbling" windows, like the live path)
     for (size_t start = 0; start < rows; start += WINDOW) {
         if (m_cancelRequested.load()) return;
 
         const size_t end = std::min(start + static_cast<size_t>(WINDOW), rows);
         const size_t count = end - start;
 
-        // Variance is computed per block with a single pass over the data
+        // The variance of each block is computed in a single pass (sum and sum of squares).
+        // Note: this is the population variance (divisor n), live uses n-1
+        // (DataAggregator::calculateStats): with 600 samples the difference is negligible
         for (auto& target : varianceTargets) {
             double sum = 0.0, sumSquares = 0.0;
             for (size_t r = start; r < end; ++r) {
@@ -197,6 +213,7 @@ void FileService::computeMissingStats(TelemetryDataset& dataset) {
             }
         }
 
+        // Accumulate max and sum up to and including this block
         for (auto& target : maxMeanTargets) {
             for (size_t r = start; r < end; ++r) {
                 double v = dataset.value(r, target.sourceA);
@@ -207,6 +224,7 @@ void FileService::computeMissingStats(TelemetryDataset& dataset) {
         }
         sessionCount += count;
 
+        // Write the updated cumulative values into every row of the block
         for (const auto& target : maxMeanTargets) {
             const double mean = target.runSum / sessionCount;
             for (size_t r = start; r < end; ++r) {
@@ -238,6 +256,7 @@ void FileService::loadBin(const std::string& filePath) {
         m_isLoading = false; m_isFinished = true; return;
     }
 
+    // Read the whole file into memory with a single operation
     const size_t fileSize = static_cast<size_t>(file.tellg());
     file.seekg(0, std::ios::beg);
     std::vector<uint8_t> buffer(fileSize);
@@ -249,7 +268,7 @@ void FileService::loadBin(const std::string& filePath) {
     const auto& layoutsA = TelemetrySchema::layoutsA();
     const auto& layoutsB = TelemetrySchema::layoutsB();
 
-    // Resolved once per layout so the hot loop only does memcpy + scaling
+    // Column indices resolved once per layout, so the hot loop only does memcpy + scaling
     std::unordered_map<const PacketLayout*, std::vector<int>> columnCache;
     auto columnsFor = [&](const PacketLayout& layout) -> const std::vector<int>& {
         auto it = columnCache.find(&layout);
@@ -264,20 +283,24 @@ void FileService::loadBin(const std::string& filePath) {
     const int idxLostB   = dataset.indexOf("lost_packets_B");
     const int idxLostTot = dataset.indexOf("lost_packets_tot");
 
+    // Row count estimate: file size / size of one A packet
     dataset.reserveRows(fileSize / (layoutsA.front().payloadSize ? layoutsA.front().payloadSize : 1));
 
-    // Latest battery values, replayed into every fast row
+    // Latest battery values (column, value), replayed into every fast row
     std::vector<std::pair<int, double>> lastB;
     bool hasB = false;
 
+    // Lost packet counting state (same rules as PacketParser)
     uint32_t lastTimestampA = 0, lastTimestampB = 0;
     uint32_t lostA = 0, lostB = 0;
     bool firstA = true, firstB = true;
 
+    // Locked layouts and first layout actually used (for the log and the presence flags)
     int lockedA = 0, lockedB = 0;
     const PacketLayout* usedA = nullptr;
     const PacketLayout* usedB = nullptr;
 
+    // Same strategy as PacketParser::matchLayout: locked layout first, then the others
     auto tryMatch = [](const std::vector<PacketLayout>& layouts, int& locked,
                        const uint8_t* data, size_t available) -> const PacketLayout* {
         if (locked >= 0 && locked < static_cast<int>(layouts.size()) &&
@@ -294,8 +317,8 @@ void FileService::loadBin(const std::string& filePath) {
         return nullptr;
     };
 
-    size_t cursor = 0;
-    size_t skipped = 0;
+    size_t cursor = 0;   // current position in the buffer
+    size_t skipped = 0;  // bytes skipped because they do not belong to valid packets
     while (cursor + 2 <= buffer.size()) {
         if (m_cancelRequested.load()) {
             std::cout << "WARNING [FileService]: BIN loading aborted by user." << std::endl;
@@ -305,7 +328,7 @@ void FileService::loadBin(const std::string& filePath) {
         const uint8_t* at = buffer.data() + cursor;
         const size_t available = buffer.size() - cursor;
 
-        // Decodes a battery packet into the carry-forward cache
+        // Decodes a battery packet into the lastB cache (replayed into the following rows)
         auto decodeB = [&](const uint8_t* data, size_t room) -> const PacketLayout* {
             const PacketLayout* layout = tryMatch(layoutsB, lockedB, data, room);
             if (!layout) return nullptr;
@@ -336,7 +359,7 @@ void FileService::loadBin(const std::string& filePath) {
                 if (!usedA) { usedA = layout; }
                 size_t consumed = layout->payloadSize;
 
-                // Same lookahead the live parser performs: when a battery packet
+                // Same look-ahead the live parser performs: when a battery packet
                 // follows immediately, merge it into THIS row instead of the next
                 // one, so a file replays exactly what was seen live
                 if (available >= consumed + 2 && at[consumed] == 0xEE && at[consumed + 1] == 0x11) {
@@ -354,8 +377,9 @@ void FileService::loadBin(const std::string& filePath) {
                 firstA = false;
 
                 const size_t row = dataset.pushRow();
-                dataset.setTimestamp(row, ts * 0.005);
+                dataset.setTimestamp(row, ts * 0.005); // 5 ms ticks -> seconds
 
+                // Write straight into the row cells (fast path)
                 float* cells = dataset.rowData(row);
                 const std::vector<int>& indices = columnsFor(*layout);
                 for (size_t i = 0; i < layout->fields.size(); ++i) {
@@ -381,6 +405,7 @@ void FileService::loadBin(const std::string& filePath) {
                 continue;
             }
         }
+        // No valid packet at this position: move forward one byte and try again
         ++cursor;
         ++skipped;
     }
@@ -422,6 +447,7 @@ void FileService::loadCsv(const std::string& filePath) {
     const size_t fileSize = static_cast<size_t>(file.tellg());
     file.seekg(0, std::ios::beg);
 
+    // '\0' terminated buffer so atof can be used directly on the tokens
     std::vector<char> buffer(fileSize + 1);
     file.read(buffer.data(), fileSize);
     buffer[fileSize] = '\0';
@@ -432,7 +458,7 @@ void FileService::loadCsv(const std::string& filePath) {
     char* p = buffer.data();
     char* const end = p + fileSize;
 
-    // ---- Header: map every column of the file onto a dataset slot ----
+    // ---- Header: map every column of the file onto a dataset column ----
     std::vector<std::string> headerNames;
     {
         char* lineStart = p;
@@ -463,6 +489,7 @@ void FileService::loadCsv(const std::string& filePath) {
         m_isLoading = false; m_isFinished = true; return;
     }
 
+    // columnOf[i] = dataset column of the i-th file column
     std::vector<int> columnOf(headerNames.size(), -1);
     int mapped = 0, unknown = 0;
     for (size_t i = 0; i < headerNames.size(); ++i) {
@@ -489,7 +516,7 @@ void FileService::loadCsv(const std::string& filePath) {
         }
     }
 
-    dataset.reserveRows(fileSize / 300);
+    dataset.reserveRows(fileSize / 300); // estimate: ~300 bytes per row
     const int timestampColumn = dataset.indexOf("timestamp");
     const size_t columnCount = headerNames.size();
     std::vector<char*> tokens(columnCount, nullptr);
@@ -500,7 +527,7 @@ void FileService::loadCsv(const std::string& filePath) {
         size_t tokenIndex = 0;
         tokens[0] = p;
 
-        // Tokenize in place: no std::string is built for the values
+        // Tokenize in place: every ';' becomes '\0', no std::string is built for the values
         while (p < end && *p != '\n' && *p != '\r') {
             if (*p == ';') {
                 *p = '\0';

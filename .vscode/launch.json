@@ -9,20 +9,20 @@
       "args": [],
       // "stopAtEntry": false,
       "cwd": "${workspaceFolder}/build/telemetry.app/Contents/MacOS/",
-      // "preLaunchTask": "cmake-build", // Opzionale: un task per rebuildare prima del debug
-      "externalConsole": true,        // Se vuoi vedere l'output in una console esterna
-      "stopAtEntry": false,           // Se vuoi fermarti all'inizio di main()
+      // "preLaunchTask": "cmake-build", // Optional: a task to rebuild before debugging
+      "externalConsole": true,        // To see the output in an external console
+      "stopAtEntry": false,           // To stop at the beginning of main()
       "environment": []
     },
     {
       "name": "Debug Windows",
-      "type": "cppvsdbg",                  // usa il debugger di Visual Studio
+      "type": "cppvsdbg",                  // uses the Visual Studio debugger
       "request": "launch",
       "program": "${workspaceFolder}/build/telemetry.exe",
       "args": [],
-      "cwd": "${workspaceFolder}/build/",  // directory di lavoro
+      "cwd": "${workspaceFolder}/build/",  // working directory
       "environment": [],
-      "console": "externalTerminal",       // o "integratedTerminal"
+      "console": "externalTerminal",       // or "integratedTerminal"
       "stopAtEntry": false
     }
   ]

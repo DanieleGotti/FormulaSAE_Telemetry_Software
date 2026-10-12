@@ -1,3 +1,12 @@
+/**
+ * @file SteerWindow.cpp
+ * @brief Implementation of the steering wheel window (see SteerWindow.hpp).
+ *
+ * @note This file contains `#define STB_IMAGE_IMPLEMENTATION`: it is the ONLY place
+ *       in the project where the stb_image implementation is compiled. The other
+ *       files (UIManager.cpp, CreditsWindow.cpp) only include the header.
+ *       If this file is moved or deleted, the define must be moved elsewhere.
+ */
 #include <imgui.h>
 #include <string>
 #include <cmath>
@@ -18,6 +27,13 @@
 #define PI 3.1415926535f
 #endif
 
+/**
+ * @brief Computes the 4 vertices of a square centered on `center` and rotated by `angle_degrees`.
+ * @param center        Square center (screen coordinates).
+ * @param size          Square side.
+ * @param angle_degrees Rotation in degrees.
+ * @return Vertices in order: top-left, top-right, bottom-right, bottom-left (before rotation).
+ */
 static std::array<ImVec2, 4> GetRotatedQuadPoints(const ImVec2& center, float size, float angle_degrees) {
     float angle_rad = angle_degrees * PI / 180.0f;
     float s = sinf(angle_rad);
@@ -26,6 +42,7 @@ static std::array<ImVec2, 4> GetRotatedQuadPoints(const ImVec2& center, float si
     std::array<ImVec2, 4> points = {
         {{-half_size, -half_size}, {half_size, -half_size}, {half_size, half_size}, {-half_size, half_size}}
     };
+    // 2D rotation of every vertex around the origin, then translation to the center
     for (auto& p : points) {
         float new_x = p.x * c - p.y * s;
         float new_y = p.x * s + p.y * c;
@@ -69,7 +86,7 @@ void SteerWindow::draw() {
             try {
                 current_angle = std::stof(rowOpt->at("steer"));
             } catch (const std::exception& e) {
-                // In case of error, the angle remains 0
+                // On error (e.g. missing field) the angle stays 0
             }
         }
     } else {
@@ -85,11 +102,12 @@ void SteerWindow::draw() {
         ImVec2 window_pos = ImGui::GetCursorScreenPos();
         ImVec2 available_space = ImGui::GetContentRegionAvail();
         
-        float bottom_padding = 30.0f;
+        float bottom_padding = 30.0f;  // space reserved for the angle text
         float image_size = std::min(available_space.x, available_space.y - bottom_padding) * 0.9f;
         
         ImVec2 image_center(window_pos.x + available_space.x * 0.5f, window_pos.y + (available_space.y - bottom_padding) * 0.5f);
 
+        // Steering wheel image drawn as a rotated quad
         auto vertices = GetRotatedQuadPoints(image_center, image_size, current_angle);
         ImU32 tint_color = m_uiManager->m_isDarkTheme ? IM_COL32(200, 200, 200, 255) : IM_COL32(80, 80, 80, 255);
         draw_list->AddImageQuad(
@@ -99,12 +117,14 @@ void SteerWindow::draw() {
             tint_color
         );
 
+        // Fixed mark at the top: zero reference
         float fixed_line_length = 15.0f;
         ImVec2 fixed_line_start(image_center.x, window_pos.y);
         ImVec2 fixed_line_end(image_center.x, window_pos.y + fixed_line_length);
         ImU32 fixed_line_color = m_uiManager->m_isDarkTheme ? IM_COL32(200, 200, 200, 255) : IM_COL32(0, 0, 0, 255);
         draw_list->AddLine(fixed_line_start, fixed_line_end, fixed_line_color, 2.0f);
 
+        // Red indicator rotating with the wheel
         float angle_rad = current_angle * PI / 180.0f;
         float start_radius = image_size * 0.35f; 
         float end_radius = image_size * 0.45f;   
@@ -118,6 +138,7 @@ void SteerWindow::draw() {
         );
         draw_list->AddLine(rotating_line_start, rotating_line_end, IM_COL32(255, 0, 0, 255), 3.0f);
 
+        // Numeric value under the wheel
         char angle_text[16];
         ImGui::PushFont(m_uiManager->font_body);
         snprintf(angle_text, 16, "%.1f°", current_angle);
@@ -159,12 +180,14 @@ bool SteerWindow::loadTextureFromMemory(const char* filename, GLuint* out_textur
         return false;
     }
 
+    // Decode PNG -> RGBA
     int image_width = 0, image_height = 0;
     unsigned char* image_data = stbi_load_from_memory(
         reinterpret_cast<const unsigned char*>(pData), dataSize, &image_width, &image_height, nullptr, 4
     );
     if (!image_data) return false;
 
+    // Upload into an OpenGL texture
     GLuint image_texture;
     glGenTextures(1, &image_texture);
     glBindTexture(GL_TEXTURE_2D, image_texture);

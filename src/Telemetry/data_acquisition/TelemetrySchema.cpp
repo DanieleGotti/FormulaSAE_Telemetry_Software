@@ -1,3 +1,29 @@
+/**
+ * @file TelemetrySchema.cpp
+ * @brief Packet field tables, historical layouts, dataset columns and value <-> text conversions.
+ *
+ * @details
+ * This is THE file to edit when the ECU firmware adds, removes or changes a
+ * transmitted value. File structure:
+ *  1. Binary helpers (type sizes, CRC16).
+ *  2. Shared scaling constants.
+ *  3. FROZEN (historical) layouts of packet A: `fieldsA_v1()` .. `fieldsA_v4()`.
+ *  4. CURRENT layout of packet A: `fieldsA_current()`  <-- edit here.
+ *  5. Packet B layouts: `fieldsB_v1()` (frozen), `fieldsB_current()`.
+ *  6. Layout registration (`layoutsA()`, `layoutsB()`).
+ *  7. Derived columns and canonical dataset order (`columns()`).
+ *  8. Enumerated value tables and text conversions (`formatValue()`, `parseValue()`).
+ *  9. Raw decoding (`readField()`, `matches()`, `expandDerivedKeys()`).
+ *
+ * Example of adding a sensor to packet A (see also TelemetrySchema.hpp):
+ * @code
+ * // 1) freeze the current layout if it has already been used on track
+ * static std::vector<FieldDef> fieldsA_v5() { return <copy of fieldsA_current() before the change>; }
+ * // 2) register it in layoutsA():  addLayout(list, "A/v5 (...)", 0xCC, 0x11, fieldsA_v5());
+ * // 3) append the new field at the end of fieldsA_current():
+ * fields.push_back({ "brake_line_pressure", WireType::U16, ValueFormat::Number, 0.1, 0.0, 1 });
+ * @endcode
+ */
 #include <sstream>
 #include <iomanip>
 #include <array>
@@ -9,7 +35,7 @@
 #include "Telemetry/data_acquisition/AmkDiagnostics.hpp"
 
 //==============================================================================
-//  Wire helpers
+//  Binary helpers
 //==============================================================================
 
 size_t wireSize(WireType type) {
@@ -23,10 +49,15 @@ size_t wireSize(WireType type) {
     return 0;
 }
 
-// CRC-16/CCITT-FALSE, byte-at-a-time. The table holds the result of the
-// original bit-by-bit loop for every possible byte, so the output is identical
-// while costing eight times less work - which matters because loading a .bin
-// now validates every single packet.
+/**
+ * @brief 256-entry lookup table for CRC-16/CCITT-FALSE.
+ *
+ * Each entry holds the result of the original bit-by-bit algorithm for that
+ * byte: the output is identical but about 8 times cheaper, which matters
+ * because loading a .bin validates EVERY packet.
+ *
+ * @return Pointer to the table (built only once).
+ */
 static const uint16_t* crcTable() {
     static const std::array<uint16_t, 256> table = [] {
         std::array<uint16_t, 256> t{};
@@ -56,45 +87,64 @@ uint16_t Calculate_CRC16(const uint8_t* data, uint16_t length) {
 //  Shared scaling constants
 //==============================================================================
 
+/// m/s -> km/h conversion for the Hall sensors (wheel speeds).
 static constexpr double HALL_MS_TO_KMH   = 3.6;
+/// Scale factor applied by the ECU to the wheel speeds (1 = none).
 static constexpr double HALL_ECU_SCALE   = 1.0;
+/// Final scale applied to the *_velocity fields: the result is in km/h.
 static constexpr double HALL_SCALE       = HALL_MS_TO_KMH * HALL_ECU_SCALE;
-static constexpr double DECI             = 0.1;   // raw stored multiplied by 10
+/// Scale for values transmitted multiplied by 10 (e.g. 253 -> 25.3).
+static constexpr double DECI             = 0.1;   // raw transmitted multiplied by 10
 
 //==============================================================================
-//  FROZEN LAYOUT: packet 0xCC as transmitted before IMDInsulationValue (134 B).
-//  Never edit this table - old recordings are decoded through it.
+//  FROZEN LAYOUT: packet 0xCC before IMDInsulationValue was added (134 B).
+//  NEVER edit this table: old recordings are decoded through it.
+//
+//  Entry format:
+//    { name, wire type, text format, scale, bias, decimals }
 //==============================================================================
 
+/**
+ * @brief Layout A v2: common base of all later A layouts.
+ * @return Fields in transmission order.
+ */
 static std::vector<FieldDef> fieldsA_v2() {
     return {
+        // Speed of the 4 wheels (Hall sensors), in km/h
         { "front_left_velocity",       WireType::F32, ValueFormat::Number, HALL_SCALE, 0.0, 1 },
         { "front_right_velocity",      WireType::F32, ValueFormat::Number, HALL_SCALE, 0.0, 1 },
         { "rear_left_velocity",        WireType::F32, ValueFormat::Number, HALL_SCALE, 0.0, 1 },
         { "rear_right_velocity",       WireType::F32, ValueFormat::Number, HALL_SCALE, 0.0, 1 },
 
+        // Front suspension linear potentiometers (damper travel)
         { "front_left_suspension",     WireType::F32, ValueFormat::Number, 1.0, 0.0, 1 },
         { "front_right_suspension",    WireType::F32, ValueFormat::Number, 1.0, 0.0, 1 },
 
+        // Accelerator pedal: two redundant raw sensors + mapped value
         { "accelerator1",              WireType::U16, ValueFormat::Number, 1.0, 0.0, 0 },
         { "accelerator2",              WireType::U16, ValueFormat::Number, 1.0, 0.0, 0 },
         { "accelerator_mapped",        WireType::F32, ValueFormat::Number, 1.0, 0.0, 1 },
 
+        // Brake pedal: two raw sensors
         { "brake1",                    WireType::U16, ValueFormat::Number, 1.0, 0.0, 0 },
         { "brake2",                    WireType::U16, ValueFormat::Number, 1.0, 0.0, 0 },
 
+        // Steering angle in degrees
         { "steer",                     WireType::F32, ValueFormat::Number, 1.0, 0.0, 1 },
 
+        // Digital inputs (0/1): shutdown circuit and buttons
         { "sdc",                       WireType::U8,  ValueFormat::Number, 1.0, 0.0, 0 },
         { "ready_to_drive_button",     WireType::U8,  ValueFormat::Number, 1.0, 0.0, 0 },
         { "ecu_reset_button",          WireType::U8,  ValueFormat::Number, 1.0, 0.0, 0 },
         { "tractive_system_on_button", WireType::U8,  ValueFormat::Number, 1.0, 0.0, 0 },
 
+        // EMMA (BMS): current, pack voltage, yaw and error bitmask
         { "emma_current",              WireType::F32, ValueFormat::Number, 1.0, 0.0, 1 },
         { "emma_voltage",              WireType::F32, ValueFormat::Number, 1.0, 0.0, 1 },
         { "emma_yaw",                  WireType::F32, ValueFormat::Number, 1.0, 0.0, 2 },
         { "emma_error",                WireType::U16, ValueFormat::EmmaError, 1.0, 0.0, 0 },
 
+        // Vehicle dynamics and torque targets computed by the ECU
         { "mean_velocity",             WireType::F32, ValueFormat::Number, 1.0, 0.0, 1 },
         { "real_yaw_rate",             WireType::F32, ValueFormat::Number, 1.0, 0.0, 2 },
         { "total_torque_request",      WireType::F32, ValueFormat::Number, 1.0, 0.0, 2 },
@@ -107,6 +157,7 @@ static std::vector<FieldDef> fieldsA_v2() {
         { "final_torque_target_L",     WireType::F32, ValueFormat::Number, 1.0, 0.0, 2 },
         { "final_torque_target_R",     WireType::F32, ValueFormat::Number, 1.0, 0.0, 2 },
 
+        // Left/right AMK inverters: values transmitted x10 (DECI scale)
         { "inv_L_torqueCurrent",       WireType::I16, ValueFormat::Number, DECI, 0.0, 1 },
         { "inv_L_magnetizingCurrent",  WireType::I16, ValueFormat::Number, DECI, 0.0, 1 },
         { "inv_L_tempMotor",           WireType::I16, ValueFormat::Number, DECI, 0.0, 1 },
@@ -114,13 +165,16 @@ static std::vector<FieldDef> fieldsA_v2() {
         { "inv_R_magnetizingCurrent",  WireType::I16, ValueFormat::Number, DECI, 0.0, 1 },
         { "inv_R_tempMotor",           WireType::I16, ValueFormat::Number, DECI, 0.0, 1 },
 
+        // Coolant temperatures (left/right pumps)
         { "left_coolant_temp",         WireType::F32, ValueFormat::Number, 1.0, 0.0, 1 },
         { "right_coolant_temp",        WireType::F32, ValueFormat::Number, 1.0, 0.0, 1 },
 
+        // State machines (shown as the state name)
         { "left_inverter_fsm",         WireType::U8,  ValueFormat::InverterFsm, 1.0, 0.0, 0 },
         { "right_inverter_fsm",        WireType::U8,  ValueFormat::InverterFsm, 1.0, 0.0, 0 },
         { "tractive_system_fsm",       WireType::U8,  ValueFormat::TractiveFsm, 1.0, 0.0, 0 },
 
+        // Selected driving mode (bitmask)
         { "ECU_Mode",                  WireType::U8,  ValueFormat::EcuMode, 1.0, 0.0, 0 },
     };
 }
@@ -130,6 +184,10 @@ static std::vector<FieldDef> fieldsA_v2() {
 //  temperatures between the inverter block and the coolant block (142 B).
 //==============================================================================
 
+/**
+ * @brief Layout A v1: like v2 but with `left_motor_temp`/`right_motor_temp` before `left_coolant_temp`.
+ * @return Fields in transmission order.
+ */
 static std::vector<FieldDef> fieldsA_v1() {
     std::vector<FieldDef> fields = fieldsA_v2();
     const FieldDef leftMotor  { "left_motor_temp",  WireType::F32, ValueFormat::Number, 1.0, 0.0, 1 };
@@ -147,6 +205,10 @@ static std::vector<FieldDef> fieldsA_v1() {
 //  FROZEN LAYOUT: adds the IMD insulation reading (136 B).
 //==============================================================================
 
+/**
+ * @brief Layout A v3: v2 + `IMDInsulationValue` (insulation resistance, kOhm).
+ * @return Fields in transmission order.
+ */
 static std::vector<FieldDef> fieldsA_v3() {
     std::vector<FieldDef> fields = fieldsA_v2();
     fields.push_back({ "IMDInsulationValue", WireType::U16, ValueFormat::Number, 1.0, 0.0, 0 });
@@ -157,6 +219,10 @@ static std::vector<FieldDef> fieldsA_v3() {
 //  FROZEN LAYOUT: adds the two AMK diagnostic numbers, one per inverter (140 B).
 //==============================================================================
 
+/**
+ * @brief Layout A v4: v3 + `inv_L_errorInfo` / `inv_R_errorInfo`.
+ * @return Fields in transmission order.
+ */
 static std::vector<FieldDef> fieldsA_v4() {
     std::vector<FieldDef> fields = fieldsA_v3();
     fields.push_back({ "inv_L_errorInfo", WireType::U16, ValueFormat::InverterDiag, 1.0, 0.0, 0 });
@@ -167,20 +233,28 @@ static std::vector<FieldDef> fieldsA_v4() {
 //==============================================================================
 //  >>>>>>>>>>>>>>>>>>  ADD NEW SENSORS OF PACKET 0xCC HERE  <<<<<<<<<<<<<<<<<<
 //
-//  This is the layout the ECU transmits TODAY. Append one entry, in the exact
+//  This is the layout the ECU transmits TODAY. Append one entry in the exact
 //  position the firmware sends it, and it automatically appears in the live UI,
-//  the dashboard table, the CSV log, the .bin loader and the high-res export.
+//  the Dashboard table, the CSV log, the .bin loader and the high-res export.
 //
-//  The frozen tables above are untouched, so previous recordings keep working.
+//  RULE: if the current layout has already been used to record data, freeze a
+//  copy of it first (fieldsA_vN) and register it in layoutsA().
+//  Today fieldsA_current() is identical to fieldsA_v4(): addLayout() detects
+//  that and skips the duplicate, so fields can be appended here directly.
 //==============================================================================
 
+/**
+ * @brief Current A layout: it also defines the dataset column order.
+ * @return Fields in transmission order.
+ */
 static std::vector<FieldDef> fieldsA_current() {
     std::vector<FieldDef> fields = fieldsA_v3();
 
-    // Numero di diagnostica AMK per inverter (0 = nessuna). Vedi AmkDiagnostics.hpp
+    // AMK diagnostic number per inverter (0 = none). See AmkDiagnostics.hpp
     fields.push_back({ "inv_L_errorInfo", WireType::U16, ValueFormat::InverterDiag, 1.0, 0.0, 0 });
     fields.push_back({ "inv_R_errorInfo", WireType::U16, ValueFormat::InverterDiag, 1.0, 0.0, 0 });
 
+    // Example of a new field (U16 transmitted x10, shown with 1 decimal):
     // fields.push_back({ "brake_line_pressure", WireType::U16, ValueFormat::Number, 0.1, 0.0, 1 });
 
     return fields;
@@ -190,15 +264,19 @@ static std::vector<FieldDef> fieldsA_current() {
 //  FROZEN LAYOUT: packet 0xEE before the online module bitmask (79 B).
 //==============================================================================
 
+/**
+ * @brief Layout B v1: state of charge, voltages and temperatures of the 14 battery modules.
+ * @return Fields in transmission order.
+ */
 static std::vector<FieldDef> fieldsB_v1() {
     std::vector<FieldDef> fields;
     fields.push_back({ "state_of_charge", WireType::U8, ValueFormat::Number, 1.0, 0.0, 0 });
 
-    // Cell voltages: raw is stored as (V * 100) - 200 to fit one byte
+    // Cell voltages: raw is (V * 100) - 200 to fit one byte, so V = raw * 0.01 + 2
     for (int i = 1; i <= 14; ++i) {
         fields.push_back({ "VoltageModule" + std::to_string(i), WireType::U8, ValueFormat::Number, 0.01, 2.0, 2 });
     }
-    // Two temperature probes per module, interleaved on the wire
+    // Two temperature probes per module, interleaved on the wire (T1 mod1, T2 mod1, T1 mod2, ...)
     for (int i = 1; i <= 14; ++i) {
         fields.push_back({ "Temperature1Module" + std::to_string(i), WireType::U16, ValueFormat::Number, DECI, 0.0, 1 });
         fields.push_back({ "Temperature2Module" + std::to_string(i), WireType::U16, ValueFormat::Number, DECI, 0.0, 1 });
@@ -208,9 +286,14 @@ static std::vector<FieldDef> fieldsB_v1() {
 
 //==============================================================================
 //  >>>>>>>>>>>>>>>>>>  ADD NEW SENSORS OF PACKET 0xEE HERE  <<<<<<<<<<<<<<<<<<
-//  Same rule as packet 0xCC: only this function is edited.
+//  Same rule as packet 0xCC: only this function is edited
+//  (after freezing the previous layout if it has already been used).
 //==============================================================================
 
+/**
+ * @brief Current B layout: v1 + `online_modules` (bit i = module i+1 online).
+ * @return Fields in transmission order.
+ */
 static std::vector<FieldDef> fieldsB_current() {
     std::vector<FieldDef> fields = fieldsB_v1();
     fields.push_back({ "online_modules", WireType::U16, ValueFormat::Number, 1.0, 0.0, 0 });
@@ -218,10 +301,18 @@ static std::vector<FieldDef> fieldsB_current() {
 }
 
 //==============================================================================
-//  Historical layouts, kept so that old recordings remain readable.
-//  Never edit these: add a new entry at the top of the list instead.
+//  Registration of the historical layouts, kept so that old recordings remain
+//  readable. Never edit the existing ones: add a new entry at the top instead.
 //==============================================================================
 
+/**
+ * @brief Builds a PacketLayout, precomputing field offsets and total size.
+ * @param tag    Version tag (for logs only).
+ * @param s1     First start byte.
+ * @param s2     Second start byte.
+ * @param fields Fields in transmission order.
+ * @return The ready-to-use layout.
+ */
 static PacketLayout makeLayout(const std::string& tag, uint8_t s1, uint8_t s2, std::vector<FieldDef> fields) {
     PacketLayout layout;
     layout.versionTag = tag;
@@ -236,13 +327,18 @@ static PacketLayout makeLayout(const std::string& tag, uint8_t s1, uint8_t s2, s
         layout.offsets.push_back(offset);
         offset += wireSize(f.wire);
     }
-    layout.payloadSize = offset + 2; // + CRC
+    layout.payloadSize = offset + 2; // + 2 CRC bytes
     return layout;
 }
 
-// Two layouts are the same when they describe the same fields in the same
-// order. Used to avoid registering a duplicate while the current layout still
-// matches the newest frozen one.
+/**
+ * @brief Compares two field lists (same name and same type, in the same order).
+ *
+ * Used to avoid registering the same layout twice while the current layout
+ * still matches the newest frozen one.
+ *
+ * @return true if the layouts are equivalent.
+ */
 static bool sameFields(const std::vector<FieldDef>& a, const std::vector<FieldDef>& b) {
     if (a.size() != b.size()) return false;
     for (size_t i = 0; i < a.size(); ++i) {
@@ -251,7 +347,14 @@ static bool sameFields(const std::vector<FieldDef>& a, const std::vector<FieldDe
     return true;
 }
 
-// Registers `candidate` unless an identical layout is already listed
+/**
+ * @brief Adds a layout to the list unless an identical layout is already there.
+ * @param list   Layout list (in detection priority order).
+ * @param tag    Version tag.
+ * @param s1     First start byte.
+ * @param s2     Second start byte.
+ * @param fields Layout fields.
+ */
 static void addLayout(std::vector<PacketLayout>& list, const std::string& tag,
                       uint8_t s1, uint8_t s2, std::vector<FieldDef> fields) {
     for (const auto& existing : list) {
@@ -262,7 +365,8 @@ static void addLayout(std::vector<PacketLayout>& list, const std::string& tag,
 
 const std::vector<PacketLayout>& TelemetrySchema::layoutsA() {
     static const std::vector<PacketLayout> layouts = [] {
-        // Newest first: detection tries them in this order
+        // Newest first: detection tries them in this order.
+        // A newly frozen layout goes right below "A/current".
         std::vector<PacketLayout> list;
         addLayout(list, "A/current",           0xCC, 0x11, fieldsA_current());
         addLayout(list, "A/v4 (inverter diag)", 0xCC, 0x11, fieldsA_v4());
@@ -289,6 +393,7 @@ const std::vector<PacketLayout>& TelemetrySchema::layoutsB() {
 //==============================================================================
 
 const std::vector<std::string>& TelemetrySchema::varianceChannels() {
+    // Every name must be an existing field: generates <name>_mean/_var/_std
     static const std::vector<std::string> channels = {
         "accelerator1", "accelerator2", "brake1", "brake2", "steer"
     };
@@ -296,6 +401,8 @@ const std::vector<std::string>& TelemetrySchema::varianceChannels() {
 }
 
 const std::vector<std::string>& TelemetrySchema::maxMeanChannels() {
+    // Generates <name>_max/_mean. "speed" is virtual (mean of the rear wheels):
+    // DataAggregator and FileService handle it as a special case.
     static const std::vector<std::string> channels = {
         "speed", "inv_L_tempMotor", "inv_R_tempMotor", "left_coolant_temp", "right_coolant_temp"
     };
@@ -307,24 +414,28 @@ const std::vector<ColumnDef>& TelemetrySchema::columns() {
         std::vector<ColumnDef> list;
         list.push_back({ "timestamp", ValueFormat::Number, 3 });
 
-        // Post-processed: distance travelled, integrated from the speedometer
-        // reading over the session timestamps. Sits right after the timestamp
-        // because the two are always read together.
+        // Post-processed: distance travelled, integrated from the speed over the
+        // session timestamps. Sits right after the timestamp because the two
+        // are always read together.
         list.push_back({ "meters", ValueFormat::Number, 1 });
 
+        // Fields of the current layouts, in transmission order
         for (const auto& f : currentA().fields) list.push_back({ f.name, f.format, f.decimals });
         for (const auto& f : currentB().fields) list.push_back({ f.name, f.format, f.decimals });
 
+        // Statistics over 3 s windows
         for (const auto& sensor : varianceChannels()) {
             list.push_back({ sensor + "_mean", ValueFormat::Number, 3 });
             list.push_back({ sensor + "_var",  ValueFormat::Number, 3 });
             list.push_back({ sensor + "_std",  ValueFormat::Number, 3 });
         }
+        // Session-cumulative max and mean
         for (const auto& channel : maxMeanChannels()) {
             list.push_back({ channel + "_max",  ValueFormat::Number, 3 });
             list.push_back({ channel + "_mean", ValueFormat::Number, 3 });
         }
 
+        // Lost packet counters (computed from timestamp gaps)
         list.push_back({ "lost_packets_A",   ValueFormat::Number, 0 });
         list.push_back({ "lost_packets_B",   ValueFormat::Number, 0 });
         list.push_back({ "lost_packets_tot", ValueFormat::Number, 0 });
@@ -355,13 +466,17 @@ int TelemetrySchema::columnIndex(const std::string& name) {
 }
 
 //==============================================================================
-//  Enumerated value tables
+//  Enumerated value tables.
+//  They must stay aligned with the ECU firmware definitions. The order of the
+//  FSM states matches their numeric value (index = value).
 //==============================================================================
 
 namespace {
 
+/// Bit -> name association for bitmask fields.
 struct FlagEntry { uint16_t bit; const char* name; };
 
+/// EMMA error/status bits (`emma_error` field).
 const FlagEntry kEmmaFlags[] = {
     { 0x0001, "ERR_UNDERVOLTAGE" },     { 0x0002, "ERR_OVERVOLTAGE" },
     { 0x0004, "ERR_OVERTEMP_CELL" },    { 0x0008, "ERR_UNDERTEMP_CELL" },
@@ -371,21 +486,29 @@ const FlagEntry kEmmaFlags[] = {
     { 0x0800, "EMMA_FINISH_PRECHARGE" },{ 0x8000, "ERR_CRITICAL_FAULT" }
 };
 
+/// Inverter FSM states (`left_inverter_fsm` / `right_inverter_fsm` fields).
 const char* const kInverterStates[] = {
     "OFF", "SYSTEM_READY", "DC_CAPACITOR_CHARGE", "DC_OK",
     "ENABLE_INVERTER", "ENABLED", "ON", "OK", "ERROR"
 };
 
+/// Tractive system FSM states (`tractive_system_fsm` field).
 const char* const kTractiveStates[] = {
     "ENTRY_STATE", "START_LIGHT_TEST", "WAIT_LIGHT_TEST", "POWER_OFF",
     "TS_WAIT_ACTIVATION", "TS_WAIT_PRECHARGE", "TS_ACTIVE", "R2D_WAIT",
     "R2D_ACTIVE", "ERROR_STATE"
 };
 
+/// ECU modes (`ECU_Mode` field): the first set bit is shown.
 const FlagEntry kEcuModes[] = {
     { 0x01, "ENDURANCE" }, { 0x02, "ACCELERATION" }, { 0x04, "TEST" }
 };
 
+/**
+ * @brief Converts the EMMA error bitmask to text ("ERR_A | ERR_B").
+ * @param error Bitmask.
+ * @return "EMMA_STATUS_OK" for 0, "UNKNOWN" if no known bit is set.
+ */
 std::string emmaErrorToText(uint16_t error) {
     if (error == 0) return "EMMA_STATUS_OK";
     std::string result;
@@ -398,7 +521,11 @@ std::string emmaErrorToText(uint16_t error) {
     return result.empty() ? "UNKNOWN" : result;
 }
 
-// Exact reverse of emmaErrorToText, so a value survives the CSV round trip
+/**
+ * @brief Exact inverse of emmaErrorToText(), so a value survives the CSV round trip.
+ * @param text Text read from the CSV.
+ * @return Rebuilt bitmask.
+ */
 uint16_t emmaErrorFromText(const char* text) {
     if (!text || *text == '\0') return 0;
     if (std::strstr(text, "EMMA_STATUS_OK")) return 0;
@@ -409,8 +536,17 @@ uint16_t emmaErrorFromText(const char* text) {
     return error;
 }
 
-// Exact match against the state table; falls back to a plain number so that a
-// column already stored numerically still loads correctly
+/**
+ * @brief Looks the text up in the state table and returns its index.
+ *
+ * If the text is a number (column stored numerically) it is parsed directly,
+ * so those files load correctly as well.
+ *
+ * @param text  Text to look up.
+ * @param table State name table.
+ * @param count Number of table entries.
+ * @return State index, or the parsed number, or 0.
+ */
 double enumFromText(const char* text, const char* const* table, size_t count) {
     if (!text || *text == '\0') return 0.0;
     for (size_t i = 0; i < count; ++i) {
@@ -423,7 +559,7 @@ double enumFromText(const char* text, const char* const* table, size_t count) {
 } // namespace
 
 //==============================================================================
-//  Formatting and parsing
+//  Formatting and parsing (value <-> text)
 //==============================================================================
 
 std::string TelemetrySchema::formatValue(ValueFormat format, int decimals, double value) {
@@ -467,7 +603,7 @@ size_t TelemetrySchema::formatValueInto(ValueFormat format, int decimals, double
         const int written = std::snprintf(buffer, capacity, "%.*f", decimals, value);
         return written > 0 ? static_cast<size_t>(written) : 0;
     }
-    // Enumerated values are short strings; reuse the shared table lookup
+    // Enumerated values are short strings: reuse the shared conversion
     const std::string text = formatValue(format, decimals, value);
     const size_t length = std::min(text.size(), capacity ? capacity - 1 : 0);
     std::memcpy(buffer, text.data(), length);
@@ -510,6 +646,8 @@ double TelemetrySchema::readField(const uint8_t* packet, size_t offset, const Fi
     const uint8_t* p = packet + offset;
     double raw = 0.0;
 
+    // memcpy avoids unaligned reads; bytes are interpreted in the host
+    // endianness (little-endian on x86/ARM, same as the firmware)
     switch (field.wire) {
         case WireType::U8:  raw = static_cast<double>(*p); break;
         case WireType::U16: { uint16_t v; std::memcpy(&v, p, 2); raw = static_cast<double>(v); break; }
@@ -524,6 +662,7 @@ bool TelemetrySchema::matches(const PacketLayout& layout, const uint8_t* data, s
     if (available < layout.payloadSize) return false;
     if (data[0] != layout.startByte1 || data[1] != layout.startByte2) return false;
 
+    // The CRC covers the whole packet except its last 2 bytes (the CRC itself)
     const uint16_t expected = Calculate_CRC16(data, static_cast<uint16_t>(layout.payloadSize - 2));
     uint16_t stored = 0;
     std::memcpy(&stored, data + layout.payloadSize - 2, 2);

@@ -1,3 +1,7 @@
+/**
+ * @file FileSelectionWindow.cpp
+ * @brief Implementation of the file selection window (see FileSelectionWindow.hpp).
+ */
 #include <imgui.h>
 #include <string>
 #include "UI/UIManager.hpp"
@@ -22,6 +26,7 @@ void FileSelectionWindow::draw() {
         m_showFileBrowser = true;
     }
 
+    // Browser popup: when the user picks a file, its path goes into the text field
     if (m_showFileBrowser) {
         auto selected_path = m_fileBrowser.draw("Select file", m_showFileBrowser);
         if (selected_path.has_value()) {

@@ -1,3 +1,7 @@
+/**
+ * @file CreditsWindow.cpp
+ * @brief Implementation of the credits window (see CreditsWindow.hpp).
+ */
 #include <imgui.h>
 #include <iostream>
 #include "UI/UIManager.hpp"
@@ -17,6 +21,7 @@ CreditsWindow::~CreditsWindow() {
 }
 
 void CreditsWindow::draw() {
+    // Visible only on the Home screen
     if (m_uiManager->getCurrentState() != AppState::CONFIGURING) return;
 
     ImGui::SetNextWindowSize(ImVec2(500, 400), ImGuiCond_FirstUseEver);
@@ -26,6 +31,7 @@ void CreditsWindow::draw() {
     float window_height = ImGui::GetWindowSize().y;
     const char* authorsText = "Authors:      Daniele Gotti      Samuele Stasi"; 
 
+    // Logo height keeping the aspect ratio at a fixed width
     float target_height = 0.0f;
     if (m_textureID && m_imgWidth > 0) {
         float aspect_ratio = static_cast<float>(m_imgHeight) / static_cast<float>(m_imgWidth);
@@ -36,6 +42,7 @@ void CreditsWindow::draw() {
     float text_height = ImGui::CalcTextSize(authorsText).y;
     ImGui::PopFont();
 
+    // Vertical centering of the logo + text block
     float spacing = ImGui::GetStyle().ItemSpacing.y; 
     float total_content_height = target_height + spacing + text_height;
 
@@ -47,6 +54,7 @@ void CreditsWindow::draw() {
     if (m_textureID && m_imgWidth > 0) {
         ImGui::SetCursorPosX((window_width - TARGET_IMAGE_WIDTH) * 0.5f);
         
+        // White logo on the dark theme, almost black on the light theme
         ImVec4 tint_col = m_uiManager->m_isDarkTheme ? 
                           ImVec4(1.0f, 1.0f, 1.0f, 1.0f) : 
                           ImVec4(0.15f, 0.15f, 0.15f, 1.0f); 
@@ -65,6 +73,7 @@ void CreditsWindow::draw() {
 
     ImGui::Dummy(ImVec2(0.0f, 20.0f)); 
 
+    // Authors centered horizontally
     ImGui::PushFont(m_uiManager->font_body);
     float text_width = ImGui::CalcTextSize(authorsText).x;
     ImGui::SetCursorPosX((window_width - text_width) * 0.5f);
@@ -78,6 +87,7 @@ bool CreditsWindow::loadTextureFromMemory(const char* filename, GLuint* out_text
     auto [pData, dataSize] = ServiceManager::getAssetManager()->getImage(filename);
     if (!pData || dataSize == 0) return false;
 
+    // Decode PNG -> RGBA and upload into an OpenGL texture
     int image_width = 0, image_height = 0;
     unsigned char* image_data = stbi_load_from_memory(reinterpret_cast<const unsigned char*>(pData), dataSize, &image_width, &image_height, nullptr, 4);
     if (!image_data) return false;

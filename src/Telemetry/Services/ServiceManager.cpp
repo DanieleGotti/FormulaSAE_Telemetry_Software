@@ -1,3 +1,7 @@
+/**
+ * @file ServiceManager.cpp
+ * @brief Implementation of the static service registry (see ServiceManager.hpp).
+ */
 #include <filesystem>
 #include <iostream>
 #include "Telemetry/Services/ServiceManager.hpp"
@@ -5,6 +9,7 @@
 #include "Telemetry/data_acquisition/PacketParser.hpp"
 #include "utils/AssetManagerFactory.hpp"
 
+// Static member definitions (all empty until initialize() is called)
 AcquisitionMethod ServiceManager::m_method;
 std::shared_ptr<IAssetManager> ServiceManager::m_assetManager = nullptr;
 std::shared_ptr<SettingsManager> ServiceManager::m_settingsManager = nullptr;
@@ -22,8 +27,8 @@ void ServiceManager::initialize() {
     
     m_dataManager = std::make_unique<DataManager>();
     
-    // Start the DataAggregator with a lambda: every time the aggregator 
-    // finishes inserting the variances, it passes the completed row to the DataManager
+    // The DataAggregator receives a lambda: every time it finishes adding the
+    // statistics to a row, it passes the complete row to the DataManager
     m_dataAggregator = std::make_unique<DataAggregator>([](const DbRow& row) {
         if (m_dataManager) m_dataManager->processData(row);
     });
@@ -37,6 +42,7 @@ void ServiceManager::initialize() {
 }
 
 std::vector<std::string> ServiceManager::getAllConnectionOptions() {
+    // Temporary instance used only to enumerate the ports
     SerialDataSource sds;
     return sds.getAvailableResources();
 }
@@ -75,6 +81,7 @@ bool ServiceManager::startServices() {
             if (m_networkService) success = m_networkService->start();
             break;
         case ACQUISITION_METHOD_FILE:
+            // Loading runs in the background: success is checked later with isFinished()
             if (m_fileService) {
                 m_fileService->startLoading();
                 success = true; 
@@ -98,7 +105,7 @@ void ServiceManager::resetForNewSession() {
     stopTasks();
     stopLogging();
 
-    // Cancel safely any running Playback CSV Export to avoid thread zombies
+    // Safely cancel any running CSV export, to avoid orphan threads
     if (m_playbackManager) {
         m_playbackManager->cancelExport();
         m_playbackManager->clearData();
@@ -106,13 +113,13 @@ void ServiceManager::resetForNewSession() {
     
     if (m_dataAggregator) m_dataAggregator->reset();
 
-    // Re-link services
+    // Recreate the services, linking them to the aggregator again
     if (m_dataAggregator) {
         m_serialService = std::make_unique<SerialService>(m_dataAggregator.get());
     }
     
-    // Creating a new unique_ptr will automatically destroy the old FileService, 
-    // triggering its destructor which stops and joins any pending load thread.
+    // Assigning a new unique_ptr destroys the old FileService: its destructor
+    // stops and joins any pending loading thread.
     m_fileService = std::make_unique<FileService>();
     m_networkService = std::make_unique<NetworkService>();
 
@@ -131,13 +138,14 @@ void ServiceManager::cleanup() {
 
 bool ServiceManager::startLogging(const std::string& logIdentifier) {
     if (m_method == ACQUISITION_METHOD_FILE) {
-        // On file, the CSV conversion is done directly by UiManager at the end of loading
+        // Nothing is recorded from file: CSV conversion is done by the PlaybackManager export
         return true; 
     } else {
         std::filesystem::create_directories(logIdentifier);
         if (!m_csvWriter) {
             m_csvWriter = std::make_shared<CsvWriter>();
             if(m_csvWriter->createFile(logIdentifier, PacketParser::getColumnOrder())) {
+                // Registered as a "log subscriber": it receives EVERY row (200 Hz), not only 10 Hz
                 getDataManager()->addLogSubscriber(m_csvWriter.get());
                 std::cout << "LOGGING [ServiceManager]: CSV generation started." << std::endl;
                 return true;

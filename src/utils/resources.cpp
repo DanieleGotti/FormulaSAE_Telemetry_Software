@@ -1,3 +1,7 @@
+/**
+ * @file resources.cpp
+ * @brief Implementation of the old resource path utilities (legacy, see resources.hpp).
+ */
 #include <utils/resources.hpp>
 
 #ifdef WIN32
@@ -10,7 +14,7 @@ std::string getResourcesPath() {
     return "";
 }
 
-// Helper function for combining the resource path
+// Joins the resources folder and the relative path
 std::string getResourcePath(const std::string& relativePath) {
     std::string resourcesPath = getResourcesPath();
     if (!resourcesPath.empty()) {

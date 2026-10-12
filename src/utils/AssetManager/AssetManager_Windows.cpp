@@ -1,3 +1,14 @@
+/**
+ * @file AssetManager_Windows.cpp
+ * @brief Windows asset manager: reads fonts and images embedded in the executable as RCDATA resources.
+ *
+ * @details
+ * Resources are declared in assets/windows_resources.rc with the IDs of
+ * assets/resources.h and compiled into the .exe (no external files to ship).
+ * Every requested file name must be mapped to its ID in the `if` branches
+ * below: for a new image/font add the ID, the .rc line and the `if` branch.
+ * Data is copied into private buffers (freed in the destructor).
+ */
 #include <windows.h>
 #include <string>
 #include <utility>
@@ -7,8 +18,12 @@
 #include <utils/IAssetManager.hpp>
 #include "../../assets/resources.h"
 
+/**
+ * @brief IAssetManager implementation based on the embedded Win32 resources.
+ */
 class AssetManager_Windows : public IAssetManager {
 public:
+    /** @brief Frees every resource copy handed out. */
     ~AssetManager_Windows() override {
         for (void* buffer : m_assetDataBuffers) {
             delete[] static_cast<char*>(buffer);
@@ -16,7 +31,13 @@ public:
         m_assetDataBuffers.clear();
     }
 
+    /**
+     * @brief Returns an embedded font.
+     * @param name "RobotoCondensed-Regular.ttf" or "RobotoCondensed-Bold.ttf".
+     * @return (data, size) or {nullptr, 0} if the name is not mapped.
+     */
     std::pair<void*, uint32_t> getFont(const std::string& name) override {
+        // File name -> resource ID (see assets/resources.h)
         int resourceId = 0;
         if (name == "RobotoCondensed-Regular.ttf") {
             resourceId = IDR_FONT_REGULAR;
@@ -29,6 +50,7 @@ public:
 
         std::cout << "INFO [AssetManager]: Loading font '" << name << "'." << std::endl;
 
+        // Locate and lock the resource inside the executable
         HINSTANCE hInstance = GetModuleHandle(nullptr);
         HRSRC hRes = FindResource(hInstance, MAKEINTRESOURCE(resourceId), RT_RCDATA);
         if (!hRes) return {nullptr, 0};
@@ -38,6 +60,7 @@ public:
         DWORD resourceSize = SizeofResource(hInstance, hRes);
         if (!pResourceData || resourceSize == 0) return {nullptr, 0};
         
+        // Copy into a private buffer (the resource memory is read-only)
         char* safeBuffer = new char[resourceSize];
         std::memcpy(safeBuffer, pResourceData, resourceSize);
         
@@ -45,7 +68,13 @@ public:
         return {safeBuffer, static_cast<uint32_t>(resourceSize)};
     }
 
+    /**
+     * @brief Returns an embedded image.
+     * @param path "steering_wheel.png", "logo_erb.png" or "icon.png".
+     * @return (data, size) or {nullptr, 0} if the name is not mapped.
+     */
     std::pair<void*, uint32_t> getImage(const std::string& path) override {
+        // File name -> resource ID (see assets/resources.h)
         int resourceId = 0;
         if (path == "steering_wheel.png") {
             resourceId = IDI_ICON_STEER;
@@ -76,6 +105,10 @@ public:
         return {safeBuffer, static_cast<uint32_t>(resourceSize)};
     }
 
+    /**
+     * @brief Returns the default window layout (IDR_IMGUI_CONFIG resource).
+     * @return ('\0' terminated text, size without terminator) or {nullptr, 0}.
+     */
     std::pair<void*, uint32_t> getDefaultImGuiIniFile() {
         int resourceId = IDR_IMGUI_CONFIG;
 
@@ -91,7 +124,7 @@ public:
         
         if (!pResourceData || resourceSize == 0) return {nullptr, 0};
 
-        // Allocate resourceSize + 1 to ensure null-termination for safety
+        // Allocate resourceSize + 1 to guarantee the '\0' terminator (it is text)
         char* safeBuffer = new char[resourceSize + 1];
         std::memcpy(safeBuffer, pResourceData, resourceSize);
         safeBuffer[resourceSize] = '\0';
@@ -101,5 +134,6 @@ public:
     }
 
 private:
+    /// Buffers allocated with new[] and handed to the caller, freed in the destructor.
     std::list<void*> m_assetDataBuffers;
 };

@@ -1,8 +1,15 @@
+/**
+ * @file TemperatureWindow.cpp
+ * @brief Implementation of the temperatures window (see TemperatureWindow.hpp).
+ *
+ * The live/playback logic is identical to AccBrkWindow.cpp (see the comments there).
+ */
 #include "UI/TemperatureWindow.hpp"
 #include "UI/UIManager.hpp"
 #include "Telemetry/Services/ServiceManager.hpp"
 #include "Telemetry/file_reading/PlaybackManager.hpp"
 
+// Plot lines: {field key, label}; default Y axis 0..120 °C
 TemperatureWindow::TemperatureWindow(UiManager* manager) : m_uiManager(manager),
     m_temperaturePlot("Temperatures", {{ "inv_L_tempMotor",    "Left motor" },
                                        { "inv_R_tempMotor",    "Right motor" },
@@ -23,7 +30,7 @@ void TemperatureWindow::onAggregatedDataReceived(const DbRow& dataRow) {
         if (!dataRow.count("timestamp")) return;
         double unix_timestamp = std::stod(dataRow.at("timestamp"));
 
-        // Detect temporal gaps (pause/restart or system reset)
+        // Time jump (pause/restart or reset): the series are cleared
         if (m_lastTimestamp >= 0.0 && (unix_timestamp < m_lastTimestamp || unix_timestamp - m_lastTimestamp > 1.5)) {
             for (auto& pair : m_plotData) {
                 pair.second.X.clear();
@@ -32,6 +39,7 @@ void TemperatureWindow::onAggregatedDataReceived(const DbRow& dataRow) {
         }
         m_lastTimestamp = unix_timestamp;
 
+        // New sample + drop the ones older than MAX_HISTORY_SECONDS
         for (auto& pair : m_plotData) {
             const std::string& label = pair.first;
             if (dataRow.count(label)) {
@@ -61,7 +69,7 @@ void TemperatureWindow::draw() {
         std::lock_guard<std::mutex> lock(m_dataMutex);
         if (!m_playbackDataLoaded && playbackManager->getTotalRows() > 0) {
 
-            // Fast DOD extraction for ImPlot
+            // Copy the full session series for ImPlot, only once
             std::vector<double> timeline = playbackManager->getPlotTimeline();
 
             for (auto& pair : m_plotData) {
@@ -72,7 +80,7 @@ void TemperatureWindow::draw() {
         }
     } else {
         std::lock_guard<std::mutex> lock(m_dataMutex);
-        m_playbackDataLoaded = false; // Reset when switching modes
+        m_playbackDataLoaded = false; // reset when switching modes
         if (!m_plotData.empty() && !m_plotData.begin()->second.X.empty()) {
             cursor_time = m_plotData.begin()->second.X.back();
         }

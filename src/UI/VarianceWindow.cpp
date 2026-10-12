@@ -1,3 +1,7 @@
+/**
+ * @file VarianceWindow.cpp
+ * @brief Implementation of the statistics window (see VarianceWindow.hpp).
+ */
 #include <imgui.h>
 #include <string>
 #include "UI/UIManager.hpp"
@@ -5,8 +9,16 @@
 #include "Telemetry/Services/ServiceManager.hpp"
 #include "Telemetry/file_reading/PlaybackManager.hpp"
 
-// Friendly label and unit for the statistics rows. Channels not listed here
-// simply show their raw schema name, so nothing breaks when one is added.
+/**
+ * @brief Human-readable label and unit for the rows of the max/mean table.
+ *
+ * Channels not listed here simply show their raw schema name with unit "[-]",
+ * so adding a channel to the schema breaks nothing. To give it a readable
+ * name just add an entry to the `names` map.
+ *
+ * @param channel Channel name (e.g. "speed").
+ * @return (label, unit) pair.
+ */
 static const std::pair<std::string, std::string>& displayNameFor(const std::string& channel) {
     static const std::map<std::string, std::pair<std::string, std::string>> names = {
         { "speed",              { "Speed",                       "[km/h]" } },
@@ -54,6 +66,7 @@ void VarianceWindow::draw() {
 
     ImGui::Begin("Sensor statistics (3 s)", nullptr);
 
+    // Prints a value with 3 decimals, "--" when missing, "Null" when not numeric
     auto printStat = [&](const std::string& key) {
         if (hasData && dataToDisplay.count(key)) {
             try {
@@ -67,6 +80,7 @@ void VarianceWindow::draw() {
         }
     };
 
+    // ---- Table 1: session max and mean ----
     if (ImGui::BeginTable("Speed statistics table", 3, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_SizingStretchSame)) {
 
         ImGui::TableSetupColumn("Sensor");
@@ -74,7 +88,7 @@ void VarianceWindow::draw() {
         ImGui::TableSetupColumn("Mean (μ)");
         ImGui::TableHeadersRow();
 
-        // Rows follow the schema, so a channel added there shows up here too
+        // Rows follow the schema: a channel added there shows up here too
         for (const auto& channel : TelemetrySchema::maxMeanChannels()) {
             const auto& display = displayNameFor(channel);
 
@@ -101,6 +115,7 @@ void VarianceWindow::draw() {
     ImGui::PopFont();
     ImGui::Separator();
 
+    // ---- Table 2: mean / variance / standard deviation over 3 s ----
     if (ImGui::BeginTable("Sensors statistics table", 4, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_SizingStretchSame)) {
 
         ImGui::TableSetupColumn("Sensor");

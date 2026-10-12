@@ -1,9 +1,13 @@
+/**
+ * @file PlaybackManager.cpp
+ * @brief Implementation of file playback and CSV export (see PlaybackManager.hpp).
+ */
 #include "Telemetry/file_reading/PlaybackManager.hpp"
 #include <fstream>
 #include <iostream>
 
-// One UI sample every 20 stored rows: 200 Hz recordings become a 10 Hz plotting
-// buffer, which keeps ImPlot fluid without changing what the data means
+/// One UI sample every 20 stored rows: 200 Hz recordings become a 10 Hz
+/// plotting buffer, which keeps ImPlot fluid without changing what the data means.
 static constexpr size_t UI_DECIMATION = 20;
 
 void PlaybackManager::setDataset(TelemetryDataset&& data, const std::string& originalFileExt) {
@@ -125,6 +129,7 @@ void PlaybackManager::generateCsvFromBin(const std::string& outputPath) {
             return;
         }
 
+        // Local copy of the dataset: the mutex is held only for the copy, not for the whole write
         TelemetryDataset localData;
         {
             std::lock_guard<std::mutex> lock(m_dataMutex);
@@ -143,7 +148,7 @@ void PlaybackManager::generateCsvFromBin(const std::string& outputPath) {
         }
 
         // One reused line buffer: no per-value allocation and a single write
-        // per row, which keeps the export as cheap as the old hardcoded writer
+        // per row, which keeps the export fast
         std::string line;
         line.reserve(columns.size() * 12);
         char cell[64];

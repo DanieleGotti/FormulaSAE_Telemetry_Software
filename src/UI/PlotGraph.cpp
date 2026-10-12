@@ -1,3 +1,7 @@
+/**
+ * @file PlotGraph.cpp
+ * @brief Implementation of the reusable time plot (see PlotGraph.hpp).
+ */
 #include <cmath>
 #include <limits>
 #include <algorithm>
@@ -8,28 +12,28 @@ PlotGraph::PlotGraph(const std::string& title, const std::vector<std::pair<std::
     : m_title(title), m_keysAndLabels(keysAndLabels), m_defaultMinY(minY), m_defaultMaxY(maxY) {}
 
 int PlotGraph::TimeAxisFormatter(double value, char* buff, int size, void* user_data) {
-    // 2 decimals added to display sub-second intervals when zoomed in
+    // 2 decimals to display sub-second intervals when zoomed in
     return snprintf(buff, size, "%.2f s", value); 
 }
 
 void PlotGraph::draw(const std::map<std::string, PlotLineData>& plotData, double cursorTime, bool isPlayback, float height) {
     
-    // We use static maps to remember the view state of each graph (distinguished by m_title)
+    // Static maps remembering the view state of each plot (distinguished by m_title)
     static std::map<std::string, double> s_last_cursor;
     static std::map<std::string, double> s_view_start;
     static std::map<std::string, double> s_view_end;
 
-    // Initialize bounds if it's the first time running
+    // Initialise the bounds the first time the plot is drawn
     if (s_view_start.find(m_title) == s_view_start.end()) {
         s_view_start[m_title] = cursorTime - 5.0;
         s_view_end[m_title]   = cursorTime + 5.0;
     }
 
-    // Check if the user is scrubbing the timeline slider
+    // Check whether the user is scrubbing the timeline slider
     bool cursor_changed = std::abs(cursorTime - s_last_cursor[m_title]) > 1e-5;
     s_last_cursor[m_title] = cursorTime;
 
-    // Retrieve previous frame's X-axis bounds
+    // X axis bounds of the previous frame
     double view_start = s_view_start[m_title];
     double view_end = s_view_end[m_title];
     double current_width = view_end - view_start;
@@ -37,15 +41,16 @@ void PlotGraph::draw(const std::map<std::string, PlotLineData>& plotData, double
     if (current_width <= 0.1) current_width = 10.0; 
 
     if (!isPlayback) {
-        // Live mode: force a trailing 10s window aligned to the right
+        // Live: fixed trailing 10 s window aligned to the right
         view_start = std::max(0.0, cursorTime - 10.0);
         view_end = cursorTime;
     } else if (cursor_changed) {
-        // Playbackmode: move the window keeping the current zoom level
+        // Playback: move the window to the cursor keeping the current zoom level
         view_start = cursorTime - (current_width * 0.5);
         view_end = cursorTime + (current_width * 0.5);
     }
 
+    // Compute the Y limits on the visible points only
     double min_y = std::numeric_limits<double>::max();
     double max_y = std::numeric_limits<double>::lowest();
     bool has_data = false;
@@ -55,7 +60,7 @@ void PlotGraph::draw(const std::map<std::string, PlotLineData>& plotData, double
         if (it != plotData.end()) {
             const auto& line = it->second;
             for (size_t i = 0; i < line.X.size(); ++i) {
-                // Only consider data within the current X-axis zoom view!
+                // Only data inside the current X view is considered
                 if (line.X[i] >= view_start && line.X[i] <= view_end) {
                     if (line.Y[i] < min_y) min_y = line.Y[i];
                     if (line.Y[i] > max_y) max_y = line.Y[i];
@@ -69,6 +74,7 @@ void PlotGraph::draw(const std::map<std::string, PlotLineData>& plotData, double
     double final_max_y = m_defaultMaxY;
 
     if (has_data) {
+        // 10% padding (minimum 2 units); a flat line gets a range of 10
         double range = max_y - min_y;
         if (range < 1e-5) range = 10.0;
         double padding = std::max(range * 0.10, 2.0);
@@ -77,7 +83,7 @@ void PlotGraph::draw(const std::map<std::string, PlotLineData>& plotData, double
     }
 
     ImPlotAxisFlags x_flags = ImPlotAxisFlags_NoHighlight;
-    if (!isPlayback) x_flags |= ImPlotAxisFlags_Lock; // Disable user zoom in live mode
+    if (!isPlayback) x_flags |= ImPlotAxisFlags_Lock; // user zoom is disabled in live mode
 
     if (ImPlot::BeginPlot(("##" + m_title).c_str(), ImVec2(-1, height), ImPlotFlags_NoTitle)) {
         ImPlot::PushStyleVar(ImPlotStyleVar_LineWeight, 2.0f);
@@ -87,14 +93,14 @@ void PlotGraph::draw(const std::map<std::string, PlotLineData>& plotData, double
         ImPlot::SetupAxisFormat(ImAxis_X1, TimeAxisFormatter, nullptr);
         ImPlot::SetupAxisFormat(ImAxis_Y1, "%.1f");
 
-        // Set the dynamically calculated Y limits
+        // Apply the dynamically computed Y limits
         ImPlot::SetupAxisLimits(ImAxis_Y1, final_min_y, final_max_y, ImGuiCond_Always);
 
-        // ImGuiCond_Once allows the user to freely zoom with the mouse in Playback mode
+        // ImGuiCond_Once lets the user zoom freely with the mouse in playback
         ImGuiCond x_cond = (cursor_changed || !isPlayback) ? ImGuiCond_Always : ImGuiCond_Once;
         ImPlot::SetupAxisLimits(ImAxis_X1, view_start, view_end, x_cond);
 
-        // Plot lines
+        // Draw the lines
         for (const auto& pair : m_keysAndLabels) {
             auto it = plotData.find(pair.first);
             if (it != plotData.end() && !it->second.X.empty()) {
@@ -102,15 +108,16 @@ void PlotGraph::draw(const std::map<std::string, PlotLineData>& plotData, double
             }
         }
 
+        // Red vertical cursor
         ImPlot::PushStyleColor(ImPlotCol_Line, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
         ImPlot::PlotInfLines("##Cursor", &cursorTime, 1);
         ImPlot::PopStyleColor();
 
-        // Read the limits after plotting to capture user's mouse zoom/pan interactions
+        // Read the limits back after plotting to capture mouse zoom/pan
         ImPlotRect limits = ImPlot::GetPlotLimits(ImAxis_X1, ImAxis_Y1);
         double new_width = limits.X.Max - limits.X.Min;
         
-        // Prevent zooming out too much (max 20 seconds) to avoid freezing the UI 
+        // Prevent zooming out too much (max 20 s) to avoid freezing the UI
         if (new_width > 20.0) {
             double center = (limits.X.Max + limits.X.Min) * 0.5;
             s_view_start[m_title] = center - 10.0;

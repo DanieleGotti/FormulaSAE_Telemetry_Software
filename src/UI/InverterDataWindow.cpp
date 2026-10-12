@@ -1,3 +1,7 @@
+/**
+ * @file InverterDataWindow.cpp
+ * @brief Implementation of the inverter and cooling window (see InverterDataWindow.hpp).
+ */
 #include <imgui.h>
 #include <iostream>
 #include <string>
@@ -9,9 +13,17 @@
 
 namespace {
 
-// Diagnostica AMK: il valore arriva gia' formattato come
-// "2347 INVERTER_HW Motor temperature error", quindi basta ricavare il
-// numero per decidere il colore (rosso = errore, giallo = warning).
+/**
+ * @brief Prints the AMK diagnostic of an inverter with the colour of its severity.
+ *
+ * The value is already formatted as "2347 INVERTER_HW Motor temperature error",
+ * so parsing its number is enough to pick the colour:
+ * green = no diagnostic, yellow = warning, red = error.
+ *
+ * @param label   Label ("Left"/"Right").
+ * @param key     Field name (inv_L_errorInfo / inv_R_errorInfo).
+ * @param dataMap Row to read from.
+ */
 void printDiagnostic(const std::string& label, const std::string& key, const DbRow& dataMap) {
     ImGui::Text("%s:", label.c_str());
 
@@ -25,7 +37,7 @@ void printDiagnostic(const std::string& label, const std::string& key, const DbR
     const std::string& text = it->second;
     const uint16_t code = amkDiagFromText(text.c_str());
 
-    ImVec4 color = ImVec4(0.4f, 0.85f, 0.4f, 1.0f);   // nessuna diagnostica
+    ImVec4 color = ImVec4(0.4f, 0.85f, 0.4f, 1.0f);   // no diagnostic
     if (code != 0U) {
         color = amkDiagIsWarning(code) ? ImVec4(0.95f, 0.80f, 0.25f, 1.0f)
                                        : ImVec4(0.95f, 0.35f, 0.35f, 1.0f);
@@ -57,6 +69,7 @@ void InverterDataWindow::printValue(const std::string& label, const std::string&
 
     std::string unitStr = unit.empty() ? "[-]" : "[" + unit + "]";
 
+    // Measure value and unit to align them to the right edge of the window
     ImGui::PushFont(m_uiManager->font_body);
     float valWidth = ImGui::CalcTextSize(valStr.c_str()).x;
     float unitWidth = ImGui::CalcTextSize(unitStr.c_str()).x;
@@ -122,9 +135,9 @@ void InverterDataWindow::printColoredValue(const std::string& label, const std::
 }
 
 ImVec4 InverterDataWindow::getColorForThreshold(float value, float limitGreen, float limitRed) {
-    if (value <= limitGreen) return ImVec4(0.1f, 0.8f, 0.1f, 1.0f);       
-    else if (value >= limitRed) return ImVec4(0.85f, 0.1f, 0.1f, 1.0f);   
-    else return ImVec4(1.0f, 0.5f, 0.0f, 1.0f);                           
+    if (value <= limitGreen) return ImVec4(0.1f, 0.8f, 0.1f, 1.0f);       // green
+    else if (value >= limitRed) return ImVec4(0.85f, 0.1f, 0.1f, 1.0f);   // red
+    else return ImVec4(1.0f, 0.5f, 0.0f, 1.0f);                           // orange
 }
 
 void InverterDataWindow::draw() {
@@ -148,6 +161,7 @@ void InverterDataWindow::draw() {
     }
 
     if (hasData) {
+        // ---- Torque current ----
         ImGui::PushFont(m_uiManager->font_label);
         ImGui::Text("Torque current");
         ImGui::PopFont();
@@ -160,6 +174,7 @@ void InverterDataWindow::draw() {
         ImGui::Spacing();
         ImGui::Separator();
         
+        // ---- Magnetizing current ----
         ImGui::PushFont(m_uiManager->font_label);
         ImGui::Text("Magnetizing current");
         ImGui::PopFont();
@@ -172,6 +187,7 @@ void InverterDataWindow::draw() {
         ImGui::Spacing();
         ImGui::Separator();
         
+        // ---- Motor temperature (100 / 120 °C thresholds) ----
         ImGui::PushFont(m_uiManager->font_label);
         ImGui::Text("Motor temperature");
         ImGui::PopFont();
@@ -184,6 +200,7 @@ void InverterDataWindow::draw() {
         ImGui::Spacing();
         ImGui::Separator();
         
+        // ---- Cooling pump temperature (100 / 120 °C thresholds) ----
         ImGui::PushFont(m_uiManager->font_label);
         ImGui::Text("Cooling pumps temperature");
         ImGui::PopFont();
@@ -195,6 +212,7 @@ void InverterDataWindow::draw() {
         ImGui::Spacing();
         ImGui::Separator();
 
+        // ---- AMK diagnostics ----
         ImGui::PushFont(m_uiManager->font_label);
         ImGui::Text("AMK diagnostics");
         ImGui::PopFont();

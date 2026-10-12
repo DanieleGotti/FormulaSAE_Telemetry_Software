@@ -1,3 +1,12 @@
+/**
+ * @file AssetManager_MacOS.cpp
+ * @brief macOS asset manager: reads the files from the Contents/Resources folder of the .app bundle.
+ *
+ * @details
+ * CMakeLists.txt copies into the bundle: images into `Resources/images/`, fonts
+ * into `Resources/fonts/` and `imgui.ini` directly into `Resources/`. Every
+ * file read stays cached (memory allocated with malloc and freed in the destructor).
+ */
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -8,16 +17,22 @@
 
 #include <utils/IAssetManager.hpp>
 
+/**
+ * @brief Application bundle based IAssetManager implementation (macOS).
+ */
 class AssetManager_MacOS : public IAssetManager {
 public:
+    /** @brief Loads `Resources/fonts/<name>`. */
     std::pair<void*, uint32_t> getFont(const std::string& name) override {
         return loadAsset("fonts/" + name);
     }
 
+    /** @brief Loads `Resources/images/<path>`. */
     std::pair<void*, uint32_t> getImage(const std::string& path) override {
         return loadAsset("images/" + path);
     }
 
+    /** @brief Frees every cached buffer. */
     ~AssetManager_MacOS() {
         for (auto& [name, fontData] : m_assetCache) {
             if (fontData.first) {
@@ -27,6 +42,11 @@ public:
     }
 
 private:
+    /**
+     * @brief Reads a bundle file into memory (cached).
+     * @param path Path relative to Contents/Resources.
+     * @return (data, size) or {nullptr, 0} if not found.
+     */
     std::pair<void*, uint32_t> loadAsset(std::string path) {
         auto it = m_assetCache.find(path);
         if (it != m_assetCache.end())
@@ -45,16 +65,20 @@ private:
         return m_assetCache[path];
     }
 
+    /**
+     * @brief Absolute path of `<bundle>.app/Contents/Resources` through CoreFoundation.
+     * @return Path, or an empty string on error (details in the log).
+     */
     std::string getResourcesPath() {
         std::cout << "DEBUG [AssetManager_MacOS]: Attempting to get the main bundle." << std::endl;
         CFBundleRef mainBundle = CFBundleGetMainBundle();
         if (mainBundle) {
             std::cout << "DEBUG [AssetManager_MacOS]: Main bundle obtained." << std::endl;
             
-            CFURLRef bundleURL = CFBundleCopyBundleURL(mainBundle); // Get the bundle's URL
+            CFURLRef bundleURL = CFBundleCopyBundleURL(mainBundle); // URL of the bundle
             if (bundleURL) {
                 std::cout << "DEBUG [AssetManager_MacOS]: Bundle URL obtained." << std::endl;
-                CFStringRef bundlePathCFString = CFURLCopyFileSystemPath(bundleURL, kCFURLPOSIXPathStyle); // Get the absolute path of the bundle
+                CFStringRef bundlePathCFString = CFURLCopyFileSystemPath(bundleURL, kCFURLPOSIXPathStyle); // absolute path of the bundle
                 
                 if (bundlePathCFString) {
                     std::cout << "DEBUG [AssetManager_MacOS]: Absolute path of the bundle obtained." << std::endl;
@@ -91,6 +115,11 @@ private:
         return "";
     }
 
+    /**
+     * @brief Joins the bundle Resources folder and a relative path.
+     * @param relativePath Relative path.
+     * @return Full path, or "" if the Resources folder was not found.
+     */
     std::string getResourcePath(const std::string& relativePath) {
         std::string resourcesPath = getResourcesPath();
         if (!resourcesPath.empty()) {
@@ -103,6 +132,7 @@ private:
         return "";
     }
 
+    /** @brief Loads `Resources/imgui.ini` (default window layout). */
     std::pair<void*, uint32_t> getDefaultImGuiIniFile() override {
         std::string filename = "imgui.ini"; 
 
@@ -112,5 +142,6 @@ private:
     }
 
 private:
+    /// Cache: relative path -> (data, size).
     std::unordered_map<std::string, std::pair<void*, uint32_t>> m_assetCache;
 };

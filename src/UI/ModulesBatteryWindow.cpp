@@ -1,3 +1,7 @@
+/**
+ * @file ModulesBatteryWindow.cpp
+ * @brief Implementation of the EMMA and battery modules window (see ModulesBatteryWindow.hpp).
+ */
 #include <iostream>
 #include <string>
 #include <vector>
@@ -8,7 +12,15 @@
 #include "Telemetry/Services/ServiceManager.hpp"
 #include "Telemetry/file_reading/PlaybackManager.hpp"
 
-// It formats the EMMA error string by parsing the individual error flags and constructing a hexadecimal representation of the error code
+/**
+ * @brief Rebuilds the hexadecimal EMMA error code from the text and prefixes it.
+ *
+ * E.g. "ERR_BSPD | ERR_DAISY_CHAIN" -> "(0x0180) ERR_BSPD | ERR_DAISY_CHAIN".
+ * @note The bits must stay aligned with kEmmaFlags in TelemetrySchema.cpp.
+ *
+ * @param errStr Text produced by TelemetrySchema for the emma_error field.
+ * @return Text with the hexadecimal code in front.
+ */
 static std::string formatEmmaError(const std::string& errStr) {
     if (errStr == "EMMA_STATUS_OK") return "(0x0000) EMMA_STATUS_OK";
     if (errStr == "Null" || errStr == "--" || errStr.empty()) return errStr;
@@ -40,15 +52,15 @@ void ModulesBatteryWindow::onAggregatedDataReceived(const DbRow& dataRow) {
 }
 
 ImVec4 ModulesBatteryWindow::getTempColor(float value) {
-    if (value < 50.0f) return ImVec4(0.1f, 0.8f, 0.1f, 1.0f);       
-    else if (value < 65.0f) return ImVec4(1.0f, 0.5f, 0.0f, 1.0f);  
-    else return ImVec4(0.85f, 0.1f, 0.1f, 1.0f);                    
+    if (value < 50.0f) return ImVec4(0.1f, 0.8f, 0.1f, 1.0f);       // green
+    else if (value < 65.0f) return ImVec4(1.0f, 0.5f, 0.0f, 1.0f);  // orange
+    else return ImVec4(0.85f, 0.1f, 0.1f, 1.0f);                    // red
 }
 
 ImVec4 ModulesBatteryWindow::getVoltageColor(float value) {
-    if (value >= 3.6f && value <= 4.2f) return ImVec4(0.1f, 0.8f, 0.1f, 1.0f); 
-    else if (value > 3.0f && value < 4.5f) return ImVec4(1.0f, 0.5f, 0.0f, 1.0f); 
-    else return ImVec4(0.85f, 0.1f, 0.1f, 1.0f); 
+    if (value >= 3.6f && value <= 4.2f) return ImVec4(0.1f, 0.8f, 0.1f, 1.0f);    // green
+    else if (value > 3.0f && value < 4.5f) return ImVec4(1.0f, 0.5f, 0.0f, 1.0f); // orange
+    else return ImVec4(0.85f, 0.1f, 0.1f, 1.0f);                                  // red
 }
 
 void ModulesBatteryWindow::printValue(const std::string& label, const std::string& key, const DbRow& dataMap, const std::string& unit) {
@@ -62,6 +74,7 @@ void ModulesBatteryWindow::printValue(const std::string& label, const std::strin
 
     std::string unitStr = unit.empty() ? "[-]" : "[" + unit + "]";
 
+    // Measure value and unit to align them to the right edge of the window
     ImGui::PushFont(m_uiManager->font_body);
     float valWidth = ImGui::CalcTextSize(valStr.c_str()).x;
     float unitWidth = ImGui::CalcTextSize(unitStr.c_str()).x;
@@ -90,6 +103,7 @@ void ModulesBatteryWindow::printErrorValue(const std::string& label, const DbRow
     auto it = dataMap.find("emma_error");
     if (it != dataMap.end()) {
         formattedStr = formatEmmaError(it->second);
+        // Green only for status OK or precharge finished; any other bit is an error
         if (it->second == "EMMA_STATUS_OK" || it->second == "EMMA_FINISH_PRECHARGE") {
             color = ImVec4(0.1f, 0.8f, 0.1f, 1.0f);
         } else {
@@ -110,19 +124,21 @@ void ModulesBatteryWindow::printErrorValue(const std::string& label, const DbRow
 }
 
 void ModulesBatteryWindow::drawModuleCard(int index, const DbRow& dataMap) {
+    // Keys of the module fields (generated in fieldsB_v1() / expandDerivedKeys())
     std::string idxStr = std::to_string(index);
     std::string keyTmp1 = "Temperature1Module" + idxStr;
     std::string keyTmp2 = "Temperature2Module" + idxStr;
     std::string keyTens = "VoltageModule" + idxStr;
     std::string keyOnline = "OnlineModule" + idxStr;
 
-    ImGui::PushID(index);
+    ImGui::PushID(index); // unique IDs for the widgets of every card
 
     ImGui::PushFont(m_uiManager->font_body);
     ImGui::Text("Module %d", index); 
     ImGui::PopFont();
     ImGui::Separator();
 
+    // "Label  value [unit]" line with coloured value, right-aligned in the column
     auto drawValue = [&](const char* label, const std::string& key, bool isTemp) {
         ImGui::Text("%s", label);
         
@@ -160,6 +176,7 @@ void ModulesBatteryWindow::drawModuleCard(int index, const DbRow& dataMap) {
         float columnWidth = ImGui::GetColumnWidth();
         float offsetX = columnWidth - totalRightWidth - 5.0f;
 
+        // Keep the value from overlapping the label in narrow columns
         float minOffsetX = ImGui::CalcTextSize(label).x + 10.0f;
         if (offsetX < minOffsetX) {
             offsetX = minOffsetX;
@@ -180,6 +197,7 @@ void ModulesBatteryWindow::drawModuleCard(int index, const DbRow& dataMap) {
         ImGui::PopFont();
     };
     
+    // Online state LED: green "1", red "0", grey when the value is missing
     auto drawOnlineDot = [&](const char* label, const std::string& key) {
         ImGui::Text("%s", label);
 
@@ -238,6 +256,7 @@ void ModulesBatteryWindow::draw() {
     }
 
     if (hasData) {
+        // ---- EMMA status ----
         ImGui::PushFont(m_uiManager->font_label);
         ImGui::Text("EMMA status");
         ImGui::PopFont();
@@ -252,11 +271,13 @@ void ModulesBatteryWindow::draw() {
         ImGui::Spacing();
         ImGui::Separator();
         
+        // ---- Modules grid ----
         ImGui::PushFont(m_uiManager->font_label);
         ImGui::Text("Modules data");
         ImGui::PopFont();
         ImGui::Separator();
 
+        // Number of columns based on the width (at least 160 px per card, 1 to 14 columns)
         float availWidth = ImGui::GetContentRegionAvail().x;
         float minModuleWidth = 160.0f; 
         int columns = static_cast<int>(availWidth / minModuleWidth);

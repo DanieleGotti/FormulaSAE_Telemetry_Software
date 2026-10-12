@@ -1,9 +1,15 @@
+/**
+ * @file SettingsManager.cpp
+ * @brief Implementation of the JSON user settings (see SettingsManager.hpp).
+ */
 #include <fstream>
 #include <utils/fsUtils.hpp>
 #include <application_services/SettingsManager.hpp>
 
+/// File path, relative to the application data folder.
 #define SETTINGSFILEPATH "settings/settings.json"
 
+// JSON file keys
 #define VERSION_KEY "version"
 #define BODY_FONT_SIZE_KEY "bodyFontSize"
 #define LABEL_FONT_SIZE_KEY "labelFontSize"
@@ -13,6 +19,7 @@
 #define DARK_MODE_KEY "darkMode"
 #define FIRST_ACCESS_KEY "firstAccess"
 
+// Default values, used to create the file and when a key is missing
 #define DEFAULT_VERSION 1.0f
 #define DEFAULT_BODYFONTSIZE 16.0f
 #define DEFAULT_LABELFONTSIZE 16.0f
@@ -23,7 +30,7 @@
 #define DEFAULT_FIRST_ACCESS true
 
 SettingsManager::SettingsManager() {
-    // Create settings directory if not present
+    // Create the settings folder if it does not exist
     auto docPath = fsutils::getAppDocumentsDirectory();
     m_settingsFilePath = docPath / SETTINGSFILEPATH;
 
@@ -32,11 +39,11 @@ SettingsManager::SettingsManager() {
 }
 
 bool SettingsManager::parseJsonSettingsFile() {
-    // Check config file existance
+    // Check whether the file exists
     std::ifstream file(m_settingsFilePath);
 
     if(!file.is_open()) {
-        // Create default config file
+        // First launch: create the file with the default values
         jsoncons::json defaultConfig;
 
         defaultConfig[VERSION_KEY] = 1.0;
@@ -58,14 +65,15 @@ bool SettingsManager::parseJsonSettingsFile() {
     }
 
     try {
-        // Read config file
+        // Read the existing file
         m_settings = jsoncons::json::parse(file);
         std::cout << "INFO [SettingsManager]: Settings loaded from '" << m_settingsFilePath << "'." << std::endl;
         std::cout << jsoncons::pretty_print(m_settings) << std::endl;
         file.close();
         return false;
     } catch(const jsoncons::ser_error &e) {
-        std::cerr << "ERRORE [SettingsManager]: Error occurred while parsing the JSON. " << std::endl;
+        // Corrupted JSON: m_settings stays empty and the getters return the defaults
+        std::cerr << "ERROR [SettingsManager]: Error occurred while parsing the JSON. " << std::endl;
         file.close();
         return false;
     }
@@ -76,6 +84,8 @@ void SettingsManager::saveSettingsToFile() {
     out << jsoncons::pretty_print(m_settings);
     out.close();
 }
+
+// ---- Getters: return the saved value, or the default when the key is missing ----
 
 float SettingsManager::getBodyFontSize() const {
     if(m_settings.contains(BODY_FONT_SIZE_KEY)) {
@@ -123,15 +133,17 @@ bool SettingsManager::getDarkMode() const {
     if(m_settings.contains(DARK_MODE_KEY)) {
         return m_settings[DARK_MODE_KEY].as<bool>();
     }
-    return false; // Default to light mode
+    return false; // key missing: light theme
 }
 
 bool SettingsManager::getFirstAccess() const {
     if(m_settings.contains(FIRST_ACCESS_KEY)) {
         return m_settings[FIRST_ACCESS_KEY].as<bool>();
     }
-    return false; // Default not first access
+    return false; // key missing: not the first launch
 }
+
+// ---- Setters: update the value and save the file immediately ----
 
 void SettingsManager::setBodyFontSize(float size) {
     m_settings[BODY_FONT_SIZE_KEY] = size;

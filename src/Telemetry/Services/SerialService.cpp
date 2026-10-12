@@ -1,3 +1,7 @@
+/**
+ * @file SerialService.cpp
+ * @brief Implementation of the serial acquisition service (see SerialService.hpp).
+ */
 #include <iostream>
 #include <chrono>
 #include "Telemetry/Services/SerialService.hpp"
@@ -22,6 +26,7 @@ bool SerialService::start() {
         return false;
     }
 
+    // New session: lost counters at zero and no stale bytes in the queue
     m_parser.resetCounters();
     m_queue.clear(); 
     m_running = true;
@@ -35,7 +40,7 @@ void SerialService::stop() {
     if (!m_running) return;
     m_running = false;
     if (m_thread.joinable()) m_thread.join();
-    if (m_processingThread.joinable()) m_processingThread.join(); // Wait for the second thread to close
+    if (m_processingThread.joinable()) m_processingThread.join(); // wait for the second thread to finish
     m_dataSource->close();
 }
 
@@ -47,6 +52,7 @@ void SerialService::acquisitionLoop() {
         if (!rawData.empty()) {
             m_queue.push(std::move(rawData));
         } else {
+            // No data: short pause so a CPU core is not kept at 100%
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
         }
     }
@@ -54,17 +60,18 @@ void SerialService::acquisitionLoop() {
 
 void SerialService::processingLoop() {
     std::vector<uint8_t> rxBuffer;
-    rxBuffer.reserve(8192); // Big buffer to avoid reallocations
+    rxBuffer.reserve(8192); // big buffer to avoid reallocations
     
     while (m_running) {
+        // The 10 ms timeout lets the loop check m_running periodically
         auto dataOpt = m_queue.wait_for_and_pop(std::chrono::milliseconds(10));
         
         if (dataOpt.has_value()) {
-            // Append the new data to the processing buffer
+            // Append the new bytes to the processing buffer
             rxBuffer.insert(rxBuffer.end(), dataOpt->begin(), dataOpt->end());
 
             DbRow readyRow;
-            // Extract all complete packets 
+            // Extract every complete packet currently in the buffer
             while (m_parser.parseLiveBytes(rxBuffer, readyRow)) {
                 if (m_aggregator) {
                     m_aggregator->processRow(readyRow); 

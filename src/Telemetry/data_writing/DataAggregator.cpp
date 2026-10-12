@@ -1,10 +1,19 @@
+/**
+ * @file DataAggregator.cpp
+ * @brief Implementation of the live statistics computation (see DataAggregator.hpp).
+ */
 #include <numeric>
 #include <cmath>
 #include <sstream>
 #include <iomanip>
 #include "Telemetry/data_writing/DataAggregator.hpp"
 
-// Helper function for formatting doubles with a fixed number of decimal places
+/**
+ * @brief Formats a double with a fixed number of decimals and a dot as separator.
+ * @param val Value.
+ * @param dec Number of decimals.
+ * @return Formatted text ("C" locale, independent of the system settings).
+ */
 static std::string formatDouble(double val, int dec) {
     std::ostringstream ss;
     ss.imbue(std::locale::classic()); 
@@ -50,13 +59,13 @@ void DataAggregator::processRow(DbRow row) {
 
     if (m_statsWindowStart < 0.0) m_statsWindowStart = current_ts;
 
-    // Reset if we receive a timestamp that is before the current window start 
+    // Timestamp earlier than the window start (e.g. ECU reset): start over
     if (current_ts < m_statsWindowStart) {
         reset();
         m_statsWindowStart = current_ts;
     }
 
-    // Add data to the current buffer
+    // Add the values to the current window
     for (const auto& sensor : m_targetSensors) {
         if (row.count(sensor)) {
             try { m_currentBuffers[sensor].push_back(std::stod(row.at(sensor))); } catch (...) {}
@@ -69,9 +78,9 @@ void DataAggregator::processRow(DbRow row) {
             const double speed_kmh = (std::stod(row.at("rear_left_velocity")) + std::stod(row.at("rear_right_velocity"))) * 0.5;
             accumulate("speed", speed_kmh);
 
-            // Distance is the speedometer reading integrated over the elapsed
-            // time. A gap longer than the threshold means samples were lost,
-            // not that the car crawled, so that interval is not integrated.
+            // Distance is the speed integrated over the elapsed time. A gap
+            // longer than the threshold means samples were lost, not that the
+            // car crawled, so that interval is not integrated.
             if (m_lastDistanceTs >= 0.0) {
                 const double dt = current_ts - m_lastDistanceTs;
                 if (dt > 0.0 && dt <= TelemetrySchema::MAX_DISTANCE_GAP_S) {
@@ -88,13 +97,14 @@ void DataAggregator::processRow(DbRow row) {
         }
     }
 
-    // If exactly 3 seconds have passed (tumbling window)
+    // Close the window once 3 seconds have passed ("tumbling" window)
     if (current_ts - m_statsWindowStart >= STATS_WINDOW) {
         for (const auto& sensor : m_targetSensors) {
             m_lastPublishedStats[sensor] = calculateStats(m_currentBuffers[sensor]);
-            m_currentBuffers[sensor].clear(); // Clear the buffer for the next 3 seconds
+            m_currentBuffers[sensor].clear(); // clear the buffer for the next 3 seconds
         }
 
+        // Fold the window accumulators into the session totals
         for (const auto& entry : m_currentAgg) {
             RunningStats& session = m_sessionAgg[entry.first];
             if (entry.second.max > session.max) session.max = entry.second.max;
@@ -103,23 +113,23 @@ void DataAggregator::processRow(DbRow row) {
         }
         m_currentAgg.clear();
 
-        // Avoid temporal drift, add exactly 3 seconds
+        // Advance by exactly 3 seconds to avoid temporal drift
         m_statsWindowStart += STATS_WINDOW; 
         
-        // If there was a large jump in the data (e.g., missing signal for 10 seconds), realign it
+        // After a large jump in the data (e.g. signal missing for 10 s), realign
         if (current_ts - m_statsWindowStart >= STATS_WINDOW) {
             m_statsWindowStart = current_ts;
         }
     }
 
-    // Write the formatted data in the row
+    // Write the formatted statistics into the row
     for (const auto& sensor : m_targetSensors) {
         if (m_lastPublishedStats.count(sensor)) {
             row[sensor + "_mean"] = formatDouble(m_lastPublishedStats[sensor].mean, 3);
             row[sensor + "_var"]  = formatDouble(m_lastPublishedStats[sensor].variance, 3);
             row[sensor + "_std"]  = formatDouble(m_lastPublishedStats[sensor].stdDev, 3);
         } else {
-            // If we haven't passed the first 3 seconds since startup
+            // The first 3 seconds since startup have not passed yet
             row[sensor + "_mean"] = "0.000";
             row[sensor + "_var"]  = "0.000";
             row[sensor + "_std"]  = "0.000";
@@ -132,7 +142,7 @@ void DataAggregator::processRow(DbRow row) {
             row[key + "_max"]  = formatDouble(it->second.max, 3);
             row[key + "_mean"] = formatDouble(it->second.sum / it->second.count, 3);
         } else {
-            // No window has been closed yet (first 3 seconds since startup)
+            // No window closed yet (first 3 seconds since startup)
             row[key + "_max"]  = "0.000";
             row[key + "_mean"] = "0.000";
         }

@@ -1,17 +1,40 @@
+# =============================================================================
+#  ERB Telemetry Software - build configuration (CMake)
+#
+#  Typical build (full instructions in DEVELOPER_GUIDE.md):
+#      git submodule update --init external/glfw external/glm external/imgui external/implot
+#      cmake -S . -B build
+#      cmake --build build
+#
+#  Dependencies:
+#    - external/glfw, external/imgui (docking branch), external/implot, external/glm:
+#      git submodules;
+#    - external/stb_image/stb_image.h: single header included by the UI sources;
+#    - jsoncons: downloaded automatically from GitHub with FetchContent.
+#
+#  Every .cpp in the folders listed in SRC_FILES is compiled automatically:
+#  adding a file to an existing folder does not require editing this file.
+#  For a NEW folder, add it to SRC_FILES.
+#
+#  Resources (fonts, images, default ImGui layout) are shipped differently per
+#  operating system (see the Windows / macOS / Linux sections at the bottom
+#  and include/utils/IAssetManager.hpp).
+# =============================================================================
 cmake_minimum_required(VERSION 3.15)
 set(CMAKE_POLICY_VERSION_MINIMUM 3.15)
 project(telemetry LANGUAGES CXX)
 
+# C++20 standard required
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# # Find Vulkan (from system installed SDK)
-# find_package(Vulkan REQUIRED) # Uncomment if used in the future
+# # Vulkan (from the system installed SDK) - not used
+# find_package(Vulkan REQUIRED) # uncomment if used in the future
 
-# Add GLFW as subdirectory
+# GLFW (windows, input, OpenGL context) built as a subproject
 add_subdirectory(external/glfw)
 
-# ---- IMGUI ----
+# ---- IMGUI + IMPLOT: built into a static library called "imgui" ----
 set(IMGUI_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external/imgui)
 set(IMPLOT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external/implot)
 
@@ -35,14 +58,14 @@ target_include_directories(imgui PUBLIC
 
 target_link_libraries(imgui PUBLIC glfw)
 
-# Include directories
+# Common include directories
 include_directories(
-    # ${Vulkan_INCLUDE_DIRS} # Uncomment if used
+    # ${Vulkan_INCLUDE_DIRS} # uncomment if Vulkan is used
     external/glm
     external/glfw/include
 )
 
-# Fetch Jsoncons (JSON library)
+# Jsoncons (JSON library, used by SettingsManager), downloaded at configure time
 include(FetchContent)
 FetchContent_Declare(
   jsoncons
@@ -55,9 +78,10 @@ set(JSONCONS_BUILD_EXAMPLES OFF CACHE BOOL "Disable jsoncons examples")
 
 FetchContent_MakeAvailable(jsoncons)
 
+# Project headers: #include paths start from include/ (e.g. "UI/UIManager.hpp")
 include_directories(${CMAKE_SOURCE_DIR}/include)
 
-# Gather source files
+# Gather the source files.
 # CONFIGURE_DEPENDS makes the build re-scan these folders, so a newly added
 # source file is picked up without having to re-run cmake by hand
 file(GLOB SRC_FILES CONFIGURE_DEPENDS
@@ -74,7 +98,7 @@ file(GLOB SRC_FILES CONFIGURE_DEPENDS
     src/utils/AssetManager/AssetManagerFactory.cpp
 )
 
-# OS-Specific Asset Managers
+# OS-specific asset manager (only one per build)
 if(WIN32)
     list(APPEND SRC_FILES src/utils/AssetManager/AssetManager_Windows.cpp)
 elseif(APPLE)
@@ -92,7 +116,9 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     jsoncons
 )
 
-# --- Windows Specific Configuration ---
+# --- Windows specific configuration ---
+# Fonts, images and imgui.ini are embedded in the executable through
+# assets/windows_resources.rc (IDs defined in assets/resources.h)
 if(WIN32)
     target_link_libraries(${PROJECT_NAME} PRIVATE opengl32)
     target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/assets")
@@ -101,14 +127,14 @@ if(WIN32)
     add_definitions(-DUNICODE -D_UNICODE)
 
 
-    # If building with MinGW (GCC on Windows), statically link standard libraries 
-    # and hide the background console window (-mwindows)
+    # With MinGW (GCC on Windows): standard libraries linked statically
+    # and no console window in the background (-mwindows)
     if(MINGW)
         set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static -static-libgcc -static-libstdc++ -mwindows")
     endif()
 endif()
 
-# Hide noisy output in MSVC
+# Hide noisy MSVC output
 if (MSVC)
     add_compile_options(/nologo)
     add_compile_options(/FC-)
@@ -120,17 +146,20 @@ if (MSVC)
     string(REPLACE "/showIncludes" "" CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL}")
 endif()
 
-# --- macOS Specific Configuration ---
+# --- macOS specific configuration ---
+# The app is a .app bundle: resources are copied into Contents/Resources
+# (images in Resources/images, fonts in Resources/fonts, imgui.ini in Resources).
+# A new image or font must be added to the lists below.
 if(APPLE)
-    # Set the app as a macOS Bundle 
+    # The executable becomes a macOS bundle
     set_target_properties(${PROJECT_NAME} PROPERTIES
         MACOSX_BUNDLE TRUE
     )
 
-    # Specify OpenGL framework for macOS
+    # macOS OpenGL framework
     target_link_libraries(${PROJECT_NAME} PRIVATE "-framework OpenGL")
 
-    # App Icon handling
+    # Application icon
     set(MACOSX_BUNDLE_ICON_FILE "macos_icon.icns")
     set_target_properties(${PROJECT_NAME} PROPERTIES
         MACOSX_BUNDLE_ICON_FILE ${MACOSX_BUNDLE_ICON_FILE}
@@ -140,7 +169,7 @@ if(APPLE)
     set_source_files_properties(${ICON_SOURCE_PATH} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
     target_sources(${PROJECT_NAME} PRIVATE ${ICON_SOURCE_PATH})
 
-    # Images handling
+    # Images
     set(IMAGES_SOURCES
         "${CMAKE_CURRENT_SOURCE_DIR}/assets/images/steering_wheel.png"
         "${CMAKE_CURRENT_SOURCE_DIR}/assets/images/logo_erb.png"
@@ -154,7 +183,7 @@ if(APPLE)
     endforeach()
 
 
-    # Fonts handling
+    # Fonts
     set(FONT_SOURCES
         "${CMAKE_CURRENT_SOURCE_DIR}/assets/fonts/RobotoCondensed-Regular.ttf"
         "${CMAKE_CURRENT_SOURCE_DIR}/assets/fonts/RobotoCondensed-Bold.ttf"
@@ -166,7 +195,7 @@ if(APPLE)
         target_sources(${PROJECT_NAME} PRIVATE ${FONT_FILE})
     endforeach()
 
-    # Default ImGui Config handling
+    # Default ImGui window layout (used on the first launch)
     set(IMGUI_CONFIG_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/assets/resources/imgui.ini")
     
     set_source_files_properties(${IMGUI_CONFIG_SOURCE} PROPERTIES 
@@ -176,20 +205,20 @@ if(APPLE)
     target_sources(${PROJECT_NAME} PRIVATE ${IMGUI_CONFIG_SOURCE})
 endif()
 
-# --- Linux Specific Configuration ---
+# --- Linux specific configuration ---
 if(UNIX AND NOT APPLE)
   add_compile_options(-march=native -mtune=native)
-  # Find the system's OpenGL libraries (provided by mesa-libGL-devel)
+  # System OpenGL libraries (provided by mesa-libGL-devel or equivalent)
   find_package(OpenGL REQUIRED)
 
-  # Link OpenGL and math library (often required on Linux)
+  # OpenGL and math library (often required on Linux)
   target_link_libraries(${PROJECT_NAME} PRIVATE 
     OpenGL::GL 
-    m  # Standard C math library, good practice to include
+    m  # standard C math library
   )
   
-  # Copy assets to build directory so the executable can find them
-  # (Since Linux doesn't bundle assets like macOS .app folders)
+  # Copy the assets folder into the build folder so the executable can find it
+  # (Linux has no bundle like the macOS .app folders)
   file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/assets" 
        DESTINATION "${CMAKE_CURRENT_BINARY_DIR}"
   )

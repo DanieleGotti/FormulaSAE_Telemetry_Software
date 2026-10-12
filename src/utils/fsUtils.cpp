@@ -1,3 +1,7 @@
+/**
+ * @file fsUtils.cpp
+ * @brief Implementation of the cross-platform system paths (see fsUtils.hpp).
+ */
 #ifdef _WIN32
 #include <windows.h>
 #elif defined(__APPLE__)
@@ -10,6 +14,7 @@
 #endif
 #include <utils/fsUtils.hpp>
 
+/// Name of the application data folder.
 #define APPFOLDER "telemetry_manager"
 
 namespace fsutils {
@@ -18,6 +23,7 @@ namespace fsutils {
   }
   
   std::filesystem::path getAppDocumentsDirectory()  {
+    // Computed only once, then reused
     static std::filesystem::path path;
 
     if(!path.empty()) return path;
@@ -55,6 +61,7 @@ namespace fsutils {
   std::filesystem::path getExecutableDirectory() {
         std::filesystem::path exeDir;
         
+        // Executable path through the native API of each system
         #ifdef _WIN32
             char buffer[MAX_PATH];
             if (GetModuleFileNameA(NULL, buffer, MAX_PATH) != 0) {
@@ -79,13 +86,14 @@ namespace fsutils {
             }
         #endif
 
+        // Fallback: current working directory
         if (exeDir.empty()) {
             exeDir = std::filesystem::current_path();
         }
 
         #if defined(__APPLE__)
-        // On macOS, if we are inside a bundle (.app/Contents/MacOS), 
-        // we move 3 levels up to place output_data exactly next to the .app file
+        // On macOS, if we are inside a bundle (.app/Contents/MacOS), go 3 levels
+        // up to place output_data exactly next to the .app file
         std::string exePathStr = exeDir.string();
         if (exePathStr.find(".app/Contents/MacOS") != std::string::npos) {
             exeDir = exeDir.parent_path().parent_path().parent_path();

@@ -1,9 +1,26 @@
+/**
+ * @file Theme.hpp
+ * @brief Visual style of the application (spacing, rounding and light/dark ImGui palette).
+ *
+ * @details
+ * Edit here to change the global look; data-specific colours (green/orange/red
+ * thresholds, LEDs, plots) are defined in the individual windows instead.
+ */
 #pragma once
 #include <imgui.h>
 
-// Centralized function for applying themes
+/**
+ * @brief Applies the style and the palette to ImGui.
+ *
+ * Called at startup by UiManager and when the user changes theme from the
+ * Settings > Appearance menu.
+ *
+ * @param style       ImGui style to modify (usually ImGui::GetStyle()).
+ * @param isDarkTheme true for the dark theme, false for the light one.
+ */
 inline void ApplyTheme(ImGuiStyle& style, bool isDarkTheme)
 {
+    // ---- Geometry shared by both themes ----
     style.WindowPadding = ImVec2(8.0f, 8.0f);
     style.FramePadding = ImVec2(6.0f, 4.0f);
     style.CellPadding = ImVec2(6.0f, 6.0f);
@@ -27,14 +44,14 @@ inline void ApplyTheme(ImGuiStyle& style, bool isDarkTheme)
 
     ImVec4* colors = style.Colors;
     if (isDarkTheme) {
-        // Default dark theme colors
-        const ImVec4 bg_main(0.10f, 0.10f, 0.11f, 1.00f);
-        const ImVec4 bg_secondary(0.13f, 0.13f, 0.15f, 1.00f);
-        const ImVec4 bg_widget(0.18f, 0.18f, 0.20f, 1.00f);
-        const ImVec4 accent(0.05f, 0.53f, 0.98f, 1.00f); 
-        const ImVec4 accent_hover(0.15f, 0.63f, 1.00f, 1.00f);
-        const ImVec4 text_main(0.95f, 0.96f, 0.98f, 1.00f);
-        const ImVec4 border_color(0.22f, 0.22f, 0.25f, 1.00f);
+        // ---- Dark theme palette ----
+        const ImVec4 bg_main(0.10f, 0.10f, 0.11f, 1.00f);       // main background
+        const ImVec4 bg_secondary(0.13f, 0.13f, 0.15f, 1.00f);  // window background
+        const ImVec4 bg_widget(0.18f, 0.18f, 0.20f, 1.00f);     // buttons, fields, tabs
+        const ImVec4 accent(0.05f, 0.53f, 0.98f, 1.00f);        // accent colour (blue)
+        const ImVec4 accent_hover(0.15f, 0.63f, 1.00f, 1.00f);  // accent on hover/click
+        const ImVec4 text_main(0.95f, 0.96f, 0.98f, 1.00f);     // text
+        const ImVec4 border_color(0.22f, 0.22f, 0.25f, 1.00f);  // borders and separators
 
         colors[ImGuiCol_Text] = text_main;
         colors[ImGuiCol_TextDisabled] = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);
@@ -84,7 +101,7 @@ inline void ApplyTheme(ImGuiStyle& style, bool isDarkTheme)
         colors[ImGuiCol_TextSelectedBg] = accent;
 
     } else {
-        // Default light theme colors
+        // ---- Light theme palette (same roles as the dark theme) ----
         const ImVec4 bg_main(0.94f, 0.94f, 0.94f, 1.00f);
         const ImVec4 bg_secondary(1.00f, 1.00f, 1.00f, 1.00f);
         const ImVec4 bg_widget(0.86f, 0.86f, 0.86f, 1.00f);

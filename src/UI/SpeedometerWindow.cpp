@@ -1,3 +1,7 @@
+/**
+ * @file SpeedometerWindow.cpp
+ * @brief Implementation of the speedometer (see SpeedometerWindow.hpp).
+ */
 #include <imgui.h>
 #include <cmath>
 #include <algorithm>
@@ -42,30 +46,35 @@ void SpeedometerWindow::draw() {
 
     ImGui::Spacing();
 
+    // ---- Geometry: centered dial, 80% of the available space ----
     ImDrawList* draw_list = ImGui::GetWindowDrawList();
     ImVec2 window_pos = ImGui::GetCursorScreenPos();
     ImVec2 available_space = ImGui::GetContentRegionAvail();
     
-    float bottom_padding = 30.0f;
+    float bottom_padding = 30.0f;  // space reserved for the speed text
     float image_size = std::min(available_space.x, available_space.y - bottom_padding) * 0.8f;
     float radius = image_size * 0.5f;
 
     ImVec2 center(window_pos.x + available_space.x * 0.5f, window_pos.y + (available_space.y - bottom_padding) * 0.5f);
 
+    // 270 degree arc: from 135 degrees (bottom left) to 405 degrees (bottom right)
     float start_angle = 3.0f * M_PI / 4.0f; 
     float end_angle   = 9.0f * M_PI / 4.0f;  
     float angle_span  = end_angle - start_angle;
     
+    // Full scale 180 km/h
     float max_speed = 180.0f;
     float normalized_speed = std::clamp(currentSpeed / max_speed, 0.0f, 1.0f);
     float current_angle = start_angle + (normalized_speed * angle_span);
 
 
+    // ---- Background track ----
     ImU32 trackColor = m_uiManager->m_isDarkTheme ? IM_COL32(40, 40, 40, 255) : IM_COL32(200, 200, 200, 255);
     draw_list->PathClear();
     draw_list->PathArcTo(center, radius, start_angle, end_angle, 60);
     draw_list->PathStroke(trackColor, ImDrawFlags_None, 14.0f);
 
+    // ---- Ticks every 10 km/h, with a number every 30 km/h ----
     ImU32 tickColor = m_uiManager->m_isDarkTheme ? IM_COL32(180, 180, 180, 255) : IM_COL32(80, 80, 80, 255);
     ImGui::PushFont(m_uiManager->font_body); 
     
@@ -92,6 +101,7 @@ void SpeedometerWindow::draw() {
     }
     ImGui::PopFont();
 
+    // ---- Light blue arc proportional to the speed ----
     if (normalized_speed > 0.001f) {
         ImU32 blueColor = IM_COL32(0, 200, 255, 255); 
         draw_list->PathClear();
@@ -99,6 +109,7 @@ void SpeedometerWindow::draw() {
         draw_list->PathStroke(blueColor, ImDrawFlags_None, 14.0f);
     }
 
+    // ---- Red needle (diamond-shaped quad) ----
     ImU32 redColor = IM_COL32(230, 20, 20, 255);
     ImVec2 n_dir(std::cos(current_angle), std::sin(current_angle));
     ImVec2 n_perp(-std::sin(current_angle), std::cos(current_angle));
@@ -110,11 +121,13 @@ void SpeedometerWindow::draw() {
     pts[3] = ImVec2(center.x - n_perp.x * 4.0f, center.y - n_perp.y * 4.0f); 
     draw_list->AddConvexPolyFilled(pts, 4, redColor);
 
+    // ---- Central hub ----
     ImU32 hubOuter = m_uiManager->m_isDarkTheme ? IM_COL32(30, 30, 30, 255) : IM_COL32(100, 100, 100, 255);
     ImU32 hubInner = m_uiManager->m_isDarkTheme ? IM_COL32(80, 80, 80, 255) : IM_COL32(50, 50, 50, 255);
     draw_list->AddCircleFilled(center, 12.0f, hubOuter);
     draw_list->AddCircleFilled(center, 6.0f, hubInner);
 
+    // ---- Numeric value under the dial ----
     char angle_text[16];
     ImGui::PushFont(m_uiManager->font_body);
     snprintf(angle_text, 16, "%.1f km/h", currentSpeed);

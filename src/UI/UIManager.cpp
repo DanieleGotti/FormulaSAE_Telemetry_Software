@@ -1,3 +1,7 @@
+/**
+ * @file UIManager.cpp
+ * @brief Implementation of the main window, render loop and state machine (see UIManager.hpp).
+ */
 #include <imgui.h>
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_opengl3.h>
@@ -41,12 +45,16 @@
 #include <windows.h>
 #endif
 
+/**
+ * @brief Subscriber that accumulates every received row in a vector.
+ * @note Not used by the current flow (leftover from a previous playback implementation).
+ */
 class PlaybackDataSubscriber : public IAggregatedDataSubscriber {
 public:
     void onAggregatedDataReceived(const DbRow& dataRow) override {
         collectedData.push_back(dataRow);
     }
-    std::vector<DbRow> collectedData;
+    std::vector<DbRow> collectedData;  ///< Collected rows.
 };
 
 
@@ -55,21 +63,26 @@ UiManager::UiManager() {
         std::cerr << "CRITICAL [UiManager]: Failed to initialize GLFW! Are you running via SSH without a DISPLAY?" << std::endl;
         exit(1);
     }
+    // ---- OpenGL context ----
 #ifdef __APPLE__
+    // macOS requires a forward-compatible Core Profile 3.2 context
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #else
+    // Windows/Linux: default context, GLSL 1.20 shaders for maximum compatibility
     glsl_version = "#version 120";
 //     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 //     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 #endif
+    // Borderless, transparent window for the splash screen (borders come back after the splash)
     glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);              
     glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_TRUE);
 
     m_window = glfwCreateWindow(500, 500, "ERB - Telemetry Software", NULL, NULL);
     
+    // Center the splash window on the primary monitor
     GLFWmonitor* primary = glfwGetPrimaryMonitor();
     if (primary) {
         const GLFWvidmode* mode = glfwGetVideoMode(primary);
@@ -77,13 +90,15 @@ UiManager::UiManager() {
     }
 
     glfwMakeContextCurrent((GLFWwindow*)m_window);
-    glfwSwapInterval(1);
+    glfwSwapInterval(1); // V-Sync
 
+    // ---- ImGui / ImPlot contexts ----
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImPlot::CreateContext();
     [[maybe_unused]] ImGuiIO& io = ImGui::GetIO();
 
+    // On the first launch apply the default window layout (assets/resources/imgui.ini)
     if (ServiceManager::getSettingsManager()->getFirstAccess()) {
       auto [pFileData, pFileLength] = ServiceManager::getAssetManager()->getDefaultImGuiIniFile();
 
@@ -96,12 +111,15 @@ UiManager::UiManager() {
       ServiceManager::getSettingsManager()->setFirstAccess(false);
     }
 
+    // The layout modified by the user is saved in the application data folder.
+    // The string is static because ImGui only keeps the pointer.
     static const std::string path = fsutils::getAppDocumentsFilePath("imgui.ini").string();
     io.IniFilename = path.c_str();
-    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;    // dockable windows
+    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;  // windows can be dragged outside the main window
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 
+    // The terminal must be created early: from here on cout/cerr end up in the UI
     m_logTerminal = std::make_shared<LogTerminal>(this);
     std::cout << "INFO [UiManager]: UiManager initialized." << std::endl;
     io.Fonts->Clear(); 
@@ -110,6 +128,8 @@ UiManager::UiManager() {
     SetWindowIconFromResource();
 #endif
 
+    // ---- Fonts: Regular for text and data, Bold for labels and titles ----
+    // FontDataOwnedByAtlas = false: the memory stays owned by the asset manager
     auto [pFontDataRegular, dFontSizeRegular] = ServiceManager::getAssetManager()->getFont("RobotoCondensed-Regular.ttf");
     if (pFontDataRegular && dFontSizeRegular > 0) {
         ImFontConfig cfg; cfg.FontDataOwnedByAtlas = false;
@@ -127,9 +147,11 @@ UiManager::UiManager() {
     assert(font_body != nullptr && "ERROR [UiManager]: Failed to load fonts.");
     std::cout << "INFO [UiManager]: Fonts loaded." << std::endl;
 
+    // ---- Theme saved in the settings ----
     m_isDarkTheme = ServiceManager::getSettingsManager()->getDarkMode();
     ApplyTheme(ImGui::GetStyle(), m_isDarkTheme);
 
+    // ---- ImGui platform and renderer backends ----
     ImGui_ImplGlfw_InitForOpenGL((GLFWwindow*)m_window, true);
     ImGui_ImplOpenGL3_Init(glsl_version);
     
@@ -137,6 +159,8 @@ UiManager::UiManager() {
 }
 
 UiManager::~UiManager() {
+    // Windows must be unsubscribed before being destroyed, otherwise the
+    // DataManager would call objects that no longer exist
     if (ServiceManager::getDataManager()) {
         if (m_dashboard) ServiceManager::getDataManager()->removeSubscriber(m_dashboard.get());
         if (m_accBrkWindow) ServiceManager::getDataManager()->removeSubscriber(m_accBrkWindow.get());
@@ -170,6 +194,7 @@ AppState UiManager::getCurrentState() const {
 
 void UiManager::setupInitialState() {
     if (m_isFirstBoot) {
+        // Only on the very first launch: splash screen with the logo
         m_currentState = AppState::SPLASH_SCREEN;
         loadTextureFromMemory("icon.png", &m_splashTextureID, &m_splashWidth, &m_splashHeight);
         m_splashStartTime = glfwGetTime();
@@ -178,6 +203,7 @@ void UiManager::setupInitialState() {
         m_currentState = AppState::CONFIGURING;
     }
 
+    // "Connect" button callback: starts the serial port and switches to live
     auto onConnect = [this](const std::string& port, int baudrate) {
         ServiceManager::setAcquisitionMethod(ACQUISITION_METHOD_SERIAL);
         if (ServiceManager::configureSerial(port, baudrate) && ServiceManager::startServices()) {
@@ -191,6 +217,7 @@ void UiManager::setupInitialState() {
         }
     };
 
+    // "Load and analyze" button callback: starts loading in the background
     auto onLoadFile = [this](const std::string& filePath) {
         ServiceManager::setAcquisitionMethod(ACQUISITION_METHOD_FILE);
         ServiceManager::configureFile(filePath);
@@ -203,6 +230,7 @@ void UiManager::setupInitialState() {
         m_currentState = AppState::LOADING_FILE;
     };
     
+    // Home screen windows
     auto serialWin = std::make_unique<SerialDeviceSelection>(this, onConnect);
     m_serialSelectionWindow = serialWin.get();
     addElement(std::move(serialWin));
@@ -218,6 +246,7 @@ void UiManager::setupInitialState() {
 void UiManager::transitionToConnectedState(AppState connectedState) {
     m_currentState = connectedState;
 
+    // Create every data window (both live and playback)
     m_dashboard = std::make_shared<Dashboard>(this);
     m_accBrkWindow = std::make_shared<AccBrkWindow>(this);
     m_statusWindow = std::make_shared<StatusWindow>(this);
@@ -232,6 +261,7 @@ void UiManager::transitionToConnectedState(AppState connectedState) {
     m_temperatureWindow = std::make_shared<TemperatureWindow>(this);
 
     if (connectedState == AppState::CONNECTED_LIVE) {
+        // Live: windows receive the data through DataManager callbacks
         auto dataManager = ServiceManager::getDataManager();
         dataManager->addSubscriber(m_dashboard.get());
         dataManager->addSubscriber(m_accBrkWindow.get());
@@ -246,17 +276,20 @@ void UiManager::transitionToConnectedState(AppState connectedState) {
         dataManager->addSubscriber(m_inverterWindow.get());
         dataManager->addSubscriber(m_temperatureWindow.get());
     } else if (connectedState == AppState::CONNECTED_PLAYBACK) {
+        // Playback: windows read from the PlaybackManager; the slider is needed
         m_playbackControls = std::make_shared<PlaybackControlsWindow>(this);
     }
 }
 
 void UiManager::run() {
     while (!glfwWindowShouldClose((GLFWwindow*)m_window)) {
+        // 1. Events and new frame
         glfwPollEvents();
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
         
+        // 2. Build the interface
         ImGui::PushFont(font_body);
         if (m_currentState != AppState::SPLASH_SCREEN) {
             showDockingSpace(); 
@@ -264,12 +297,14 @@ void UiManager::run() {
         draw();
         ImGui::PopFont();
         
+        // 3. Rendering
         ImGui::Render();
         
         int display_w, display_h;
         glfwGetFramebufferSize((GLFWwindow*)m_window, &display_w, &display_h);
         glViewport(0, 0, display_w, display_h);
         
+        // Transparent background during the splash, theme colour otherwise
         ImVec4 clear_color;
         if (m_currentState == AppState::SPLASH_SCREEN) {
             clear_color = ImVec4(0.0f, 0.0f, 0.0f, 0.0f); 
@@ -282,6 +317,7 @@ void UiManager::run() {
 
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     
+        // Windows detached from the main one (multi-viewport)
         if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
             GLFWwindow* backup_current_context = glfwGetCurrentContext();
             ImGui::UpdatePlatformWindows();
@@ -289,6 +325,7 @@ void UiManager::run() {
             glfwMakeContextCurrent(backup_current_context);
         }
 
+        // 4. Present and perform scheduled removals (frame completed)
         glfwSwapBuffers((GLFWwindow*)m_window);
         processPendingRemovals();
     }
@@ -300,6 +337,7 @@ void UiManager::run() {
 
 void UiManager::draw() {
 
+    // ---- Splash screen: centered logo, then switch to the normal window ----
     if (m_currentState == AppState::SPLASH_SCREEN) {
         ImGuiViewport* viewport = ImGui::GetMainViewport();
         ImGui::SetNextWindowPos(viewport->Pos);
@@ -307,6 +345,7 @@ void UiManager::draw() {
         ImGui::Begin("Splash screen", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoInputs);
         
         if (m_splashTextureID && m_splashWidth > 0) {
+            // Logo at most 400 px wide
             float scale = 1.0f;
             if (m_splashWidth > 400) scale = 400.0f / m_splashWidth;
             
@@ -318,7 +357,7 @@ void UiManager::draw() {
         }
         ImGui::End();
 
-        // Freeze for 2 seconds
+        // After 4 seconds: decorated, maximised window, CONFIGURING state
         if (glfwGetTime() - m_splashStartTime > 4.0) {
             
             glfwHideWindow((GLFWwindow*)m_window);
@@ -327,7 +366,8 @@ void UiManager::draw() {
             glfwSetWindowAttrib((GLFWwindow*)m_window, GLFW_DECORATED, GLFW_TRUE);
 
 #if defined(__APPLE__)
-            // On macOS, maximize doesn't work well with the way we handle the splash screen
+            // On macOS maximising does not work well with the way the splash is handled:
+            // the window is set manually to the monitor work area
             int xpos, ypos, width, height;
             glfwGetMonitorWorkarea(glfwGetPrimaryMonitor(), &xpos, &ypos, &width, &height);
             glfwSetWindowPos((GLFWwindow*)m_window, xpos, ypos);
@@ -349,6 +389,7 @@ void UiManager::draw() {
         m_logTerminal->draw();
     }
 
+    // ---- File loading: wait for FileService, then switch to playback ----
     if (m_currentState == AppState::LOADING_FILE) {
         auto fileService = ServiceManager::getFileService();
         if (fileService && fileService->isFinished()) {
@@ -358,7 +399,7 @@ void UiManager::draw() {
             originalExt = originalExt.substr(originalExt.find_last_of("."));
             std::transform(originalExt.begin(), originalExt.end(), originalExt.begin(), ::tolower);
             
-            // Pass the highly optimized dataset directly to the manager
+            // The dataset is handed (moved, no copies) to the PlaybackManager
             ServiceManager::getPlaybackManager()->setDataset(std::move(loadedData), originalExt);
             transitionToConnectedState(AppState::CONNECTED_PLAYBACK);
 
@@ -369,10 +410,12 @@ void UiManager::draw() {
         }
     }
 
+    // ---- Generic windows (configuration, credits) ----
     for (auto& element : m_uiElements) {
         element->draw();
     }
     
+    // ---- Data windows ----
     if (m_currentState == AppState::CONNECTED_LIVE || m_currentState == AppState::CONNECTED_PLAYBACK) {
         if (m_dashboard) m_dashboard->draw();
         if (m_accBrkWindow) m_accBrkWindow->draw();
@@ -417,6 +460,7 @@ void UiManager::processPendingRemovals() {
 
 
 void UiManager::showDockingSpace() {
+    // Invisible full-screen window hosting the dockspace and the menu bar
     ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
     window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
     window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBackground; 
@@ -435,8 +479,10 @@ void UiManager::showDockingSpace() {
     ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
     ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_None);
 
+    // ---- Menu bar ----
     if (ImGui::BeginMainMenuBar()) {
         
+        // "Home" is available only outside the configuration screen
         if (m_currentState != AppState::CONFIGURING) {
             if (ImGui::MenuItem("Home")) {
                 resetToHome();
@@ -445,6 +491,7 @@ void UiManager::showDockingSpace() {
 
         if (ImGui::BeginMenu("Settings")) {
             if (ImGui::BeginMenu("Appearance")) {
+                // Light/dark theme switch (saved in the settings)
                 bool isDark = ServiceManager::getSettingsManager()->getDarkMode();
                 if (ImGui::MenuItem(isDark ? "Light mode" : "Dark mode")) {
                     ServiceManager::getSettingsManager()->setDarkMode(!isDark);
@@ -452,6 +499,7 @@ void UiManager::showDockingSpace() {
                     ApplyTheme(ImGui::GetStyle(), !isDark);
                 }
                 ImGui::Separator();
+                // Global text scale, 0.1 steps (minimum 0.5)
                 ImGui::Text("Text size");
                 ImGui::SameLine();
                 float fontScale = ServiceManager::getSettingsManager()->getGlobalFontScale();
@@ -478,6 +526,7 @@ void UiManager::showDockingSpace() {
 void UiManager::resetToHome() {
     std::cout << "INFO [UiManager]: Resetting interface to Home screen." << std::endl;
 
+    // 1. Unsubscribe the windows from the DataManager
     if (ServiceManager::getDataManager()) {
         if (m_dashboard) ServiceManager::getDataManager()->removeSubscriber(m_dashboard.get());
         if (m_accBrkWindow) ServiceManager::getDataManager()->removeSubscriber(m_accBrkWindow.get());
@@ -493,8 +542,10 @@ void UiManager::resetToHome() {
         if (m_temperatureWindow) ServiceManager::getDataManager()->removeSubscriber(m_temperatureWindow.get());
     }
 
+    // 2. Stop and recreate the backend services
     ServiceManager::resetForNewSession();
 
+    // 3. Destroy the data windows
     m_dashboard.reset();
     m_accBrkWindow.reset();
     m_statusWindow.reset();
@@ -509,6 +560,7 @@ void UiManager::resetToHome() {
     m_inverterWindow.reset();
     m_temperatureWindow.reset();
 
+    // 4. Recreate the Home screen
     m_uiElements.clear();
     m_serialSelectionWindow = nullptr;
     m_fileSelectionWindow = nullptr;
@@ -520,12 +572,14 @@ bool UiManager::loadTextureFromMemory(const char* filename, GLuint* out_texture,
     auto [pData, dataSize] = ServiceManager::getAssetManager()->getImage(filename);
     if (!pData || dataSize == 0) return false;
 
+    // Decode PNG -> RGBA (4 channels)
     int image_width = 0, image_height = 0;
     unsigned char* image_data = stbi_load_from_memory(
         reinterpret_cast<const unsigned char*>(pData), dataSize, &image_width, &image_height, nullptr, 4
     );
     if (!image_data) return false;
 
+    // Upload into an OpenGL texture
     GLuint image_texture;
     glGenTextures(1, &image_texture);
     glBindTexture(GL_TEXTURE_2D, image_texture);
@@ -543,6 +597,7 @@ bool UiManager::loadTextureFromMemory(const char* filename, GLuint* out_texture,
 
 #if defined(WIN32)
 void UiManager::SetWindowIconFromResource() {
+    // Load the IDI_ICON1 icon embedded in the executable
     HINSTANCE hInstance = GetModuleHandle(nullptr);
     HICON hIcon = LoadIcon(hInstance, MAKEINTRESOURCEW(IDI_ICON1));
     if (!hIcon) return;
@@ -559,6 +614,7 @@ void UiManager::SetWindowIconFromResource() {
     HDC memDC = CreateCompatibleDC(hdc);
     HBITMAP oldBmp = (HBITMAP)SelectObject(memDC, iconInfo.hbmColor);
 
+    // Extract the 32-bit pixels (negative height = top-down rows)
     BITMAPINFO bmi = {};
     bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
     bmi.bmiHeader.biWidth = width;
@@ -570,6 +626,7 @@ void UiManager::SetWindowIconFromResource() {
     std::vector<unsigned char> pixels(width * height * 4);
     GetDIBits(memDC, iconInfo.hbmColor, 0, height, pixels.data(), &bmi, DIB_RGB_COLORS);
 
+    // Windows provides BGRA, GLFW wants RGBA: swap the R and B channels
   for (size_t i = 0; i < pixels.size(); i += 4) {
         unsigned char temp = pixels[i];       
         pixels[i] = pixels[i + 2];            
@@ -579,6 +636,7 @@ void UiManager::SetWindowIconFromResource() {
     GLFWimage img{width, height, pixels.data()};
     glfwSetWindowIcon((GLFWwindow*)m_window, 1, &img);
 
+    // Release the GDI resources
     SelectObject(memDC, oldBmp);
     DeleteDC(memDC);
     ReleaseDC(nullptr, hdc);

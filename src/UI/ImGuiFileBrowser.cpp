@@ -1,3 +1,7 @@
+/**
+ * @file ImGuiFileBrowser.cpp
+ * @brief Implementation of the modal file browser (see ImGuiFileBrowser.hpp).
+ */
 #include <imgui.h>
 #include <algorithm>
 #include <iostream>
@@ -17,15 +21,16 @@
 
 namespace fs = std::filesystem;
 
+/// Initial and "Home" folder: <executable folder>/output_data.
 static fs::path GetDefaultPath() {
-    // Rely on our OS-agnostic utility to find the executable directory
+    // Rely on the OS-agnostic utility to find the executable folder
     return fsutils::getExecutableDirectory() / "output_data";
 }
 
 ImGuiFileBrowser::ImGuiFileBrowser() {
     m_currentPath = GetDefaultPath();
 
-    // If the folder doesn't exist, create it
+    // Create the folder if it does not exist (on error fall back to the working directory)
     if (!fs::exists(m_currentPath)) {
         try {
             fs::create_directories(m_currentPath);
@@ -55,6 +60,7 @@ void ImGuiFileBrowser::syncPathBuffer() {
 void ImGuiFileBrowser::refreshDrives() {
     m_drives.clear();
 #ifdef _WIN32
+    // Drive bitmask: bit 0 = A:, bit 1 = B:, ...
     const DWORD mask = GetLogicalDrives();
     for (int i = 0; i < 26; ++i) {
         if (mask & (1u << i)) {
@@ -87,6 +93,7 @@ void ImGuiFileBrowser::refreshFiles() {
         }
     }
 
+    // Folders first, then files; each group in alphabetical order
     std::sort(m_currentFiles.begin(), m_currentFiles.end(), [](const FileEntry& a, const FileEntry& b) {
         if (a.is_directory != b.is_directory) return a.is_directory;
         return a.name < b.name;
@@ -103,6 +110,7 @@ bool ImGuiFileBrowser::navigateTo(const fs::path& path) {
         return false;
     }
 
+    // On a read error go back to the previous folder
     const fs::path previous = m_currentPath;
     m_currentPath = target;
     try {
@@ -125,6 +133,7 @@ std::optional<std::string> ImGuiFileBrowser::draw(const std::string& popup_id, b
         ImGui::OpenPopup(popup_id.c_str());
     }
 
+    // Centered popup, 760x540 when it opens
     ImVec2 center = ImGui::GetMainViewport()->GetCenter();
     ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
     ImGui::SetNextWindowSize(ImVec2(760, 540), ImGuiCond_Appearing);
@@ -135,6 +144,7 @@ std::optional<std::string> ImGuiFileBrowser::draw(const std::string& popup_id, b
         // so the entry vector is never mutated while it is being iterated
         std::optional<fs::path> pendingNavigation;
 
+        // ---- Toolbar: Up / Home / Refresh ----
         const bool atRoot = isFilesystemRoot(m_currentPath);
         if (atRoot) ImGui::BeginDisabled();
         if (ImGui::Button("Up")) {
@@ -162,7 +172,7 @@ std::optional<std::string> ImGuiFileBrowser::draw(const std::string& popup_id, b
             }
         }
 
-        // ---- Editable location bar ----
+        // ---- Editable path bar (Enter or "Go") ----
         ImGui::SetNextItemWidth(-90.0f);
         const bool submitted = ImGui::InputText("##PathBar", m_pathBuffer, sizeof(m_pathBuffer),
                                                 ImGuiInputTextFlags_EnterReturnsTrue);
@@ -173,6 +183,7 @@ std::optional<std::string> ImGuiFileBrowser::draw(const std::string& popup_id, b
 
         ImGui::Separator();
 
+        // ---- Folder and file list ----
         ImGui::BeginChild("File view", ImVec2(0, -ImGui::GetFrameHeightWithSpacing() * 2));
 
         if (m_currentFiles.empty()) {
@@ -197,6 +208,7 @@ std::optional<std::string> ImGuiFileBrowser::draw(const std::string& popup_id, b
 
         ImGui::Separator();
 
+        // ---- Selected file and Cancel / Open buttons ----
         char selected_buf[512];
         std::snprintf(selected_buf, sizeof(selected_buf), "%s", m_selectedFile.c_str());
         ImGui::SetNextItemWidth(-150.0f);
@@ -214,7 +226,7 @@ std::optional<std::string> ImGuiFileBrowser::draw(const std::string& popup_id, b
         }
         if (m_selectedFile.empty()) ImGui::EndDisabled();
 
-        // Safe point to change directory: nothing is iterating the vectors now
+        // Safe point to change folder: nothing is iterating the vectors now
         if (pendingNavigation.has_value()) {
             navigateTo(*pendingNavigation);
         }

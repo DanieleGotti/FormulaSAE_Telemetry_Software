@@ -1,3 +1,9 @@
+/**
+ * @file HallWindow.cpp
+ * @brief Implementation of the wheel speed window (see HallWindow.hpp).
+ *
+ * The live/playback logic is identical to AccBrkWindow.cpp (see the comments there).
+ */
 #include "UI/HallWindow.hpp" 
 #include "UI/UIManager.hpp" 
 #include "Telemetry/Services/ServiceManager.hpp" 
@@ -18,6 +24,7 @@ void HallWindow::onAggregatedDataReceived(const DbRow& dataRow) {
         if (!dataRow.count("timestamp")) return; 
         double unix_timestamp = std::stod(dataRow.at("timestamp"));
 
+        // Time jump (pause or reset): the series are cleared
         if (m_lastTimestamp >= 0.0 && (unix_timestamp < m_lastTimestamp || unix_timestamp - m_lastTimestamp > 1.5)) {
             for (auto& pair : m_plotData) {
                 pair.second.X.clear();
@@ -26,6 +33,7 @@ void HallWindow::onAggregatedDataReceived(const DbRow& dataRow) {
         }
         m_lastTimestamp = unix_timestamp;
         
+        // New sample + drop the ones older than MAX_HISTORY_SECONDS
         for (auto& pair : m_plotData) {
             const std::string& label = pair.first;
             if (dataRow.count(label)) {
@@ -55,7 +63,7 @@ void HallWindow::draw() {
         std::lock_guard<std::mutex> lock(m_dataMutex);
         if (!m_playbackDataLoaded && playbackManager->getTotalRows() > 0) {
             
-            // Fast DOD extraction for ImPlot
+            // Copy the full session series for ImPlot, only once
             std::vector<double> timeline = playbackManager->getPlotTimeline();
             
             for (auto& pair : m_plotData) {

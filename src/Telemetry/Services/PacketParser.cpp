@@ -1,3 +1,16 @@
+/**
+ * @file PacketParser.cpp
+ * @brief Implementation of the live packet decoder (see PacketParser.hpp).
+ *
+ * @note This file lives in src/Telemetry/Services but its header is in
+ *       include/Telemetry/data_acquisition.
+ *
+ * Lost packet counting rules (the same used by FileService::loadBin):
+ *  - packet A, 1 tick period: if the timestamp jump is `diff` (1 < diff < 5000)
+ *    then `diff - 1` packets were lost;
+ *  - packet B, 40 tick period: if 40 < diff < 100000 then `diff/40 - 1` packets were lost.
+ * Huge (or backwards) jumps are treated as ECU resets and are not counted.
+ */
 #include <sstream>
 #include <iomanip>
 #include <iostream>
@@ -59,6 +72,7 @@ const PacketLayout* PacketParser::matchLayout(const std::vector<PacketLayout>& l
 //==============================================================================
 
 void PacketParser::populateRowFromA(const PacketLayout& layout, const uint8_t* data, DbRow& row) {
+    // Timestamp in seconds: ECU ticks * 5 ms
     row["timestamp"] = TelemetrySchema::formatValue(ValueFormat::Number, 3, readTimestamp(data) * 0.005);
 
     for (size_t i = 0; i < layout.fields.size(); ++i) {
@@ -108,7 +122,7 @@ bool PacketParser::parseLiveBytes(std::vector<uint8_t>& rxBuffer, DbRow& outRow)
     while (rxBuffer.size() >= 2) {
         // ---- 1. Find the next plausible packet start ----
         size_t syncIndex = std::string::npos;
-        int packetType = 0;
+        int packetType = 0; // 1 = packet A (0xCC), 2 = packet B (0xEE)
 
         for (size_t i = 0; i + 1 < rxBuffer.size(); ++i) {
             const size_t available = rxBuffer.size() - i;
@@ -146,6 +160,7 @@ bool PacketParser::parseLiveBytes(std::vector<uint8_t>& rxBuffer, DbRow& outRow)
             if (!layoutA) {
                 // Might still be a longer layout whose tail has not arrived yet
                 if (rxBuffer.size() < maxA) return false;
+                // Otherwise it is really corrupted: drop one byte and resynchronise
                 std::cerr << "\n[ERROR] Packet 0xCC corrupted (timestamp: "
                           << readTimestamp(rxBuffer.data()) << "): no known layout validates its CRC.\n" << std::endl;
                 rxBuffer.erase(rxBuffer.begin(), rxBuffer.begin() + 1);
@@ -171,6 +186,7 @@ bool PacketParser::parseLiveBytes(std::vector<uint8_t>& rxBuffer, DbRow& outRow)
                 if (!layoutB && rxBuffer.size() < consumed + maxB) return false;
 
                 if (layoutB) {
+                    // B lost packet counting: 40 tick (200 ms) period
                     const uint32_t tsB = readTimestamp(rxBuffer.data() + consumed);
                     if (!m_firstB && tsB > m_lastTimestampB) {
                         const uint32_t diff = tsB - m_lastTimestampB;
@@ -184,6 +200,7 @@ bool PacketParser::parseLiveBytes(std::vector<uint8_t>& rxBuffer, DbRow& outRow)
                 }
             }
 
+            // A lost packet counting: 1 tick (5 ms) period
             if (!m_firstA && tsA > m_lastTimestampA) {
                 const uint32_t diff = tsA - m_lastTimestampA;
                 if (diff > 1 && diff < 5000) m_lostA += (diff - 1);
@@ -198,6 +215,7 @@ bool PacketParser::parseLiveBytes(std::vector<uint8_t>& rxBuffer, DbRow& outRow)
             return true;
 
         } else {
+            // Standalone B packet: only the cache is updated, no row is emitted
             const PacketLayout* layoutB = matchLayout(layoutsB, m_lockedB, rxBuffer.data(), rxBuffer.size());
 
             if (!layoutB) {

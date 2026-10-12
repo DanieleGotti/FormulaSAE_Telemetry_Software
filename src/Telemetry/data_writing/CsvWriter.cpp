@@ -1,3 +1,7 @@
+/**
+ * @file CsvWriter.cpp
+ * @brief Implementation of the CSV logger (see CsvWriter.hpp).
+ */
 #include <chrono>
 #include <iomanip>
 #include <filesystem>
@@ -5,6 +9,10 @@
 #include <sstream>
 #include "Telemetry/data_writing/CsvWriter.hpp"
 
+/**
+ * @brief Generates the log file name from the local date/time.
+ * @return Name in the `telemetry_YYYYMMDD_hhmmss.csv` format.
+ */
 static std::string generate_csv_filename() {
     const auto now = std::chrono::system_clock::now();
     const auto in_time_t = std::chrono::system_clock::to_time_t(now);
@@ -47,15 +55,16 @@ bool CsvWriter::createFile(const std::string& directoryPath, const std::vector<s
 void CsvWriter::onAggregatedDataReceived(const DbRow& dataRow) {
     if (!m_outputFile.is_open()) return;
 
+    // The timestamp is made relative to the start of the recording
     double relative_ts = 0.0;
     bool has_ts = dataRow.count("timestamp");
     if (has_ts) {
         try {
             double current_ts = std::stod(dataRow.at("timestamp"));
             if (m_recordingStartTime < 0.0) {
-                m_recordingStartTime = current_ts; // Save the first timestamp
+                m_recordingStartTime = current_ts; // save the first timestamp
             }
-            relative_ts = current_ts - m_recordingStartTime; // Subtract the offset
+            relative_ts = current_ts - m_recordingStartTime; // subtract the offset
         } catch(...) {}
     }
 
@@ -63,11 +72,11 @@ void CsvWriter::onAggregatedDataReceived(const DbRow& dataRow) {
     for (size_t i = 0; i < m_columnOrder.size(); ++i) {
         const std::string& col_name = m_columnOrder[i];
         
-        // If it's the timestamp column, format and write the recalculated relative value
+        // Timestamp column: write the recomputed relative value
         if (col_name == "timestamp" && has_ts) {
             ss << std::fixed << std::setprecision(3) << relative_ts;
         } 
-        // Otherwise, for all other values, check the map and write as before
+        // Every other column: copy the row text (empty cell when missing)
         else if (dataRow.count(col_name)) {
             ss << dataRow.at(col_name);
         }
@@ -98,7 +107,7 @@ bool CsvWriter::WriteToFile(const std::string& filePath, const std::vector<std::
     }
     outputFile << '\n';
 
-    // Write all data rows
+    // Write all the data rows
     for (const auto& dataRow : data) {
         for (size_t i = 0; i < columnOrder.size(); ++i) {
             const std::string& col_name = columnOrder[i];

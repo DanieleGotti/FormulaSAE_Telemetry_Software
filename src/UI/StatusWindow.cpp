@@ -1,3 +1,7 @@
+/**
+ * @file StatusWindow.cpp
+ * @brief Implementation of the status panel (see StatusWindow.hpp).
+ */
 #include <imgui.h>
 #include <string>
 #include <algorithm>
@@ -6,6 +10,10 @@
 #include "Telemetry/Services/ServiceManager.hpp"
 #include "Telemetry/file_reading/PlaybackManager.hpp"
 
+/**
+ * @brief Prefixes the inverter state name with its numeric code: "ENABLED" -> "(5) ENABLED".
+ * @note The table must stay aligned with kInverterStates in TelemetrySchema.cpp.
+ */
 static std::string formatInverterFsm(const std::string& stateStr) {
     const char* states[] = {"OFF", "SYSTEM_READY", "DC_CAPACITOR_CHARGE", "DC_OK", 
                             "ENABLE_INVERTER", "ENABLED", "ON", "OK", "ERROR"};
@@ -15,6 +23,10 @@ static std::string formatInverterFsm(const std::string& stateStr) {
     return stateStr;
 }
 
+/**
+ * @brief Prefixes the tractive system state name with its numeric code.
+ * @note The table must stay aligned with kTractiveStates in TelemetrySchema.cpp.
+ */
 static std::string formatTractiveFsm(const std::string& stateStr) {
     const char* states[] = {"ENTRY_STATE", "START_LIGHT_TEST", "WAIT_LIGHT_TEST", "POWER_OFF", 
                             "TS_WAIT_ACTIVATION", "TS_WAIT_PRECHARGE", "TS_ACTIVE", "R2D_WAIT", 
@@ -25,6 +37,10 @@ static std::string formatTractiveFsm(const std::string& stateStr) {
     return stateStr;
 }
 
+/**
+ * @brief Prefixes the ECU mode with its hexadecimal value: "TEST" -> "(0x04) TEST".
+ * @note Must stay aligned with kEcuModes in TelemetrySchema.cpp.
+ */
 static std::string formatEcuMode(const std::string& stateStr) {
     if (stateStr == "ENDURANCE") return "(0x01) ENDURANCE";
     if (stateStr == "ACCELERATION") return "(0x02) ACCELERATION";
@@ -37,10 +53,12 @@ StatusWindow::StatusWindow(UiManager* manager) : m_uiManager(manager) {}
 void StatusWindow::onAggregatedDataReceived(const DbRow& dataRow) {
     std::lock_guard<std::mutex> lock(m_dataMutex);
     try {
+        // Digital inputs: "1" = active
         if (dataRow.count("sdc")) m_sdcInputState = (std::stoi(dataRow.at("sdc")) == 1);
         if (dataRow.count("ready_to_drive_button")) m_r2dButtonState = (std::stoi(dataRow.at("ready_to_drive_button")) == 1);
         if (dataRow.count("ecu_reset_button")) m_resetButtonState = (std::stoi(dataRow.at("ecu_reset_button")) == 1);
         if (dataRow.count("tractive_system_on_button")) m_tsOnButtonState = (std::stoi(dataRow.at("tractive_system_on_button")) == 1);
+        // States: already converted to text by the schema
         if (dataRow.count("left_inverter_fsm")) m_leftInverterFsm = dataRow.at("left_inverter_fsm");
         if (dataRow.count("right_inverter_fsm")) m_rightInverterFsm = dataRow.at("right_inverter_fsm");
         if (dataRow.count("tractive_system_fsm")) m_tractiveSystemFsm = dataRow.at("tractive_system_fsm");
@@ -54,7 +72,7 @@ void StatusWindow::drawLed(const char* label, bool state) {
     float radius = ImGui::GetTextLineHeight() * 0.4f;
     ImVec2 p = ImGui::GetCursorScreenPos();
     ImVec2 center(p.x + radius, p.y + ImGui::GetTextLineHeight() / 2.0f);
-    ImGui::Dummy(ImVec2(radius * 2, ImGui::GetTextLineHeight()));
+    ImGui::Dummy(ImVec2(radius * 2, ImGui::GetTextLineHeight())); // reserve the LED space
     ImU32 color = state ? IM_COL32(25, 204, 25, 255) : IM_COL32(217, 25, 25, 255);
     draw_list->AddCircleFilled(center, radius, color);
     ImGui::SameLine();
@@ -63,17 +81,19 @@ void StatusWindow::drawLed(const char* label, bool state) {
 
 void StatusWindow::drawBattery(int soc) {
     float h = ImGui::GetTextLineHeightWithSpacing() * 1.5f; 
-    float w = 84.0f;  
-    float polo_w = 4.0f;
+    float w = 84.0f;      // width of the battery body
+    float polo_w = 4.0f;  // width of the positive terminal
 
     ImVec2 p = ImGui::GetCursorScreenPos();
     ImDrawList* draw_list = ImGui::GetWindowDrawList();
 
     ImU32 outlineColor = m_uiManager->m_isDarkTheme ? IM_COL32(220, 220, 220, 255) : IM_COL32(40, 40, 40, 255);
     
+    // Outline and terminal
     draw_list->AddRect(p, ImVec2(p.x + w, p.y + h), outlineColor, 2.0f, 0, 2.0f);
     draw_list->AddRectFilled(ImVec2(p.x + w, p.y + h * 0.3f), ImVec2(p.x + w + polo_w, p.y + h * 0.7f), outlineColor, 1.0f);
 
+    // Fill colour based on the charge
     ImU32 fillColor;
     if (soc > 50) fillColor = IM_COL32(25, 204, 25, 255);        
     else if (soc > 20) fillColor = IM_COL32(255, 128, 0, 255); 
@@ -84,7 +104,7 @@ void StatusWindow::drawBattery(int soc) {
         draw_list->AddRectFilled(ImVec2(p.x + 2.0f, p.y + 2.0f), ImVec2(p.x + 2.0f + fillWidth, p.y + h - 2.0f), fillColor, 1.0f);
     }
 
-    ImGui::Dummy(ImVec2(w + polo_w, h));
+    ImGui::Dummy(ImVec2(w + polo_w, h)); // reserve the space taken by the drawing
 }
 
 void StatusWindow::draw() {
@@ -93,6 +113,7 @@ void StatusWindow::draw() {
     ImGui::Begin("Status panel", nullptr); 
     ImGui::PopStyleVar();
 
+    // Values to show in this frame
     bool r2dState = false; 
     bool resetState = false; 
     bool sdcState = false; 
@@ -104,6 +125,7 @@ void StatusWindow::draw() {
     int currentSoc = 0;
 
     if (m_uiManager->getCurrentState() == AppState::CONNECTED_PLAYBACK) {
+        // Playback: read from the current row
         auto playbackManager = ServiceManager::getPlaybackManager();
         if (auto rowOpt = playbackManager->getCurrentRow()) {
             const DbRow& row = *rowOpt;
@@ -120,6 +142,7 @@ void StatusWindow::draw() {
             } catch (const std::exception& e) {}
         }
     } else {
+        // Live: copy of the values stored by the callback
         std::lock_guard<std::mutex> lock(m_dataMutex);
         r2dState = m_r2dButtonState; 
         resetState = m_resetButtonState;
@@ -137,12 +160,14 @@ void StatusWindow::draw() {
     std::string formattedTs = formatTractiveFsm(tsFsm);
     std::string formattedEcuMode = formatEcuMode(ecuMode);
 
+    // Three-column table: LEDs | FSMs | battery
     if (ImGui::BeginTable("Status table", 3, ImGuiTableFlags_BordersInnerV | ImGuiTableFlags_SizingFixedFit)) {
         
         ImGui::TableSetupColumn("LEDs", ImGuiTableColumnFlags_WidthFixed, 240.0f);
         ImGui::TableSetupColumn("FSMs", ImGuiTableColumnFlags_WidthStretch);
         ImGui::TableSetupColumn("Battery", ImGuiTableColumnFlags_WidthFixed, 160.0f);
 
+        // Header row
         ImGui::TableNextRow();
         
         ImGui::TableSetColumnIndex(0);
@@ -157,8 +182,10 @@ void StatusWindow::draw() {
         ImGui::PushFont(m_uiManager->font_label); ImGui::Text("State of charge"); ImGui::PopFont();
         ImGui::Separator();
 
+        // Content row
         ImGui::TableNextRow();
 
+        // Column 1: four LEDs on two lines
         ImGui::TableSetColumnIndex(0);
         ImGui::Spacing();
         ImGui::BeginGroup();
@@ -166,6 +193,7 @@ void StatusWindow::draw() {
         drawLed("Reset button", resetState); ImGui::SameLine(100.0f); drawLed("TS ON button", tsOnState);
         ImGui::EndGroup();
 
+        // Column 2: four side-by-side boxes with the states
         ImGui::TableSetColumnIndex(1);
         ImGui::Spacing();
         
@@ -176,6 +204,7 @@ void StatusWindow::draw() {
         
         float box_height = ImGui::GetTextLineHeightWithSpacing() * 1.5f; 
 
+        // Box with title and centered text
         auto drawFsmBox = [&](const char* title, const char* id, const std::string& text) {
             ImGui::BeginGroup();
             ImGui::PushFont(m_uiManager->font_body); 
@@ -196,6 +225,7 @@ void StatusWindow::draw() {
         drawFsmBox("Tractive system FSM:", "TsPanel", formattedTs); ImGui::SameLine();
         drawFsmBox("ECU mode:", "EcuModePanel", formattedEcuMode); 
 
+        // Column 3: percentage and battery icon, centered
         ImGui::TableSetColumnIndex(2);
         ImGui::Spacing(); 
         
@@ -212,7 +242,7 @@ void StatusWindow::draw() {
         ImGui::Text("%s", soc_text);
         ImGui::PopFont();
 
-        float batt_total_width = 84.0f + 4.0f; 
+        float batt_total_width = 84.0f + 4.0f; // body + terminal (see drawBattery)
         ImGui::SetCursorPosX(ImGui::GetCursorPosX() + (cell_w - batt_total_width) * 0.5f);
         
         drawBattery(currentSoc);

@@ -1,3 +1,7 @@
+/**
+ * @file DynamicsPowertrainWindow.cpp
+ * @brief Implementation of the vehicle dynamics and torque targets window (see DynamicsPowertrainWindow.hpp).
+ */
 #include <imgui.h>
 #include <iostream>
 #include <string>
@@ -24,6 +28,7 @@ void DynamicsPowertrainWindow::printValue(const std::string& label, const std::s
 
     std::string unitStr = unit.empty() ? "[-]" : "[" + unit + "]";
 
+    // Measure value and unit to align them to the right edge of the window
     ImGui::PushFont(m_uiManager->font_body);
     float valWidth = ImGui::CalcTextSize(valStr.c_str()).x;
     float unitWidth = ImGui::CalcTextSize(unitStr.c_str()).x;
@@ -46,6 +51,7 @@ void DynamicsPowertrainWindow::printValue(const std::string& label, const std::s
 void DynamicsPowertrainWindow::draw() {
     ImGui::Begin("Vehicle dynamics and powertrain targets");
 
+    // Row to show: current playback row or latest live row
     DbRow dataToDisplay;
     bool hasData = false;
 
@@ -64,6 +70,7 @@ void DynamicsPowertrainWindow::draw() {
     }
 
     if (hasData) {
+        // ---- Vehicle dynamics ----
         ImGui::PushFont(m_uiManager->font_label);
         ImGui::Text("Vehicle dynamics");
         ImGui::PopFont();
@@ -77,6 +84,7 @@ void DynamicsPowertrainWindow::draw() {
         ImGui::Spacing();
         ImGui::Separator();
         
+        // ---- Tyre slips ----
         ImGui::PushFont(m_uiManager->font_label);
         ImGui::Text("Tyre slips");
         ImGui::PopFont();
@@ -89,6 +97,7 @@ void DynamicsPowertrainWindow::draw() {
         ImGui::Spacing();
         ImGui::Separator();
         
+        // ---- Torque vectoring ----
         ImGui::PushFont(m_uiManager->font_label);
         ImGui::Text("Torque vectoring");
         ImGui::PopFont();
@@ -101,6 +110,7 @@ void DynamicsPowertrainWindow::draw() {
         ImGui::Spacing();
         ImGui::Separator();
         
+        // ---- Traction control (torque reduction) ----
         ImGui::PushFont(m_uiManager->font_label);
         ImGui::Text("Traction control");
         ImGui::PopFont();
@@ -113,6 +123,7 @@ void DynamicsPowertrainWindow::draw() {
         ImGui::Spacing();
         ImGui::Separator();
         
+        // ---- Final torque targets ----
         ImGui::PushFont(m_uiManager->font_label);
         ImGui::Text("Final torque targets");
         ImGui::PopFont();
