@@ -5,6 +5,39 @@
 #include "UI/UIManager.hpp"
 #include "UI/InverterDataWindow.hpp" 
 #include "Telemetry/Services/ServiceManager.hpp"
+#include "Telemetry/data_acquisition/AmkDiagnostics.hpp"
+
+namespace {
+
+// Diagnostica AMK: il valore arriva gia' formattato come
+// "2347 INVERTER_HW Motor temperature error", quindi basta ricavare il
+// numero per decidere il colore (rosso = errore, giallo = warning).
+void printDiagnostic(const std::string& label, const std::string& key, const DbRow& dataMap) {
+    ImGui::Text("%s:", label.c_str());
+
+    const auto it = dataMap.find(key);
+    if (it == dataMap.end()) {
+        ImGui::SameLine();
+        ImGui::TextDisabled("Null");
+        return;
+    }
+
+    const std::string& text = it->second;
+    const uint16_t code = amkDiagFromText(text.c_str());
+
+    ImVec4 color = ImVec4(0.4f, 0.85f, 0.4f, 1.0f);   // nessuna diagnostica
+    if (code != 0U) {
+        color = amkDiagIsWarning(code) ? ImVec4(0.95f, 0.80f, 0.25f, 1.0f)
+                                       : ImVec4(0.95f, 0.35f, 0.35f, 1.0f);
+    }
+
+    ImGui::SameLine();
+    ImGui::PushStyleColor(ImGuiCol_Text, color);
+    ImGui::TextWrapped("%s", text.c_str());
+    ImGui::PopStyleColor();
+}
+
+} // namespace
 
 InverterDataWindow::InverterDataWindow(UiManager* manager) : m_uiManager(manager) {}
 
@@ -158,6 +191,18 @@ void InverterDataWindow::draw() {
         
         printColoredValue("Left", "left_coolant_temp", dataToDisplay, 100.0f, 120.0f);
         printColoredValue("Right", "right_coolant_temp", dataToDisplay, 100.0f,120.0f);
+
+        ImGui::Spacing();
+        ImGui::Separator();
+
+        ImGui::PushFont(m_uiManager->font_label);
+        ImGui::Text("AMK diagnostics");
+        ImGui::PopFont();
+        ImGui::Separator();
+        ImGui::Spacing();
+
+        printDiagnostic("Left", "inv_L_errorInfo", dataToDisplay);
+        printDiagnostic("Right", "inv_R_errorInfo", dataToDisplay);
         
     } else {
         ImGui::Text("Waiting for data.");

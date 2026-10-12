@@ -29,7 +29,8 @@ enum class ValueFormat : uint8_t {
     EmmaError,    // bitmask -> "ERR_UNDERVOLTAGE | ERR_BSPD"
     InverterFsm,  // 0..8 -> state name
     TractiveFsm,  // 0..9 -> state name
-    EcuMode       // bitmask -> mode name
+    EcuMode,      // bitmask -> mode name
+    InverterDiag  // AMK diagnostic number -> "2347 INVERTER_HW Motor temperature error"
 };
 
 size_t wireSize(WireType type);

@@ -6,6 +6,7 @@
 #include <cstdlib>
 #include <unordered_map>
 #include "Telemetry/data_acquisition/TelemetrySchema.hpp"
+#include "Telemetry/data_acquisition/AmkDiagnostics.hpp"
 
 //==============================================================================
 //  Wire helpers
@@ -153,6 +154,17 @@ static std::vector<FieldDef> fieldsA_v3() {
 }
 
 //==============================================================================
+//  FROZEN LAYOUT: adds the two AMK diagnostic numbers, one per inverter (140 B).
+//==============================================================================
+
+static std::vector<FieldDef> fieldsA_v4() {
+    std::vector<FieldDef> fields = fieldsA_v3();
+    fields.push_back({ "inv_L_errorInfo", WireType::U16, ValueFormat::InverterDiag, 1.0, 0.0, 0 });
+    fields.push_back({ "inv_R_errorInfo", WireType::U16, ValueFormat::InverterDiag, 1.0, 0.0, 0 });
+    return fields;
+}
+
+//==============================================================================
 //  >>>>>>>>>>>>>>>>>>  ADD NEW SENSORS OF PACKET 0xCC HERE  <<<<<<<<<<<<<<<<<<
 //
 //  This is the layout the ECU transmits TODAY. Append one entry, in the exact
@@ -164,6 +176,10 @@ static std::vector<FieldDef> fieldsA_v3() {
 
 static std::vector<FieldDef> fieldsA_current() {
     std::vector<FieldDef> fields = fieldsA_v3();
+
+    // Numero di diagnostica AMK per inverter (0 = nessuna). Vedi AmkDiagnostics.hpp
+    fields.push_back({ "inv_L_errorInfo", WireType::U16, ValueFormat::InverterDiag, 1.0, 0.0, 0 });
+    fields.push_back({ "inv_R_errorInfo", WireType::U16, ValueFormat::InverterDiag, 1.0, 0.0, 0 });
 
     // fields.push_back({ "brake_line_pressure", WireType::U16, ValueFormat::Number, 0.1, 0.0, 1 });
 
@@ -249,6 +265,7 @@ const std::vector<PacketLayout>& TelemetrySchema::layoutsA() {
         // Newest first: detection tries them in this order
         std::vector<PacketLayout> list;
         addLayout(list, "A/current",           0xCC, 0x11, fieldsA_current());
+        addLayout(list, "A/v4 (inverter diag)", 0xCC, 0x11, fieldsA_v4());
         addLayout(list, "A/v3 (IMD)",          0xCC, 0x11, fieldsA_v3());
         addLayout(list, "A/v2 (no IMD)",       0xCC, 0x11, fieldsA_v2());
         addLayout(list, "A/v1 (motor temps)",  0xCC, 0x11, fieldsA_v1());
@@ -431,6 +448,8 @@ std::string TelemetrySchema::formatValue(ValueFormat format, int decimals, doubl
             }
             return "UNKNOWN";
         }
+        case ValueFormat::InverterDiag:
+            return amkDiagToText(static_cast<uint16_t>(value));
         case ValueFormat::Number:
         default: {
             // snprintf on the default "C" locale: always a dot separator, and
@@ -474,6 +493,9 @@ double TelemetrySchema::parseValue(ValueFormat format, const char* text) {
             }
             return 0.0;
         }
+        case ValueFormat::InverterDiag:
+            return static_cast<double>(amkDiagFromText(text));
+
         case ValueFormat::Number:
         default:
             return text ? std::atof(text) : 0.0;
