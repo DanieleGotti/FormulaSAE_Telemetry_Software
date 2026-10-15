@@ -1,4 +1,4 @@
-# <img src="assets/images/icon2.png" height="48" align="top"> FieldKit AI 
+# <img src="assets/images/icon2.png" height="48" align="top"> Formula SAE Telemetry Software
 ### *Data Acquisition and Telemetry System for the ERB 02-EVO Formula SAE Car - 2026*
 
 ## 📈 Overview
